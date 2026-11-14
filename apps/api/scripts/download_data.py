@@ -7,7 +7,10 @@ Sources (docs/data/sources.md):
   https://pgda.gsfc.nasa.gov/products/69), used only by scripts/compare_pgda.py:
   https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/
 
-Usage: uv run python scripts/download_data.py [--no-dem] [--pgda]
+With --ci, only the kernels and the 80 m grid are fetched: enough for every test and the
+end-to-end tests, at half the size.
+
+Usage: uv run python scripts/download_data.py [--no-dem] [--pgda] [--ci]
 """
 
 import argparse
@@ -47,11 +50,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-dem", action="store_true", help="Skip the elevation grids")
     parser.add_argument("--pgda", action="store_true", help="Also get NASA's illumination maps")
+    parser.add_argument("--ci", action="store_true", help="Kernels and the 80 m grid only")
     args = parser.parse_args()
     for name, url in KERNELS.items():
         fetch(url, DATA / "kernels" / name)
     if not args.no_dem:
-        for grid in GRIDS:
+        for grid in GRIDS[:1] if args.ci else GRIDS:
             for ext in ("LBL", "IMG"):
                 fetch(f"{LOLA}/{grid}.{ext}", DATA / "dem" / f"{grid}.{ext}")
     if args.pgda:

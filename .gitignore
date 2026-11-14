@@ -38,3 +38,7 @@ apps/api/app/data/cache/
 
 # next.js generated types
 next-env.d.ts
+
+# playwright
+apps/web/playwright-report/
+apps/web/test-results/

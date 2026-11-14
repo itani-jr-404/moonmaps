@@ -132,15 +132,63 @@ jobs:
         run: uvx ruff format --check .
       - name: Contract is up to date with the API models
         run: uv run python scripts/export_openapi.py --check
-      - name: Test
+      - name: Restore NASA data (JPL kernels and the 80 m LOLA grid)
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/api/app/data/kernels
+            apps/api/app/data/dem
+          key: nasa-data-v1-${{ hashFiles('apps/api/scripts/download_data.py') }}
+      - name: Download NASA data
+        run: uv run python scripts/download_data.py --ci
+      - name: Test (every test must run; none may be skipped)
         run: |
-          set +e
-          if [ -f pyproject.toml ]; then
-            uv run --with pytest pytest -q
-          else
-            .venv/bin/python -m pytest -q
-          fi
-          code=$?
-          # pytest exits with 5 when it finds no tests; that is not a failure yet.
-          if [ "$code" -eq 5 ]; then echo "No tests found."; exit 0; fi
-          exit "$code"
+          uv run pytest -q -rs | tee pytest.out
+          if grep -qi "skipped" pytest.out; then echo "Some tests were skipped."; exit 1; fi
+
+  e2e:
+    name: End-to-end (browser against the real API)
+    needs: changes
+    if: needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_TELEMETRY_DISABLED: '1'
+      CI: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: |
+          pip install --quiet uv
+          (cd apps/api && uv sync)
+          corepack enable
+          pnpm install --frozen-lockfile
+      - name: Restore NASA data (JPL kernels and the 80 m LOLA grid)
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/api/app/data/kernels
+            apps/api/app/data/dem
+          key: nasa-data-v1-${{ hashFiles('apps/api/scripts/download_data.py') }}
+      - name: Download NASA data
+        working-directory: apps/api
+        run: uv run python scripts/download_data.py --ci
+      - name: Build the web app
+        run: pnpm --filter web build
+      - name: Install the browser
+        run: pnpm --filter web exec playwright install --with-deps chromium
+      - name: End-to-end tests
+        run: pnpm --filter web test:e2e
+      - name: Keep the report when a test fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+          retention-days: 14

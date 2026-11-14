@@ -52,7 +52,11 @@ function Fact({
   text: string;
 }) {
   return (
-    <div className={`${styles.fact} ${ok === false ? styles.no : ''}`}>
+    <div
+      className={`${styles.fact} ${ok === false ? styles.no : ''}`}
+      data-testid={`fact-${label === 'Sunlight for power' ? 'sun' : 'earth'}`}
+      data-ok={ok === null ? undefined : String(ok)}
+    >
       <span className={`${styles.icon} ${icon}`} aria-hidden="true" />
       <div>
         <b className={styles.factLabel}>{label}</b>
@@ -101,7 +105,12 @@ export function VerdictCard({
   const state = good === null ? '' : good ? styles.good : styles.bad;
 
   return (
-    <div className={`${styles.card} ${state}`} data-reveal>
+    <div
+      className={`${styles.card} ${state}`}
+      data-reveal
+      data-testid="planner-answer"
+      data-verdict={good === null ? undefined : good ? 'good' : 'bad'}
+    >
       <div className={styles.glow} aria-hidden="true" />
       {isUpdating ? (
         <p className={styles.updating} role="status">

@@ -33,7 +33,11 @@ export function AimCard({ aim }: { aim: AimState }) {
   }, [verdictKey, reduce]);
 
   return (
-    <div className={clsx(styles.card, ok && (good ? styles.good : styles.bad))}>
+    <div
+      className={clsx(styles.card, ok && (good ? styles.good : styles.bad))}
+      data-testid="aim-card"
+      data-verdict={ok ? (good ? 'good' : 'bad') : aim.status}
+    >
       <b>Land here?</b>
       <span
         ref={verdictRef}

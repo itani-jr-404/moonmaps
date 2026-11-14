@@ -40,7 +40,12 @@ export function BestWindows({
       ) : (
         <ol className="mt-5 grid list-none gap-2.5">
           {best.map((w, i) => (
-            <li key={w.start}>
+            <li
+              key={w.start}
+              data-testid="best-window"
+              data-start={w.start}
+              data-end={w.end}
+            >
               <button
                 type="button"
                 onClick={() => onPick(windowJumpTime(w))}

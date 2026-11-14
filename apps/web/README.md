@@ -21,3 +21,5 @@ pnpm lint && pnpm typecheck && pnpm test
 ## More
 
 Layout: [docs/architecture/repository-structure.md](../../docs/architecture/repository-structure.md). Sections, state and data: [docs/frontend/routes-and-state.md](../../docs/frontend/routes-and-state.md). 3D: [docs/frontend/3d-scenes.md](../../docs/frontend/3d-scenes.md). Assets and their credits: [docs/data/sources.md](../../docs/data/sources.md).
+
+End-to-end tests (real browser, real API): `pnpm build && pnpm test:e2e` from `apps/web`. See [docs/developer/testing.md](../../docs/developer/testing.md).

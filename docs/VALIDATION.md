@@ -10,7 +10,7 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 
 | Check | Pass rule | Result | Section |
 | --- | --- | --- | --- |
-| Automated tests, lint, type check, build, contract | All pass | **Pass.** 37 API tests and 32 web tests pass; lint, type check, production build and contract check pass. CI passes on GitHub Actions. | [1](#1-automated-tests) |
+| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 37 API tests (with the NASA data, none skipped), 32 web unit tests and 8 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
 | Sun and Earth positions against NASA JPL Horizons, 2026 | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference 0.0123 degrees | [2](#2-positions-against-nasa-jpl-horizons) |
 | Sun elevation at 16 Apollo moonwalk times (1969 to 1972) against JPL Horizons | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference under 0.005 degrees | [3](#3-past-missions) |
 | Long-term sunlight against NASA Goddard's polar illumination map | Mean absolute difference at most 0.10 and correlation at least 0.90 | **Pass.** Mean absolute difference 0.006, correlation 0.992, over 300 random points | [4](#4-sunlight-and-earth-visibility-against-nasas-polar-maps) |
@@ -19,7 +19,7 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 | Earth to Moon distance against NASA's Moon Fact Sheet | Inside about 357,000 to 407,000 km | **Pass.** 357,284 to 406,607 km over 2027 | [5](#5-physical-checks) |
 | LOLA terrain file read correctly | Layout as in its label; Shackleton crater is a bowl | **Pass** | [6](#6-terrain-and-horizon) |
 | API behaviour | Every endpoint answers; every error code is returned | **Pass.** Single answers took 20 to 41 ms | [7](#7-api-behaviour) |
-| Web app in a browser, desktop and phone width | The screen shows the API's answers; no sideways scrolling on a phone | **Pass.** The screen and the API agree to the minute; the page fits a 390 px wide phone screen | [8](#8-web-app-in-a-browser) |
+| The web app shows exactly what the API returns | Automated browser tests compare every answer on screen with the API response the page received | **Pass.** 8 of 8 browser tests: planner, 30-day calendar, best times, live readout, globe aim and landing, error state, phone width, reduced motion, navigation | [8](#8-web-app-in-a-browser) |
 | Sources | Every number and dataset has a source | **Pass**, with the open items listed in Section 9 | [9](#9-sources) |
 
 ## 1. Automated tests
@@ -35,7 +35,11 @@ pnpm contracts:check                      # API models, openapi.json and api.d.t
 python3 scripts/check_docs_links.py       # 0 broken links
 ```
 
-Continuous integration on GitHub Actions runs the same checks on every change: [run on the pull request](https://github.com/itani-jr-404/moonmaps/actions/runs/43618617734) and [run on `main` after the merge](https://github.com/itani-jr-404/moonmaps/actions/runs/43618742905).
+```bash
+cd apps/web && pnpm build && pnpm test:e2e   # 8 passed: real browser, real API
+```
+
+Continuous integration on GitHub Actions (https://github.com/itani-jr-404/moonmaps/actions/workflows/ci.yml) runs all of these on every change. It downloads the JPL kernels and the 80 m LOLA grid first, so every API test runs there; the job fails if any test is skipped. A separate job builds the web app, starts the API, and runs the browser tests in Chromium.
 
 ### API tests (pytest), 37 passed
 
@@ -230,7 +234,26 @@ Measured on a laptop on 14 November 2026 against the running API (`uv run uvicor
 
 ## 8. Web app in a browser
 
-The production build (`pnpm build`, then `next start`) was opened against the running API on 14 November 2026. The API's log showed every request the page made answered with status 200, and no errors.
+### Automated end-to-end tests
+
+The tests in `apps/web/e2e/` (Playwright, https://playwright.dev/) open the production build of the web app in Chrome, with the real API running on its NASA data. Each test captures the API response the page itself received and checks that the screen shows exactly that answer. The browser runs in Beirut time with British English formats, so times on screen can be compared with the API's UTC times. Any uncaught error in the page fails the test.
+
+| Test | What it proves |
+| --- | --- |
+| Planner opened from a link (`?site=shackleton-ridge&t=2026-11-14T14:56Z`) | The page asks the API about that site and moment. "Good" or "Bad landing site" follows the API's Sun and Earth visibility. The Sun and Earth lines show the API's next sunrise, sunset, earthrise or earthset. Each of the 30 calendar days has the grade that the API's windows give for that local day. Every "best time" lies inside one of the API's windows. The terrain source is shown. |
+| Choosing other sites and a quick date | Clicking Malapert Massif, "In a week" and Apollo 11 each sends a new request and shows its answer, with the same checks. The address updates to the new place. Apollo 11 shows "Smooth Moon: no terrain data at this latitude", as the API reports. |
+| API unreachable | With the API blocked, the planner shows "We could not reach the Moon Maps API" and a "Try again" button. After unblocking, "Try again" loads and shows the correct answer. |
+| Live south pole readout | "Sunlight" and "Earth" in the hero match the API's answer for 89.9 S, 0 E. |
+| Aiming at the globe and landing | Hovering the Moon shows a card whose verdict, "Sunlight right now" and "Can see Earth" match the API answer for that spot. Clicking lands, and the surface panel's verdict matches the API answer for the landed point. "See the best dates" hands the spot to the planner. |
+| Reduced motion | With the system set to reduce motion, there is no intro, the headline and navigation show at once, every scroll-reveal block is fully visible, and the planner works. |
+| Phone width (390 by 844 px, touch) | The page is no wider than the screen, and the planner shows its answer. |
+| Navigation | Each link in the navigation bar brings its section into view. |
+
+Result on 14 November 2026: **8 of 8 pass**, in two consecutive runs. The tests found one real bug, now fixed: after the intro, an invisible 1 px line from the preloader stayed across the middle of the screen and blocked the mouse there.
+
+### Checks by hand
+
+The production build (`pnpm build`, then `next start`) was also opened by hand against the running API on 14 November 2026. The API's log showed every request the page made answered with status 200, and no errors.
 
 | What was checked | Result |
 | --- | --- |
@@ -266,6 +289,7 @@ Screenshots taken during the check:
 | Skyfield (https://rhodesmill.org/skyfield/) | Brandon Rhodes | Reading the kernels; observer on the Moon |
 | CGI Moon Kit (https://svs.gsfc.nasa.gov/4720) | NASA Scientific Visualization Studio | Moon images in the 3D views |
 | NASA 3D Resources (https://science.nasa.gov/3d-resources/) | NASA | Astronaut and lunar module models |
+| Playwright (https://playwright.dev/) | Microsoft | The end-to-end browser tests |
 | Every library, with version and licence | Their authors | Listed in [reference/references.md](reference/references.md) |
 | AI assistance | Anthropic (Claude) | Writing code, tests and documents, reviewed by the team; recorded in [reference/ai-use.md](reference/ai-use.md) |
 
@@ -273,8 +297,8 @@ Open items are listed in [CURRENT_STATE.md](CURRENT_STATE.md#to-confirm-before-r
 
 ## 10. What is not validated yet
 
-- **Reduced-motion mode and full-speed animation.** The browser we tested in slowed animation to about 1.5 frames per second and could not switch on reduced motion. The intro timing, the smoothness of the 3D scenes and the reduced-motion paths were not seen working.
-- **Real phones.** We checked the layout at phone width in a desktop browser, not on a phone.
+- **How smooth it looks.** The automated tests check what the page shows, not how smoothly the 3D scenes and the intro animate. We have not measured frame rates.
+- **Real phones.** The phone-width test runs in a desktop browser set to a phone's size and touch input, not on a phone.
 - **Site coordinates by eye.** We have not opened them in Quickmap or Moon Trek.
 - **Many users at once.** The timings in Section 7 are single requests on a laptop.
 - **The deployed app.** Nothing is deployed yet.

@@ -140,6 +140,7 @@
   background: var(--accent-grad);
   transform: scaleX(0);
   z-index: 45;
+  pointer-events: none;
 }
 
 /* ---------- hero ---------- */
