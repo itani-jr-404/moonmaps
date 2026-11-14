@@ -59,6 +59,8 @@ pnpm --filter web lint && pnpm --filter web typecheck && pnpm --filter web test
 cd apps/api && uv run ruff check . && uv run pytest
 # contract is up to date
 pnpm contracts:check
+# documentation links (works today)
+python3 scripts/check_docs_links.py
 ```
 
 These commands are the planned ones. Update this block when the repository is set up.

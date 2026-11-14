@@ -60,6 +60,7 @@ A pre-commit hook formats and lints staged files. CI rejects unformatted code.
 - A pull request states what changed, how it was tested, and which documents were updated.
 - At least one other person looks at a pull request before it is merged. For engine code, that person re-checks the calculation.
 - `main` is always deployable.
+- `main` cannot be protected on our GitHub plan, so this is a habit, not a lock: never push to `main` directly. Open a pull request and merge it when the checks are green.
 
 ## Tests
 

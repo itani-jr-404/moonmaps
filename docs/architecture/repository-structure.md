@@ -63,6 +63,7 @@ moon-maps/
       openapi.json                exported from the API
       api.d.ts                    generated from openapi.json
   docs/                           these documents
+  scripts/                        repository checks (documentation links)
   .github/workflows/ci.yml
   README.md
   LICENSE
@@ -83,4 +84,4 @@ moon-maps/
 3. Run `openapi-typescript` to rewrite `packages/contracts/api.d.ts`.
 4. The web app imports its types from `packages/contracts`. A breaking change now fails the TypeScript check.
 
-CI runs steps 2 and 3 and fails if the committed files differ from the output.
+Once the export script exists, CI will run steps 2 and 3 and fail if the committed files differ from the output.
