@@ -22,6 +22,10 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | 12 | Assistant | Planned | `POST /assistant/chat` (not built) |
 | 13 | Planner and Explorer modes | Planned | None |
 | 14 | Data export | Planned | `POST /analyze` (built) |
+| 15 | Checks against past landings (judges' feedback) | Started: LCROSS and SLIM checks in [VALIDATION.md](../VALIDATION.md); Apollo and Chandrayaan-3 planned | `GET /sky`, `POST /analyze` (built) |
+| 16 | Earth to Moon distance on screen (judges' feedback) | Planned; the value exists in `GET /scene` | `GET /scene` (built) |
+| 17 | Travel time to the Moon for past missions (judges' feedback) | Planned; each time needs a mission source | None |
+| 18 | Sky forecast for each site: where the Earth and the Sun will be over the coming days (judges' feedback) | Planned; the planner's 30-day calendar already forecasts good windows | `POST /analyze` (built) |
 
 The web app is one page, `/`, with the sections hero, choose a landing, why, planner and about. Its code is in `apps/web/src/features/` (`hero`, `landing`, `why`, `planner`, `about`, `site-chrome`). The "Code" paths in the sections below are planned folders; where a feature is built inside one of the folders above, that folder is where to look. The API side of every built endpoint is described in [backend/api-reference.md](../backend/api-reference.md).
 
