@@ -77,6 +77,9 @@ export function MonthCalendar({
                 key={d.start}
                 type="button"
                 aria-pressed={selected}
+                data-testid="calendar-day"
+                data-kind={d.kind}
+                data-start={d.start}
                 aria-label={label}
                 title={label}
                 onClick={() => onPick(dayJumpTime(d))}

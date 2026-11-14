@@ -59,7 +59,13 @@ export function SurfaceHud({
   }, [reduce]);
 
   return (
-    <div ref={ref} className={styles.hud} data-hud>
+    <div
+      ref={ref}
+      className={styles.hud}
+      data-hud
+      data-testid="surface-hud"
+      data-verdict={ok ? (good ? 'good' : 'bad') : landed.status}
+    >
       <div className={styles.hudTop}>
         <span className={styles.hudTag}>Landed</span>
         <b className="font-mono">{landed.place}</b>

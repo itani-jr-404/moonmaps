@@ -25,6 +25,12 @@ In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-14,
 
 `tests/conftest.py` builds the synthetic grids and a temporary data folder. Tests that need the kernels or the real grid are skipped with a message when the files are missing, so the pure tests always run.
 
+## End-to-end tests (Playwright)
+
+In `apps/web/e2e/`. They open the production build in a real browser with the real API running on its NASA data, capture each API response the page receives, and check that the screen shows exactly that answer: the planner, the 30-day calendar, the best times, the live readout, the globe's aim card and the landed view. They also cover the error state, a phone-size screen, reduced motion and the navigation. Any uncaught page error fails a test.
+
+Run from `apps/web`: `pnpm build && pnpm test:e2e`. Playwright starts the API and the web server itself (`playwright.config.ts`); the API needs `scripts/download_data.py` first. Locally the tests use the installed Chrome; CI installs Playwright's Chromium.
+
 ## Web tests (Vitest)
 
 In `apps/web/src`, next to the code, as `*.test.ts`. Run with `pnpm test` from the root. Vitest uses jsdom (`apps/web/vitest.config.ts`). The web app is being written, so this list changes; today the tests cover:
@@ -74,7 +80,8 @@ The workflow is `.github/workflows/ci.yml` (GitHub Actions, https://docs.github.
 | --- | --- | --- |
 | Documentation links | Always | `python3 scripts/check_docs_links.py`: every relative link in the repository's Markdown files must point at a file that exists. The saved copies of web pages under `research/` are skipped. |
 | Web app | Something changed under `apps/web` or `packages/contracts`, or in the root `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml` | Node 22; `corepack enable` (which reads `packageManager`, pnpm 11.3.0); `pnpm install --frozen-lockfile`; the contract types check; then the web app's `lint`, `typecheck`, `test` and `build` scripts |
-| API | Something changed under `apps/api` | Python 3.12, install with uv, `ruff check`, `ruff format --check`, the contract check (`export_openapi.py --check`), `pytest`. The runner does not download the kernels or grids, so tests that need them are skipped |
+| API | Something changed under `apps/api` | Python 3.12, install with uv, `ruff check`, `ruff format --check`, the contract check (`export_openapi.py --check`), then `download_data.py --ci` (JPL kernels and the 80 m LOLA grid, cached between runs) and `pytest`. The job fails if any test is skipped. |
+| End-to-end | Something changed under `apps/web` or `apps/api` | Installs both sides, downloads the same data, builds the web app, installs Chromium and runs `pnpm --filter web test:e2e`. The report is kept as an artifact when a test fails. |
 
 A change to the workflow file itself runs every job.
 

@@ -88,6 +88,7 @@ Versions are the ones installed from the lock files (`apps/api/uv.lock`, `pnpm-l
 | clsx | 2.1.1 | MIT | Class names | https://github.com/lukeed/clsx |
 | tailwind-merge | 3.7.0 | MIT | Merging Tailwind classes | https://github.com/dcastil/tailwind-merge |
 | Vitest (development) | 5.1.0 | MIT | Tests | https://vitest.dev/ |
+| Playwright, @playwright/test (development) | 1.65.1 | Apache-2.0 | End-to-end browser tests | https://playwright.dev/ |
 | @vitejs/plugin-react (development) | 6.3.0 | MIT | React in Vitest | https://github.com/vitejs/vite-plugin-react |
 | Testing Library for React (development) | 16.3.3 | MIT | Component tests | https://testing-library.com/ |
 | jsdom (development) | 31.0.1 | MIT | Browser environment for tests | https://github.com/jsdom/jsdom |

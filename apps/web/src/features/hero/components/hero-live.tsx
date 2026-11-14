@@ -44,10 +44,19 @@ export function HeroLive({ sky }: { sky: HeroLiveSky }) {
       <div aria-live="polite">
         <b>Right now at the south pole</b>
         <span>
-          Sunlight: <em className={`${styles.sunValue} font-mono`}>{sun}</em>
+          Sunlight:{' '}
+          <em className={`${styles.sunValue} font-mono`} data-testid="live-sun">
+            {sun}
+          </em>
         </span>
         <span>
-          Earth: <em className={`${styles.earthValue} font-mono`}>{earth}</em>
+          Earth:{' '}
+          <em
+            className={`${styles.earthValue} font-mono`}
+            data-testid="live-earth"
+          >
+            {earth}
+          </em>
         </span>
       </div>
       <div>
