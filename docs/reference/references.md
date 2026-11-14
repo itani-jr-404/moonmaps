@@ -23,6 +23,7 @@ Everything the project uses or cites: data, tools, code and reading. Add a line 
 12. NASA Images and Media Usage Guidelines. https://www.nasa.gov/nasa-brand-center/images-and-media/ (read 2026-11-14).
 13. Arizona State University and NASA LRO, Quickmap. https://quickmap.lroc.asu.edu/
 14. NASA, Moon Trek. https://trek.nasa.gov/moon/
+14a. NASA NSSDCA, Moon Fact Sheet, Dr. David R. Williams, last updated 11 January 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html (read 2026-11-14). Used for the distance and radius checks in [VALIDATION.md](../VALIDATION.md).
 
 ## Site coordinates
 

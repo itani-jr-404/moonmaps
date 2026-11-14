@@ -6,7 +6,7 @@ This file says what is real today. Update it in every pull request that builds, 
 
 ## Summary
 
-The API is built for the core calculation: sites, analysis of up to four scenarios, the sky at one moment, the Moon's sub-solar and sub-Earth points, and the comparison with JPL Horizons. The contract is generated from it. The web app is a one-page Next.js port of the team's prototype and is still being written; it reads everything from the API. CI checks the documentation links, the web app, the API and the contract. Nothing is deployed.
+The API is built for the core calculation: sites, analysis of up to four scenarios, the sky at one moment, the Moon's sub-solar and sub-Earth points, and the comparison with JPL Horizons. The contract is generated from it. The web app is a one-page Next.js port of the team's prototype; it reads everything from the API. The evidence that it works, and what is not yet validated, is in [VALIDATION.md](VALIDATION.md). CI checks the documentation links, the web app, the API and the contract. Nothing is deployed.
 
 ## Built
 
@@ -64,6 +64,7 @@ See [decisions/](decisions/README.md) for the reasons.
 | Whether to add a terrain horizon for sites north of 75 S, and from which data | Team | Accuracy for Apollo and other non-polar sites |
 | Textures for the planets other than Earth and Moon, and their licence | Whoever builds a Solar System scene | Solar System scene |
 | Credit lines for the NASA 3D models | Team | About section |
+| Why some curated points (for example `de-gerlache-rim-2`) get little sunlight: local slope, the chosen point, or an error. Needs the comparison with NASA's PGDA illumination maps | Team | Trust in per-site percentages; see [VALIDATION.md](VALIDATION.md#7-year-long-results-and-an-open-finding) |
 
 ## To confirm before relying on it
 

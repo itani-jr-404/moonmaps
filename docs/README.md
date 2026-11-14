@@ -9,6 +9,7 @@ These documents describe what is built and the design we are building towards. [
 | If you want to | Read |
 | --- | --- |
 | Know what exists today | [CURRENT_STATE.md](CURRENT_STATE.md) |
+| See the evidence that it works, with sources | [VALIDATION.md](VALIDATION.md) |
 | Explain the project in one page (features, purpose, what sets it apart) | [product/project-brief.md](product/project-brief.md) |
 | Understand what the app is for | [product/overview.md](product/overview.md) |
 | Understand the whole system in ten minutes | [architecture/system-overview.md](architecture/system-overview.md) |
