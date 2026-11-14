@@ -47,6 +47,7 @@ Everything the project uses or cites: data, tools, code and reading. Add a line 
 | zod | Checking form input | https://zod.dev/ |
 | openapi-typescript | Generating types from the contract | https://openapi-ts.dev/ |
 | Vitest, Testing Library, pytest, ruff, ESLint, Prettier | Tests and code checks | |
+| GitHub Actions (`actions/checkout`, `actions/setup-node`, `actions/setup-python`), uv | Running the checks on every pull request | https://docs.github.com/actions , https://docs.astral.sh/uv/ |
 
 To confirm before submission: the licence of each library, and that each is free to use in an open-source project.
 

@@ -42,15 +42,29 @@ Synthetic grids are built in the tests (a flat plane, a plane with one cone), so
 
 ## Contract check
 
-CI exports the OpenAPI file from the API and regenerates the TypeScript types. If either differs from what is committed, the build fails. This catches a model change that was not followed through.
+Planned, not in CI yet. Once `apps/api/scripts/export_openapi.py` exists, CI will export the OpenAPI file from the API and regenerate the TypeScript types. If either differs from what is committed, the build fails. This catches a model change that was not followed through.
 
 ## What runs when
 
 | When | What |
 | --- | --- |
 | On commit | Format and lint of staged files |
-| On every push and pull request | Lint, type check and tests for both sides; the contract check |
+| On every pull request and every push to `main` | The checks below, run by GitHub Actions |
 | Before a demo or submission | The checklist below, by hand |
+
+## What CI runs
+
+The workflow is `.github/workflows/ci.yml` (GitHub Actions, https://docs.github.com/actions).
+
+| Job | Runs when | Steps |
+| --- | --- | --- |
+| Documentation links | Always | `python3 scripts/check_docs_links.py`: every relative link in the repository's Markdown files must point at a file that exists. The saved copies of web pages under `research/` are skipped. |
+| Web app | Something changed under `apps/web` or `packages/contracts`, and `apps/web/package.json` exists | Install, then the `lint`, `typecheck`, `test` and `build` scripts, each only if the web app defines it. Works with pnpm or npm. |
+| API | Something changed under `apps/api`, and it has a `pyproject.toml` or `requirements.txt` | Install with uv, `ruff check`, `ruff format --check`, `pytest`. Finding no tests is not a failure. |
+
+A change to the workflow file itself runs every job.
+
+`main` cannot be protected on the repository's GitHub plan (GitHub's API refuses branch protection for a private repository on the free plan, checked 2026-11-14), so a red check does not block a merge by itself. The rule is a habit: merge only when the checks are green.
 
 ## Manual checklist before a demo
 

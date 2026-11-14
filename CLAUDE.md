@@ -59,6 +59,7 @@ These are the planned commands. Update this block when the tooling is in place.
 pnpm --filter web lint && pnpm --filter web typecheck && pnpm --filter web test
 cd apps/api && uv run ruff check . && uv run pytest
 pnpm contracts:check
+python3 scripts/check_docs_links.py   # works today
 ```
 
 Then confirm: sources cited, documents updated.

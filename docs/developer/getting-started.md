@@ -98,9 +98,10 @@ pnpm --filter web typecheck
 pnpm --filter web test
 cd apps/api && uv run ruff check . && uv run ruff format --check . && uv run pytest
 pnpm contracts:check
+python3 scripts/check_docs_links.py   # from the repository root
 ```
 
-CI runs the same checks.
+CI runs the lint, type check, test and build steps and the link check on every pull request. See [testing.md](testing.md).
 
 ## Common problems
 

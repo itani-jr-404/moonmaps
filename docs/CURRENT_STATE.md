@@ -1,6 +1,6 @@
 # Current state
 
-Last updated: 2026-11-14, about 15:20 Beirut time.
+Last updated: 2026-11-14, about 16:20 Beirut time.
 
 This file says what is real today. Update it in every pull request that builds, removes or postpones something.
 
@@ -12,7 +12,8 @@ The design is written (these documents) and the repository is set up. A prototyp
 
 | Part | State |
 | --- | --- |
-| Repository | Set up: structure, documents, rules, licence. No CI yet. |
+| Repository | Set up: structure, documents, rules, licence |
+| CI | Runs on every pull request and on `main`. The documentation link check runs now; the web and API checks start by themselves once those folders hold a project. See [developer/testing.md](developer/testing.md). |
 | Web: prototype | Exists outside the repository; to be moved into `apps/web` and described here |
 | API: ephemeris engine | Not started |
 | API: terrain and horizon engine | Not started |

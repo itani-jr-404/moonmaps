@@ -1,0 +1,142 @@
+name: Checks
+
+# Runs on every pull request and on every push to main.
+# The docs job always runs. The web and api jobs run only when their folder
+# changed and the folder already holds a project.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Find what changed
+    runs-on: ubuntu-latest
+    outputs:
+      web: ${{ steps.filter.outputs.web }}
+      api: ${{ steps.filter.outputs.api }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: filter
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            files=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          elif [ -n "$BEFORE" ] && ! echo "$BEFORE" | grep -Eq '^0+$' && git cat-file -e "$BEFORE" 2>/dev/null; then
+            files=$(git diff --name-only "$BEFORE" HEAD)
+          else
+            files=$(git ls-files)
+          fi
+
+          web=false
+          api=false
+          if echo "$files" | grep -Eq '^(apps/web/|packages/contracts/|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|\.github/workflows/)'; then web=true; fi
+          if echo "$files" | grep -Eq '^(apps/api/|\.github/workflows/)'; then api=true; fi
+
+          # Nothing to check until the folder holds a project.
+          [ -f apps/web/package.json ] || web=false
+          if [ ! -f apps/api/pyproject.toml ] && [ ! -f apps/api/requirements.txt ]; then api=false; fi
+
+          echo "web=$web" >> "$GITHUB_OUTPUT"
+          echo "api=$api" >> "$GITHUB_OUTPUT"
+          echo "web: $web, api: $api"
+
+  docs:
+    name: Documentation links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check relative links in Markdown files
+        run: python3 scripts/check_docs_links.py
+
+  web:
+    name: Web app
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: |
+          # Works whether the web app is part of a pnpm workspace or stands alone with pnpm or npm.
+          if [ -f pnpm-lock.yaml ]; then
+            corepack enable && corepack prepare pnpm@9 --activate
+            pnpm install --frozen-lockfile
+            echo "RUN=pnpm --dir apps/web run --if-present" >> "$GITHUB_ENV"
+          elif [ -f apps/web/pnpm-lock.yaml ]; then
+            corepack enable && corepack prepare pnpm@9 --activate
+            pnpm --dir apps/web install --frozen-lockfile
+            echo "RUN=pnpm --dir apps/web run --if-present" >> "$GITHUB_ENV"
+          elif [ -f apps/web/package-lock.json ]; then
+            npm --prefix apps/web ci
+            echo "RUN=npm --prefix apps/web run --if-present" >> "$GITHUB_ENV"
+          else
+            npm --prefix apps/web install
+            echo "RUN=npm --prefix apps/web run --if-present" >> "$GITHUB_ENV"
+          fi
+      - name: Lint
+        run: $RUN lint
+      - name: Type check
+        run: $RUN typecheck
+      - name: Test
+        run: $RUN test
+      - name: Build
+        run: $RUN build
+
+  api:
+    name: API
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install
+        run: |
+          pip install --quiet uv
+          if [ -f pyproject.toml ]; then
+            uv sync
+          else
+            uv venv
+            uv pip install -r requirements.txt pytest
+          fi
+      - name: Lint
+        run: uvx ruff check .
+      - name: Format check
+        run: uvx ruff format --check .
+      - name: Test
+        run: |
+          set +e
+          if [ -f pyproject.toml ]; then
+            uv run --with pytest pytest -q
+          else
+            .venv/bin/python -m pytest -q
+          fi
+          code=$?
+          # pytest exits with 5 when it finds no tests; that is not a failure yet.
+          if [ "$code" -eq 5 ]; then echo "No tests found."; exit 0; fi
+          exit "$code"
