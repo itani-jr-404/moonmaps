@@ -23,6 +23,10 @@ Everything the project uses or cites: data, tools, code and reading. Add a line 
 12. NASA Images and Media Usage Guidelines. https://www.nasa.gov/nasa-brand-center/images-and-media/ (read 2026-11-14).
 13. Arizona State University and NASA LRO, Quickmap. https://quickmap.lroc.asu.edu/
 14. NASA, Moon Trek. https://trek.nasa.gov/moon/
+14b. NASA NSSDCA, Sun Fact Sheet, Dr. David R. Williams, last updated 9 May 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html (read 2026-11-14). The Sun's radius in the comparison with NASA's maps.
+14c. NASA NSSDCA spacecraft pages for Apollo 11, Apollo 15 and Apollo 17 (launch and landing times). https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-096A (read 2026-11-14).
+14d. Brian W. Lawrence, "Sun Angles", Apollo Lunar Surface Journal, last revised 8 February 1999. https://www.apollojournals.org/alsj/sunangles.html (read 2026-11-14).
+14e. LOLA polar illumination and Earth-visibility maps (PGDA product 69): `AVGVISIB_75S_120M_201608` and `AVGVISIB_75S_120M_201608_EARTH`. https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/ (downloaded 2026-11-14).
 14a. NASA NSSDCA, Moon Fact Sheet, Dr. David R. Williams, last updated 11 January 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html (read 2026-11-14). Used for the distance and radius checks in [VALIDATION.md](../VALIDATION.md).
 
 ## Site coordinates
@@ -42,7 +46,7 @@ Every page used for a coordinate or a landing date, with its owner and the date 
 
 ## Papers
 
-22. Mazarico, E., Neumann, G. A., Smith, D. E., Zuber, M. T., Torrence, M. H. (2011). Illumination conditions of the lunar polar regions using LOLA topography. Icarus 211, 1066-1081.
+22. Mazarico, E., Neumann, G. A., Smith, D. E., Zuber, M. T., Torrence, M. H. (2011). Illumination conditions of the lunar polar regions using LOLA topography. Icarus 211, 1066-1081. doi:10.1016/j.icarus.2010.10.030
 
 ## Software
 

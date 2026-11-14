@@ -40,6 +40,8 @@ class SunEarth:
     sun_el: NDArray[np.float64]
     earth_az: NDArray[np.float64]
     earth_el: NDArray[np.float64]
+    sun_km: NDArray[np.float64]
+    earth_km: NDArray[np.float64]
 
 
 @dataclass(frozen=True)
@@ -79,13 +81,15 @@ class Ephemeris:
             self._frame, lat, lon, elevation_m=height_m
         )
         at = site.at(self._times(unix_seconds))
-        s_alt, s_az, _ = at.observe(self._sun).apparent().altaz()
-        e_alt, e_az, _ = at.observe(self._earth).apparent().altaz()
+        s_alt, s_az, s_dist = at.observe(self._sun).apparent().altaz()
+        e_alt, e_az, e_dist = at.observe(self._earth).apparent().altaz()
         return SunEarth(
             sun_az=np.atleast_1d(s_az.degrees),
             sun_el=np.atleast_1d(s_alt.degrees),
             earth_az=np.atleast_1d(e_az.degrees),
             earth_el=np.atleast_1d(e_alt.degrees),
+            sun_km=np.atleast_1d(s_dist.km),
+            earth_km=np.atleast_1d(e_dist.km),
         )
 
     def subpoints(self, unix_second: float) -> SubPoints:

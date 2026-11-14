@@ -10,7 +10,7 @@ Everyone writes at least one test for the code they add. Calculations are also c
 
 ## API tests (pytest)
 
-In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-14, with the data downloaded, 36 tests pass.
+In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-14, with the data downloaded, 37 tests pass.
 
 | File | Tests | Needs data files |
 | --- | --- | --- |
@@ -20,6 +20,7 @@ In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-14,
 | `test_visibility.py` | Clearance uses the terrain in the body's direction; windows with interpolated edges and open at both ends; intersection; metrics for an all-light case and for next events; status thresholds | No |
 | `test_lola_grid.py` | On the real `LDEM_80S_80M`: the label values; Shackleton crater is a deep bowl and its mirror point is not; a point at 75 S is outside the grid | LOLA grid |
 | `test_horizons.py` | Every saved JPL Horizons case is within 0.05 degrees | Kernels |
+| `test_apollo_sun.py` | Our Sun elevation at 16 Apollo moonwalk times (1969 to 1972) is within 0.05 degrees of the saved JPL Horizons values | Kernels |
 | `test_api.py` | Through the FastAPI test client with a synthetic grid: `/health`, `/sites`, `/analyze` for curated and custom sites, with and without the series, its error codes and the four-scenario limit, `/sky` and `/scene`, `/validation` | Kernels |
 
 `tests/conftest.py` builds the synthetic grids and a temporary data folder. Tests that need the kernels or the real grid are skipped with a message when the files are missing, so the pure tests always run.
@@ -37,6 +38,16 @@ In `apps/web/src`, next to the code, as `*.test.ts`. Run with `pnpm test` from t
 | `features/landing/lib` | The verdict for a point and the nearest curated site |
 
 3D scenes are not unit tested; their math helpers are.
+
+## Validation scripts
+
+Run by hand; they need the network or large files, so they are not part of CI. Their results are saved in `apps/api/app/data/validation/` and reported in [VALIDATION.md](../VALIDATION.md).
+
+| Script | What it does |
+| --- | --- |
+| `scripts/fetch_horizons.py` | Saves the 2026 JPL Horizons reference values |
+| `scripts/check_apollo_sun.py` | Compares our Sun elevation at Apollo moonwalk times with the Apollo Lunar Surface Journal and with JPL Horizons, and saves both |
+| `scripts/compare_pgda.py` | Compares our long-term sunlight and Earth-visibility shares at 310 points with NASA Goddard's polar maps; needs `scripts/download_data.py --pgda` |
 
 ## Contract check
 

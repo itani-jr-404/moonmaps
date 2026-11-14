@@ -29,7 +29,7 @@ function useIsClient(): boolean {
 }
 
 const inputCls =
-  'h-[52px] rounded-[14px] border border-line-2 bg-white/[.03] px-3.5 text-base text-ink [color-scheme:dark] focus:border-accent focus:outline-none';
+  'h-[52px] w-full min-w-0 rounded-[14px] border border-line-2 bg-white/[.03] px-3.5 text-base text-ink [color-scheme:dark] focus:border-accent focus:outline-none';
 
 /** Step 2: date and time in the visitor's own time zone, plus quick choices. */
 export function WhenPicker() {
@@ -46,8 +46,8 @@ export function WhenPicker() {
 
   return (
     <PlannerStep n={2} title="When?">
-      <div className="mb-3 grid grid-cols-[1.4fr_1fr] gap-3">
-        <label className="grid gap-1.5 text-xs text-faint">
+      <div className="mb-3 grid grid-cols-1 gap-3 min-[480px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <label className="grid min-w-0 gap-1.5 text-xs text-faint">
           <span>Date</span>
           <input
             type="date"
@@ -56,7 +56,7 @@ export function WhenPicker() {
             onChange={(e) => apply(e.target.value, timeValue(d))}
           />
         </label>
-        <label className="grid gap-1.5 text-xs text-faint">
+        <label className="grid min-w-0 gap-1.5 text-xs text-faint">
           <span>Time</span>
           <input
             type="time"

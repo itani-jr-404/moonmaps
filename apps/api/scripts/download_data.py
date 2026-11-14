@@ -3,8 +3,11 @@
 Sources (docs/data/sources.md):
 - JPL kernels from NAIF: https://naif.jpl.nasa.gov/pub/naif/generic_kernels/
 - LOLA polar elevation grids: https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/
+- With --pgda, NASA Goddard's average sunlight and Earth-visibility maps (PGDA product 69,
+  https://pgda.gsfc.nasa.gov/products/69), used only by scripts/compare_pgda.py:
+  https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/
 
-Usage: uv run python scripts/download_data.py [--no-dem]
+Usage: uv run python scripts/download_data.py [--no-dem] [--pgda]
 """
 
 import argparse
@@ -24,6 +27,8 @@ KERNELS = {
     "pck00008.tpc": f"{NAIF}/pck/a_old_versions/pck00008.tpc",
 }
 GRIDS = ["LDEM_80S_80M", "LDEM_75S_120M"]
+PGDA = "https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG"
+PGDA_MAPS = ["AVGVISIB_75S_120M_201608", "AVGVISIB_75S_120M_201608_EARTH"]
 
 
 def fetch(url: str, target: Path) -> None:
@@ -41,6 +46,7 @@ def fetch(url: str, target: Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-dem", action="store_true", help="Skip the elevation grids")
+    parser.add_argument("--pgda", action="store_true", help="Also get NASA's illumination maps")
     args = parser.parse_args()
     for name, url in KERNELS.items():
         fetch(url, DATA / "kernels" / name)
@@ -48,6 +54,10 @@ def main() -> int:
         for grid in GRIDS:
             for ext in ("LBL", "IMG"):
                 fetch(f"{LOLA}/{grid}.{ext}", DATA / "dem" / f"{grid}.{ext}")
+    if args.pgda:
+        for name in PGDA_MAPS:
+            for ext in ("LBL", "IMG"):
+                fetch(f"{PGDA}/{name}.{ext}", DATA / "dem" / "pgda" / f"{name}.{ext}")
     return 0
 
 

@@ -52,7 +52,11 @@ What agreement to expect:
 - Same order and same broad level: a site the map calls well lit should come out well lit.
 - Not identical numbers. Our range is shorter than 18.6 years, our profile is 1 degree wide, our observer stands 2 m up, and for the Earth we use the centre of the disc while the maps count any part of it.
 
-This check is planned, not built. It will be a script and a table, not a pass or fail test.
+This check is built: `apps/api/scripts/compare_pgda.py` (maps downloaded with `scripts/download_data.py --pgda`). Over 300 random points and 18.6 years, the mean absolute difference from NASA's maps is 0.006 for the Sun and 0.006 for the Earth, with correlations of 0.992 and 0.999, using the maps' "any part of the disc" rule. Results and the pass rule are in [VALIDATION.md](../VALIDATION.md#4-sunlight-and-earth-visibility-against-nasas-polar-maps).
+
+## Check 4: past missions
+
+`apps/api/scripts/check_apollo_sun.py` compares our Sun elevation at 16 Apollo moonwalk times with the Apollo Lunar Surface Journal's table and with JPL Horizons; `tests/test_apollo_sun.py` keeps the Horizons comparison in the test suite. Results are in [VALIDATION.md](../VALIDATION.md#3-past-missions).
 
 ## Check 3: unit tests on the pieces
 
