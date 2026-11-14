@@ -1,0 +1,1314 @@
+{
+  "components": {
+    "schemas": {
+      "AnalyzeRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/Scenario"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Scenarios",
+            "type": "array"
+          }
+        },
+        "required": [
+          "scenarios"
+        ],
+        "title": "AnalyzeRequest",
+        "type": "object"
+      },
+      "AnalyzeResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioResult"
+            },
+            "title": "Results",
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "title": "AnalyzeResponse",
+        "type": "object"
+      },
+      "AtStart": {
+        "additionalProperties": false,
+        "description": "Visibility at the first sample, the moment the scenario asks about.",
+        "properties": {
+          "earth_clearance": {
+            "title": "Earth Clearance",
+            "type": "number"
+          },
+          "earth_visible": {
+            "title": "Earth Visible",
+            "type": "boolean"
+          },
+          "sun_clearance": {
+            "title": "Sun Clearance",
+            "type": "number"
+          },
+          "sun_visible": {
+            "title": "Sun Visible",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "sun_visible",
+          "earth_visible",
+          "sun_clearance",
+          "earth_clearance"
+        ],
+        "title": "AtStart",
+        "type": "object"
+      },
+      "AzEl": {
+        "additionalProperties": false,
+        "properties": {
+          "az": {
+            "title": "Az",
+            "type": "number"
+          },
+          "el": {
+            "title": "El",
+            "type": "number"
+          }
+        },
+        "required": [
+          "az",
+          "el"
+        ],
+        "title": "AzEl",
+        "type": "object"
+      },
+      "BodyInSky": {
+        "additionalProperties": false,
+        "properties": {
+          "az": {
+            "description": "Azimuth, degrees clockwise from north",
+            "title": "Az",
+            "type": "number"
+          },
+          "clearance": {
+            "description": "el minus horizon_el; positive means above the terrain",
+            "title": "Clearance",
+            "type": "number"
+          },
+          "el": {
+            "description": "Elevation above the local horizontal plane, degrees",
+            "title": "El",
+            "type": "number"
+          },
+          "horizon_el": {
+            "description": "Terrain horizon at this azimuth, degrees",
+            "title": "Horizon El",
+            "type": "number"
+          },
+          "visible": {
+            "title": "Visible",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "az",
+          "el",
+          "horizon_el",
+          "clearance",
+          "visible"
+        ],
+        "title": "BodyInSky",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "Health": {
+        "additionalProperties": false,
+        "properties": {
+          "dem": {
+            "description": "Names of the elevation grids that are loaded",
+            "items": {
+              "type": "string"
+            },
+            "title": "Dem",
+            "type": "array"
+          },
+          "kernels": {
+            "title": "Kernels",
+            "type": "boolean"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "kernels",
+          "dem",
+          "version"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "Horizon": {
+        "additionalProperties": false,
+        "properties": {
+          "az_step_deg": {
+            "title": "Az Step Deg",
+            "type": "number"
+          },
+          "elevation_deg": {
+            "description": "Index i is azimuth i * az_step_deg",
+            "items": {
+              "type": "number"
+            },
+            "title": "Elevation Deg",
+            "type": "array"
+          },
+          "site_height_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ground height above the 1737.4 km sphere; null without terrain",
+            "title": "Site Height M"
+          },
+          "source": {
+            "description": "Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)",
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "az_step_deg",
+          "elevation_deg",
+          "source"
+        ],
+        "title": "Horizon",
+        "type": "object"
+      },
+      "Metrics": {
+        "additionalProperties": false,
+        "properties": {
+          "both_fraction": {
+            "title": "Both Fraction",
+            "type": "number"
+          },
+          "earth_visible_fraction": {
+            "title": "Earth Visible Fraction",
+            "type": "number"
+          },
+          "longest_comm_gap_hours": {
+            "title": "Longest Comm Gap Hours",
+            "type": "number"
+          },
+          "longest_dark_hours": {
+            "title": "Longest Dark Hours",
+            "type": "number"
+          },
+          "max_sun_elevation": {
+            "title": "Max Sun Elevation",
+            "type": "number"
+          },
+          "next_earthrise": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Earthrise"
+          },
+          "next_earthset": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Earthset"
+          },
+          "next_sunrise": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Sunrise"
+          },
+          "next_sunset": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Sunset"
+          },
+          "sun_elevation_at_start": {
+            "title": "Sun Elevation At Start",
+            "type": "number"
+          },
+          "sunlight_fraction": {
+            "title": "Sunlight Fraction",
+            "type": "number"
+          }
+        },
+        "required": [
+          "sunlight_fraction",
+          "earth_visible_fraction",
+          "both_fraction",
+          "next_sunset",
+          "next_sunrise",
+          "next_earthset",
+          "next_earthrise",
+          "longest_dark_hours",
+          "longest_comm_gap_hours",
+          "max_sun_elevation",
+          "sun_elevation_at_start"
+        ],
+        "title": "Metrics",
+        "type": "object"
+      },
+      "Scenario": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "format": "date-time",
+            "title": "End",
+            "type": "string"
+          },
+          "include_series": {
+            "default": true,
+            "description": "Leave out the per-sample series to keep the response small",
+            "title": "Include Series",
+            "type": "boolean"
+          },
+          "site": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SiteById"
+              },
+              {
+                "$ref": "#/components/schemas/SiteByCoords"
+              }
+            ],
+            "title": "Site"
+          },
+          "start": {
+            "format": "date-time",
+            "title": "Start",
+            "type": "string"
+          },
+          "step_minutes": {
+            "default": 60,
+            "maximum": 1440.0,
+            "minimum": 5.0,
+            "title": "Step Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "site",
+          "start",
+          "end"
+        ],
+        "title": "Scenario",
+        "type": "object"
+      },
+      "ScenarioResult": {
+        "additionalProperties": false,
+        "properties": {
+          "at_start": {
+            "$ref": "#/components/schemas/AtStart"
+          },
+          "end": {
+            "format": "date-time",
+            "title": "End",
+            "type": "string"
+          },
+          "horizon": {
+            "$ref": "#/components/schemas/Horizon"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          },
+          "series": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Series"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "site": {
+            "$ref": "#/components/schemas/Site"
+          },
+          "start": {
+            "format": "date-time",
+            "title": "Start",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ScenarioStatus"
+          },
+          "step_minutes": {
+            "title": "Step Minutes",
+            "type": "integer"
+          },
+          "windows": {
+            "$ref": "#/components/schemas/Windows"
+          }
+        },
+        "required": [
+          "site",
+          "start",
+          "end",
+          "step_minutes",
+          "horizon",
+          "at_start",
+          "series",
+          "windows",
+          "metrics",
+          "status"
+        ],
+        "title": "ScenarioResult",
+        "type": "object"
+      },
+      "ScenarioStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "comm": {
+            "enum": [
+              "go",
+              "caution",
+              "no-go"
+            ],
+            "title": "Comm",
+            "type": "string"
+          },
+          "power": {
+            "enum": [
+              "go",
+              "caution",
+              "no-go"
+            ],
+            "title": "Power",
+            "type": "string"
+          }
+        },
+        "required": [
+          "power",
+          "comm"
+        ],
+        "title": "ScenarioStatus",
+        "type": "object"
+      },
+      "SceneResponse": {
+        "additionalProperties": false,
+        "description": "Where the Sun and the Earth stand over the Moon at one moment, for the globe's lighting.",
+        "properties": {
+          "earth_distance_km": {
+            "title": "Earth Distance Km",
+            "type": "number"
+          },
+          "subearth_lat": {
+            "title": "Subearth Lat",
+            "type": "number"
+          },
+          "subearth_lon": {
+            "title": "Subearth Lon",
+            "type": "number"
+          },
+          "subsolar_lat": {
+            "title": "Subsolar Lat",
+            "type": "number"
+          },
+          "subsolar_lon": {
+            "title": "Subsolar Lon",
+            "type": "number"
+          },
+          "t": {
+            "format": "date-time",
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "t",
+          "subsolar_lat",
+          "subsolar_lon",
+          "subearth_lat",
+          "subearth_lon",
+          "earth_distance_km"
+        ],
+        "title": "SceneResponse",
+        "type": "object"
+      },
+      "Series": {
+        "additionalProperties": false,
+        "description": "Parallel arrays; index i of every array belongs to time t[i].",
+        "properties": {
+          "earth_az": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Earth Az",
+            "type": "array"
+          },
+          "earth_clearance": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Earth Clearance",
+            "type": "array"
+          },
+          "earth_el": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Earth El",
+            "type": "array"
+          },
+          "earth_visible": {
+            "items": {
+              "type": "boolean"
+            },
+            "title": "Earth Visible",
+            "type": "array"
+          },
+          "sun_az": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Sun Az",
+            "type": "array"
+          },
+          "sun_clearance": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Sun Clearance",
+            "type": "array"
+          },
+          "sun_el": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Sun El",
+            "type": "array"
+          },
+          "sun_visible": {
+            "items": {
+              "type": "boolean"
+            },
+            "title": "Sun Visible",
+            "type": "array"
+          },
+          "t": {
+            "items": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "title": "T",
+            "type": "array"
+          }
+        },
+        "required": [
+          "t",
+          "sun_az",
+          "sun_el",
+          "sun_clearance",
+          "sun_visible",
+          "earth_az",
+          "earth_el",
+          "earth_clearance",
+          "earth_visible"
+        ],
+        "title": "Series",
+        "type": "object"
+      },
+      "Site": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "apollo",
+              "clps",
+              "artemis-candidate",
+              "international",
+              "reference",
+              "custom"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "lat": {
+            "description": "Latitude in degrees, south negative",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "description": "East longitude, -180 to 180",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lon",
+            "type": "number"
+          },
+          "mission_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mission Date"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "lat",
+          "lon",
+          "kind"
+        ],
+        "title": "Site",
+        "type": "object"
+      },
+      "SiteByCoords": {
+        "additionalProperties": false,
+        "properties": {
+          "lat": {
+            "description": "Latitude in degrees, south negative",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "description": "East longitude in degrees, -180 to 360",
+            "maximum": 360.0,
+            "minimum": -180.0,
+            "title": "Lon",
+            "type": "number"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "lat",
+          "lon"
+        ],
+        "title": "SiteByCoords",
+        "type": "object"
+      },
+      "SiteById": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "SiteById",
+        "type": "object"
+      },
+      "SkyResponse": {
+        "additionalProperties": false,
+        "description": "The Sun and the Earth seen from one point at one moment.",
+        "properties": {
+          "earth": {
+            "$ref": "#/components/schemas/BodyInSky"
+          },
+          "horizon_source": {
+            "description": "Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)",
+            "title": "Horizon Source",
+            "type": "string"
+          },
+          "lat": {
+            "description": "Latitude in degrees, south negative",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "description": "East longitude, -180 to 180",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lon",
+            "type": "number"
+          },
+          "sun": {
+            "$ref": "#/components/schemas/BodyInSky"
+          },
+          "t": {
+            "format": "date-time",
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "t",
+          "lat",
+          "lon",
+          "horizon_source",
+          "sun",
+          "earth"
+        ],
+        "title": "SkyResponse",
+        "type": "object"
+      },
+      "ValidationCase": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "enum": [
+              "sun",
+              "earth"
+            ],
+            "title": "Body",
+            "type": "string"
+          },
+          "diff": {
+            "$ref": "#/components/schemas/AzEl"
+          },
+          "horizons": {
+            "$ref": "#/components/schemas/AzEl"
+          },
+          "lat": {
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "title": "Lon",
+            "type": "number"
+          },
+          "ours": {
+            "$ref": "#/components/schemas/AzEl"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "site_name": {
+            "title": "Site Name",
+            "type": "string"
+          },
+          "t": {
+            "format": "date-time",
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "site_name",
+          "lat",
+          "lon",
+          "t",
+          "body",
+          "ours",
+          "horizons",
+          "diff",
+          "passed"
+        ],
+        "title": "ValidationCase",
+        "type": "object"
+      },
+      "ValidationReport": {
+        "additionalProperties": false,
+        "properties": {
+          "all_passed": {
+            "title": "All Passed",
+            "type": "boolean"
+          },
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationCase"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "generated_at": {
+            "description": "When the JPL Horizons values were fetched",
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "horizons_source": {
+            "title": "Horizons Source",
+            "type": "string"
+          },
+          "max_diff_deg": {
+            "title": "Max Diff Deg",
+            "type": "number"
+          },
+          "tolerance_deg": {
+            "title": "Tolerance Deg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "generated_at",
+          "horizons_source",
+          "tolerance_deg",
+          "max_diff_deg",
+          "all_passed",
+          "cases"
+        ],
+        "title": "ValidationReport",
+        "type": "object"
+      },
+      "Window": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "format": "date-time",
+            "title": "End",
+            "type": "string"
+          },
+          "start": {
+            "format": "date-time",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Window",
+        "type": "object"
+      },
+      "Windows": {
+        "additionalProperties": false,
+        "properties": {
+          "both": {
+            "items": {
+              "$ref": "#/components/schemas/Window"
+            },
+            "title": "Both",
+            "type": "array"
+          },
+          "earth": {
+            "items": {
+              "$ref": "#/components/schemas/Window"
+            },
+            "title": "Earth",
+            "type": "array"
+          },
+          "sun": {
+            "items": {
+              "$ref": "#/components/schemas/Window"
+            },
+            "title": "Sun",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sun",
+          "earth",
+          "both"
+        ],
+        "title": "Windows",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Moon Maps API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/analyze": {
+      "post": {
+        "operationId": "analyze_analyze_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyzeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyzeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Analyze",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/scene": {
+      "get": {
+        "operationId": "scene_scene_get",
+        "parameters": [
+          {
+            "description": "UTC time, default now",
+            "in": "query",
+            "name": "t",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UTC time, default now",
+              "title": "T"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SceneResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Scene",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/sites": {
+      "get": {
+        "operationId": "sites_sites_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Site"
+                  },
+                  "title": "Response Sites Sites Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Sites",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sky": {
+      "get": {
+        "operationId": "sky_sky_get",
+        "parameters": [
+          {
+            "description": "Latitude in degrees, south negative",
+            "in": "query",
+            "name": "lat",
+            "required": true,
+            "schema": {
+              "description": "Latitude in degrees, south negative",
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Lat",
+              "type": "number"
+            }
+          },
+          {
+            "description": "East longitude in degrees, -180 to 360",
+            "in": "query",
+            "name": "lon",
+            "required": true,
+            "schema": {
+              "description": "East longitude in degrees, -180 to 360",
+              "maximum": 360,
+              "minimum": -180,
+              "title": "Lon",
+              "type": "number"
+            }
+          },
+          {
+            "description": "UTC time, default now",
+            "in": "query",
+            "name": "t",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "UTC time, default now",
+              "title": "T"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkyResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Sky",
+        "tags": [
+          "analysis"
+        ]
+      }
+    },
+    "/validation": {
+      "get": {
+        "operationId": "validation_validation_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Validation",
+        "tags": [
+          "system"
+        ]
+      }
+    }
+  }
+}

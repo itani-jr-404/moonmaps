@@ -1,0 +1,100 @@
+/* Footer grid and the outlined LUNA watermark. Values copied from the Moon Maps prototype. */
+
+.footer {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--color-line);
+  padding-top: 80px;
+  background: var(--color-bg);
+}
+.grid {
+  display: grid;
+  gap: 48px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1.4fr 1fr 1fr;
+  }
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.logoText {
+  display: flex;
+  flex-direction: column;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.34em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-left: 12px;
+  border-left: 1px solid var(--color-line-2);
+}
+.logoText span:last-child {
+  color: var(--color-accent);
+}
+.blurb {
+  max-width: 34ch;
+  margin-top: 16px;
+  color: var(--color-muted);
+  font-size: 15px;
+}
+
+.col h4 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 24px;
+}
+.col li + li {
+  margin-top: 12px;
+}
+.col a {
+  color: var(--color-muted);
+  font-size: 15px;
+  transition: color 0.4s;
+}
+.col a:hover {
+  color: var(--color-accent-2);
+}
+.note {
+  margin-top: 16px;
+  color: var(--color-faint);
+  font-size: 13px;
+}
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  margin-top: 64px;
+  padding-block: 24px;
+  border-top: 1px solid var(--color-line);
+  font-size: 13px;
+  color: var(--color-faint);
+}
+
+.wmWrap {
+  overflow: hidden;
+  height: clamp(120px, 24vw, 360px);
+}
+.wm {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(160px, 34vw, 520px);
+  line-height: 0.74;
+  text-align: center;
+  letter-spacing: 0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(74 127 212 / 0.35);
+  user-select: none;
+  will-change: transform;
+}

@@ -1,26 +1,37 @@
 # Data sources
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-14.
 
-Every dataset the app uses, where it comes from, how we use it, and how it must be credited. The challenge page lists four resources (JPL Horizons, Quickmap, Moon Trek, the Canadian Space Agency's Moon Exploration portal); we use all four, and the NASA datasets behind them.
+Every dataset the app uses, where it comes from, how we use it, and how it must be credited. The challenge page lists four resources (JPL Horizons, Quickmap, Moon Trek, the Canadian Space Agency's Moon Exploration portal). The "In use now" column says which ones the code uses today.
 
 ## Summary
 
-| Source | Owner | Used for | In the repo? |
-| --- | --- | --- | --- |
-| JPL ephemeris kernels | NASA JPL | Calculating positions live | Downloaded by script |
-| JPL Horizons | NASA JPL | Reference values for testing | Saved results are committed |
-| LOLA elevation grids | NASA LRO | Horizon and 3D terrain | Downloaded by script |
-| PGDA illumination maps | NASA Goddard | Checking our sunlight percentages; optional map layer | Downloaded by script |
-| CGI Moon Kit | NASA SVS | Moon surface map, and global elevation for non-polar sites | Web-size copies committed |
-| Blue Marble | NASA | Earth surface map | Web-size copy committed |
-| Quickmap | Arizona State University, with NASA LRO data | Finding and checking site coordinates; visual comparison | No |
-| Moon Trek | NASA | Visual comparison of terrain and horizons | No |
-| Moon Exploration portal | Canadian Space Agency | Background for site descriptions and the assistant's documents | Our own summaries, with links |
+| Source | Owner | Used for | In use now | In the repo? |
+| --- | --- | --- | --- | --- |
+| JPL ephemeris kernels | NASA JPL (NAIF) | Calculating positions live | Yes | Downloaded by script |
+| JPL Horizons | NASA JPL | Reference values for testing | Yes | Saved results are committed |
+| LOLA elevation grids | NASA LRO | Horizon profiles | Yes | Downloaded by script |
+| CGI Moon Kit | NASA SVS | Moon colour map and a greyscale relief map for the web app's globe | Yes | Web-size copies committed |
+| NASA 3D Resources | NASA | Lunar module, spacesuit and astronaut models in the web app | Yes | Committed |
+| PGDA illumination maps | NASA Goddard | Checking our sunlight percentages | No, planned | No |
+| Blue Marble | NASA | Earth surface map | No, planned | No |
+| Quickmap | Arizona State University, with NASA LRO data | Checking site coordinates by hand | Not yet (the check is still to do) | No |
+| Moon Trek | NASA | Visual comparison of terrain and horizons | No | No |
+| Moon Exploration portal | Canadian Space Agency | Background for site descriptions and the assistant's documents | No | No |
+| LROC, USGS, IAU and arXiv pages | Various | Site coordinates | Yes | Values in `sites.json`, sources in [research/site-coordinates.md](../../research/site-coordinates.md) |
 
 ## JPL ephemeris kernels
 
-Read by Skyfield. File names and what each is for are in [science/conventions-and-ephemeris.md](../science/conventions-and-ephemeris.md). Skyfield downloads them on first use; `scripts/download_data.py` does this ahead of time and puts them in `app/data/kernels/`.
+Read by Skyfield. What each is for is in [science/conventions-and-ephemeris.md](../science/conventions-and-ephemeris.md). `apps/api/scripts/download_data.py` downloads them from NASA's NAIF generic kernels (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/) into `apps/api/app/data/kernels/`. The API does not download anything at run time.
+
+| File | Address | Size |
+| --- | --- | --- |
+| `de421.bsp` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/a_old_versions/de421.bsp | 16,790,528 bytes |
+| `moon_pa_de421_1900-2050.bpc` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/moon_pa_de421_1900-2050.bpc | 1,770,496 bytes |
+| `moon_080317.tf` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/fk/satellites/moon_080317.tf | 21,437 bytes |
+| `pck00008.tpc` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/a_old_versions/pck00008.tpc | 111,586 bytes |
+
+Sizes are of the files downloaded on 2026-11-14.
 
 ## JPL Horizons
 
@@ -44,6 +55,8 @@ https://ssd.jpl.nasa.gov/api/horizons.api?format=text
 
 Result of that test: the Sun at about 1.51 to 1.52 degrees elevation, azimuth 114.4 falling to 112.9 degrees, from 00:00 to 03:00 UT. The response header states the ephemeris used, that no atmospheric refraction is applied, and that the Moon is treated as a sphere of radius 1737.4 km.
 
+`apps/api/scripts/fetch_horizons.py` makes the same kind of call with `format=json`, `ANG_FORMAT='DEG'` and `CSV_FORMAT='YES'` for 16 cases and saves them in `apps/api/app/data/validation/horizons.json` (fetched 2026-11-14). See [science/validation.md](../science/validation.md).
+
 Two things to remember:
 
 - Horizons has no terrain. Its sunrise and sunset are for a smooth ball.
@@ -63,7 +76,18 @@ Browse: https://imbrium.mit.edu/BROWSE/LOLA_GDR/POLAR/SOUTH_POLE . Download patt
 | `LDEM_85S_20M` | 85 S to the pole | 20 | 439 MB |
 | `LDEM_875S_5M` | 87.5 S to the pole | 5 | 1756 MB |
 
-We use `LDEM_80S_80M` by default, and `LDEM_75S_120M` for sites a little farther north. The finer grids cover too small an area for horizons, which are set by mountains tens of kilometres away. The `.LBL` file describes the layout; see the "to confirm" list in [science/terrain-and-horizon.md](../science/terrain-and-horizon.md).
+We use `LDEM_80S_80M` first and `LDEM_75S_120M` where the first does not reach. The finer grids cover too small an area for horizons, which are set by mountains tens of kilometres away. The `.LBL` file describes the layout; the values we read from it are in [science/terrain-and-horizon.md](../science/terrain-and-horizon.md).
+
+Downloaded on 2026-11-14 by `apps/api/scripts/download_data.py` into `apps/api/app/data/dem/`:
+
+| File | Size |
+| --- | --- |
+| `LDEM_80S_80M.IMG` | 115,520,000 bytes (7600 x 7600 x 2) |
+| `LDEM_80S_80M.LBL` | 4,986 bytes |
+| `LDEM_75S_120M.IMG` | 116,250,752 bytes (7624 x 7624 x 2) |
+| `LDEM_75S_120M.LBL` | 4,991 bytes |
+
+The labels give the product creation time as 2017-06-15. A credit line for LOLA data is to confirm; until then we name the instrument, the mission and NASA.
 
 NASA Goddard's PGDA group also publishes 5 m per pixel models of named south pole sites (20 km squares) at https://pgda.gsfc.nasa.gov/products/78 . They are useful for the site list and for close-up views, not for horizons.
 
@@ -73,22 +97,38 @@ https://pgda.gsfc.nasa.gov/products/69 (Mazarico et al., 2011, Icarus 211, 1066-
 
 Maps of the lunar poles giving the average share of time the Sun is visible, the permanently shadowed areas, and the average share of time the Earth is visible, averaged over 18.6 years. Available at 240 m (65 S to the pole), 120 m (75 S) and 60 m (85 S), as GeoTIFF among other formats.
 
-They are long-term averages, so they cannot answer "what about this date". We use them to check that our terrain step gives sensible percentages, and possibly as a coloured layer on the Moon globe.
+They are long-term averages, so they cannot answer "what about this date". The plan is to use them to check that our terrain step gives sensible percentages. Not downloaded yet.
 
 The Earth counts as visible in these maps when any part of its disc shows. Ours uses the centre of the disc. See [science/visibility-and-metrics.md](../science/visibility-and-metrics.md).
 
 ## CGI Moon Kit
 
-https://svs.gsfc.nasa.gov/4720 . Credit line required by the page: NASA's Scientific Visualization Studio.
+https://svs.gsfc.nasa.gov/4720 . Credit line required by the page: "NASA's Scientific Visualization Studio".
 
-- Color maps of the whole Moon from LRO (`lroc_color_poles_*`), in several sizes. Longitude 0 is at the centre of the image.
-- Elevation maps of the whole Moon (`ldem_4`, `ldem_16`, `ldem_64`, in pixels per degree).
+The web app uses two files from the kit, committed in `apps/web/public/textures/`:
 
-We use the color map on the Moon globe and the landing page, and the elevation map for relief shading and for the horizon at non-polar sites. To confirm: the units and layout of the elevation files, from the kit's page.
+| File | Size | What it is | Credit line |
+| --- | --- | --- | --- |
+| `lroc_color_2k.jpg` | 457,942 bytes, 2048 x 1024 | Colour map of the whole Moon from the LROC WAC colour mosaic | NASA's Scientific Visualization Studio |
+| `ldem_3_8bit.jpg` | 111,552 bytes, 1024 x 512, greyscale | 8-bit relief map from LOLA, used for shading only | NASA's Scientific Visualization Studio |
+
+Download addresses, checksums and the quoted usage terms are in [research/web-assets.md](../../research/web-assets.md). The height scale of `ldem_3_8bit.jpg` is to confirm; it is not used for any number. The kit's elevation maps are not used for horizons.
+
+## NASA 3D Resources
+
+https://science.nasa.gov/3d-resources/ . The page says "All of these assets are free to download and use" (read 2026-11-14). Committed in `apps/web/public/models/`:
+
+| File | Size | Source page | Credit line |
+| --- | --- | --- | --- |
+| `LunarModule.glb` | 716,840 bytes | https://science.nasa.gov/3d-resources/apollo-lunar-module/ | "NASA/Michael D. Carbajal, via NASA 3D Resources" (our wording, to confirm) |
+| `Z2Spacesuit.glb` | 804,312 bytes, compressed by us from 16,933,148 bytes with glTF-Transform | https://science.nasa.gov/3d-resources/z2-spacesuit/ | "NASA/LaRC/Advanced Concepts Lab, via NASA 3D Resources" (our wording, to confirm) |
+| `Astronaut.glb` | 762,988 bytes | https://science.nasa.gov/3d-resources/astronaut/ | "DigitalSpace Corporation, via NASA 3D Resources" (our wording, to confirm; the named source is not NASA, so its terms are to confirm before wide use) |
+
+The pages give no credit line, and NASA's media guidelines ask that NASA be acknowledged as the source. Details, checksums and the compression command are in [research/web-assets.md](../../research/web-assets.md).
 
 ## Blue Marble
 
-https://visibleearth.nasa.gov/collection/1484/blue-marble . NASA's composite images of the Earth. Used as the Earth's surface in the 3D scenes.
+https://visibleearth.nasa.gov/collection/1484/blue-marble . NASA's composite images of the Earth. Planned for an Earth surface in the 3D scenes; not downloaded yet.
 
 ## Planet textures
 
@@ -99,24 +139,25 @@ Not chosen. Requirements: free to use, credited in [reference/references.md](../
 - Quickmap: https://quickmap.lroc.asu.edu/
 - Moon Trek: https://trek.nasa.gov/moon/
 
-We do not pull data from these at run time. We use them by hand: to find and confirm site coordinates, and to compare our terrain and horizons with theirs. Screenshots are used only with attribution.
+We do not pull data from these at run time. The plan is to use them by hand: to confirm site coordinates, and to compare our terrain and horizons with theirs. Neither check has been done yet. Screenshots are used only with attribution.
 
 ## Canadian Space Agency: Moon Exploration
 
 https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/
 
-Background on past, current and future Moon missions. We write our own short summaries for the site descriptions and the assistant's `missions.md`, each with a link back to the page it came from. Follow the site's terms of use.
+Background on past, current and future Moon missions. Planned for our own short summaries in site descriptions and the assistant's documents, each with a link back to the page it came from. Not used yet. Follow the site's terms of use.
 
 ## Size and storage
 
 | Item | Size | Where |
 | --- | --- | --- |
-| Kernels | About 20 MB | `app/data/kernels/`, not in git |
-| Two elevation grids | About 220 MB | `app/data/dem/`, not in git |
-| Horizon cache | A few KB per site | `app/data/cache/`, not in git |
-| Web textures | A few MB each | `apps/web/public/textures/`, in git |
-| Saved Horizons results | A few KB | `app/data/validation/`, in git |
+| Kernels | About 18.7 MB | `apps/api/app/data/kernels/`, not in git |
+| Two elevation grids | About 232 MB | `apps/api/app/data/dem/`, not in git |
+| Horizon cache | One small `.npz` file per point | `apps/api/app/data/cache/horizon/`, not in git |
+| Saved Horizons results | 3,712 bytes | `apps/api/app/data/validation/horizons.json`, in git |
+| Web textures | About 0.57 MB | `apps/web/public/textures/`, in git |
+| 3D models | About 2.3 MB | `apps/web/public/models/`, in git |
 
 ## Credits shown in the app
 
-The About page lists every source above with its owner and a link. The footer of the app carries a short data credit. NASA does not endorse this project, and the app says so.
+The footer of the web app carries a short data credit (NASA's Scientific Visualization Studio, NASA LRO LOLA, NASA JPL Horizons) and says that NASA does not endorse this project. A full list of every source above in the app, and the credit lines for the 3D models, are still to add.

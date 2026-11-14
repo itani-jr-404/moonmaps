@@ -35,3 +35,6 @@ apps/api/app/data/cache/
 *.bsp
 *.bpc
 *.IMG
+
+# next.js generated types
+next-env.d.ts

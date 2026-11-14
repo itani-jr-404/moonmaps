@@ -1,6 +1,6 @@
 # Sites
 
-Status: Design. Last updated: 2026-11-14.
+Status: Built. Last updated: 2026-11-14.
 
 The curated site list is one file, `apps/api/app/data/sites.json`. The API serves it at `GET /sites`. It is the only place site coordinates are defined.
 
@@ -12,7 +12,7 @@ The curated site list is one file, `apps/api/app/data/sites.json`. The API serve
 | `name` | string | As the mission or the IAU names it |
 | `lat` | number | Degrees, -90 to 90 |
 | `lon` | number | Degrees, east-positive, -180 to 180 |
-| `kind` | string | `apollo`, `clps`, `artemis-candidate`, `international`, `reference` |
+| `kind` | string | `apollo`, `clps`, `artemis-candidate`, `international`, `reference`. The API also uses `custom` for a point given by coordinates; it never appears in the file |
 | `description` | string | One or two plain sentences: what it is and why it matters |
 | `source_url` | string | Where the coordinates came from |
 | `mission_date` | string, optional | Landing date for past missions |
@@ -24,8 +24,8 @@ The curated site list is one file, `apps/api/app/data/sites.json`. The API serve
   "lat": 0.67416,
   "lon": 23.47314,
   "kind": "apollo",
-  "description": "First crewed landing on the Moon, July 1969.",
-  "source_url": "https://...",
+  "description": "...",
+  "source_url": "https://lroc.im-ldi.com/images/938",
   "mission_date": "1969-07-20"
 }
 ```
@@ -38,33 +38,47 @@ The curated site list is one file, `apps/api/app/data/sites.json`. The API serve
 4. For a region (an Artemis candidate region is an area, not a point), choose one representative point, say so in the description, and prefer the point a published study uses.
 5. A site with no terrain grid available still goes in; the app will say the horizon is a smooth Moon.
 
-## What the list should contain
+## The list today
 
-The challenge asks for "past Apollo missions, future CLPS mission targets, targets of other commercial lunar missions, or landing sites from other countries' lunar programs". Target: 12 to 20 sites.
+17 sites, in `apps/api/app/data/sites.json`. The source of every coordinate, the title and owner of the page, the date it was read and any conversion are in [research/site-coordinates.md](../../research/site-coordinates.md).
 
-| Kind | Examples to include |
-| --- | --- |
-| `artemis-candidate` | The named south pole regions NASA has published as candidates, such as Malapert massif, de Gerlache rim, Nobile rim, the ridge between Shackleton and de Gerlache, Haworth, Amundsen rim |
-| `clps` | South pole CLPS landing sites and targets |
-| `international` | South pole or high-latitude landings by other countries, such as India's Chandrayaan-3 |
-| `apollo` | Two or three Apollo sites, for contrast: the Sun gets high there and the Earth stays put |
-| `reference` | A point very close to the pole, used by the accuracy page |
+| id | Name | Latitude | Longitude | Kind |
+| --- | --- | --- | --- | --- |
+| `shackleton-ridge` | Shackleton–de Gerlache connecting ridge | -89.684 | -163.261 | artemis-candidate |
+| `malapert-massif` | Malapert Massif | -86.0 | 0.0 | artemis-candidate |
+| `haworth` | Haworth | -86.8 | -22.0 | artemis-candidate |
+| `mons-mouton` | Mons Mouton | -84.6 | 31.0 | artemis-candidate |
+| `nobile-rim-2` | Nobile Rim 2 | -84.20156 | 60.69989 | artemis-candidate |
+| `de-gerlache-rim-2` | de Gerlache Rim 2 | -88.51566 | -61.16732 | artemis-candidate |
+| `amundsen-rim` | Amundsen Rim | -84.19184 | 67.22904 | artemis-candidate |
+| `cabeus-lcross` | Cabeus, LCROSS Centaur impact point | -84.6796 | -48.7093 | reference |
+| `south-pole-reference` | Near south pole reference point | -89.9 | 0.0 | reference |
+| `im-2` | IM-2 Athena, Mons Mouton | -84.7906 | 29.1957 | clps |
+| `chandrayaan-3` | Chandrayaan-3 Vikram lander | -69.3741 | 32.32 | international |
+| `apollo-11` | Apollo 11, Tranquility Base | 0.67416 | 23.47314 | apollo |
+| `apollo-15` | Apollo 15, Hadley-Apennine | 26.13239 | 3.6333 | apollo |
+| `apollo-17` | Apollo 17, Taurus-Littrow | 20.1911 | 30.7723 | apollo |
+| `slim` | SLIM, near Shioli crater | -13.316 | 25.251 | international |
+| `change-4` | Chang'e 4, Von Kármán crater | -45.457 | 177.589 | international |
+| `change-6` | Chang'e 6, Apollo basin | -41.6385 | -153.9852 | international |
 
-NASA Goddard's 5 m site models (https://pgda.gsfc.nasa.gov/products/78) give named south pole sites with their locations, and are a good primary source for the polar entries.
+The 10 sites south of 80 S have a terrain horizon from the 80 m LOLA grid (`lola-80s-80m`). The other 7 (Chandrayaan-3, the three Apollo sites, SLIM and both Chang'e sites) are north of 75 S and use a smooth Moon (`sphere`); see [science/terrain-and-horizon.md](../science/terrain-and-horizon.md).
 
-## Starter values, to confirm
+Still to confirm:
 
-These are from memory and must be checked against a primary source before they go into `sites.json`.
+- None of the points has been opened in Quickmap yet (step 3 of the rules above).
+- The de Gerlache Rim 2 longitude is read as west from a letter "O" in the source table.
+- Nobile Rim 2, de Gerlache Rim 2 and Amundsen Rim are the best-ranked points of one published study, not points NASA chose.
+- `cabeus-lcross` is filed as `reference` because no kind fits an impact point.
+- Whether the landing dates of some international and CLPS sites are UTC dates.
 
-| Site | Latitude | Longitude | Note |
-| --- | --- | --- | --- |
-| Apollo 11 | 0.674 | 23.473 | LRO-derived position |
-| Apollo 15 | 26.132 | 3.634 | |
-| Apollo 17 | 20.191 | 30.772 | |
-| Chandrayaan-3 | -69.37 | 32.32 | Landed August 2023 |
-| Shackleton crater, centre | -89.67 | 129.78 | The crater floor is permanently dark; the rim is the candidate area |
+The details of each doubt are in [research/site-coordinates.md](../../research/site-coordinates.md).
+
+## Shackleton crater test point
+
+`apps/api/tests/test_lola_grid.py` uses 89.67 S, 129.78 E as the position of Shackleton crater, to check that the projection is not mirrored. That value was written from memory and its source is to confirm. The test does not depend on its exact value: it only needs a point inside the crater.
 
 ## Generated outputs
 
-- `scripts/precompute_horizons.py` reads `sites.json` and builds the horizon profile of every site.
-- The assistant's `knowledge/sites.md` is generated from `sites.json`, so the assistant and the app never disagree about a site.
+- `apps/api/scripts/precompute_horizons.py` reads `sites.json` and builds the horizon profile of every site.
+- Planned: the assistant's `knowledge/sites.md`, generated from `sites.json`, so the assistant and the app never disagree about a site.

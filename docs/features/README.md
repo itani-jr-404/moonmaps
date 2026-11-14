@@ -8,20 +8,22 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 
 | # | Feature | Status | Depends on |
 | --- | --- | --- | --- |
-| 1 | Site list and custom coordinates | Planned | `GET /sites` |
-| 2 | Date range and time slider | Planned | None |
-| 3 | Horizon panorama | Planned | `POST /analyze` |
-| 4 | Timeline | Planned | `POST /analyze` |
-| 5 | Power and communication metrics | Planned | `POST /analyze` |
-| 6 | Comparison | Planned | `POST /analyze` |
-| 7 | Accuracy page | Planned | `GET /validation` |
-| 8 | Moon globe | Planned | `GET /sites`, `GET /scene` |
-| 9 | Site view in 3D | Planned | `GET /terrain`, `POST /analyze` |
-| 10 | Solar System view | Planned | `GET /scene` |
-| 11 | Landing page | Planned | None |
-| 12 | Assistant | Planned | `POST /assistant/chat` |
+| 1 | Site list and custom coordinates | Building: site picker in the planner, and choosing a point on the globe | `GET /sites` (built) |
+| 2 | Date range and time slider | Building: the planner's moment picker; no range slider yet | None |
+| 3 | Horizon panorama | Planned | `POST /analyze` (built) |
+| 4 | Timeline | Building: a 30-day calendar and the best windows in the planner, instead of bars | `POST /analyze` (built) |
+| 5 | Power and communication metrics | Building: the planner's verdict | `POST /analyze` (built) |
+| 6 | Comparison | Planned | `POST /analyze` (built) |
+| 7 | Accuracy page | Planned | `GET /validation` (built) |
+| 8 | Moon globe | Building: the globe in "choose a landing" | `GET /sites`, `GET /sky` (built) |
+| 9 | Site view in 3D | Building: surface view and planner diorama with decorative ground; real terrain planned | `GET /sky` (built), `GET /terrain` (not built) |
+| 10 | Solar System view | Planned | Planet positions in `GET /scene` (not built) |
+| 11 | Landing page | Building: hero, why and about sections on the one page | None |
+| 12 | Assistant | Planned | `POST /assistant/chat` (not built) |
 | 13 | Planner and Explorer modes | Planned | None |
-| 14 | Data export | Planned | `POST /analyze` |
+| 14 | Data export | Planned | `POST /analyze` (built) |
+
+The web app is one page, `/`, with the sections hero, choose a landing, why, planner and about. Its code is in `apps/web/src/features/` (`hero`, `landing`, `why`, `planner`, `about`, `site-chrome`). The "Code" paths in the sections below are planned folders; where a feature is built inside one of the folders above, that folder is where to look. The API side of every built endpoint is described in [backend/api-reference.md](../backend/api-reference.md).
 
 Features 1 to 5 are the core path. With only those, a user can pick a site and a date and read the answer.
 
@@ -114,7 +116,7 @@ Done when: clicking a pin selects that site, clicking elsewhere creates a custom
 
 The terrain around the site with moving shadows.
 
-Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md), scene 3. Code: `features/site-view`.
+Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md). Planned code: `features/site-view`.
 
 Done when: the shadows move with the slider, and the scene goes dark at the times the metrics say the Sun is hidden.
 

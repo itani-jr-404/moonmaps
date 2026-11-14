@@ -1,0 +1,156 @@
+/* The answer card. Values copied from the prototype's .pl-res styles. */
+
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid var(--color-line-2);
+  background: #05080f;
+  transition:
+    background-color 0.8s var(--ease),
+    border-color 0.8s var(--ease),
+    box-shadow 0.8s var(--ease);
+}
+.card > *:not(.glow) {
+  position: relative;
+}
+
+.glow {
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(
+    closest-side,
+    rgba(98, 214, 160, 0.45),
+    rgba(98, 214, 160, 0)
+  );
+  opacity: 0;
+  transition: opacity 0.9s var(--ease);
+  pointer-events: none;
+}
+
+.kicker {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+.where {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+.when {
+  font-size: 15px;
+  color: var(--color-muted);
+}
+.verdict {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(40px, 5.2vw, 76px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  margin: 28px 0 12px;
+  transition:
+    color 0.6s,
+    text-shadow 0.6s;
+}
+.why {
+  font-size: 17px;
+  max-width: 44ch;
+  color: var(--color-muted);
+}
+
+.facts {
+  display: grid;
+  gap: 12px;
+  margin-top: 28px;
+}
+.fact {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-line);
+}
+.factLabel {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-faint);
+  letter-spacing: 0.04em;
+}
+.factText {
+  font-size: 16px;
+  color: var(--color-ink);
+}
+.fact.no .factText {
+  color: var(--color-faint);
+}
+.icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: relative;
+}
+.iconSun {
+  background: radial-gradient(
+    circle,
+    #fff3cf 0 30%,
+    #ffc36b 31% 55%,
+    rgba(255, 195, 107, 0) 72%
+  );
+}
+.iconEarth {
+  background: radial-gradient(circle at 35% 35%, #9ae6dc, #2a6fb0 55%, #0b2546);
+}
+.fact.no .icon {
+  filter: grayscale(1) brightness(0.45);
+}
+
+/* GOOD: bright */
+.good {
+  background: linear-gradient(160deg, #123a2e, #0c2a3a 60%, #0e1f3c);
+  border-color: rgba(98, 214, 160, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(98, 214, 160, 0.25),
+    0 30px 90px -20px rgba(98, 214, 160, 0.45);
+}
+.good .glow {
+  opacity: 1;
+}
+.good .verdict {
+  color: #eafff6;
+  text-shadow:
+    0 0 22px rgba(98, 214, 160, 0.9),
+    0 0 60px rgba(98, 214, 160, 0.5);
+}
+
+/* BAD: dark */
+.bad {
+  background: #030407;
+  border-color: rgba(232, 130, 106, 0.35);
+}
+.bad .verdict {
+  color: var(--color-warn);
+  text-shadow: none;
+}
+.bad .why,
+.bad .when {
+  color: rgba(232, 238, 248, 0.45);
+}
+
+.card > .updating {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  font-size: 12px;
+  color: var(--color-faint);
+}

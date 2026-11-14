@@ -1,0 +1,6 @@
+packages/contracts/
+pnpm-lock.yaml
+apps/api/
+research/
+docs/
+*.md

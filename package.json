@@ -1,0 +1,35 @@
+{
+  "name": "moon-maps",
+  "private": true,
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@11.3.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "lint": "pnpm --filter web lint",
+    "typecheck": "pnpm --filter web typecheck",
+    "test": "pnpm --filter web test",
+    "contracts:generate": "cd apps/api && uv run python scripts/export_openapi.py && cd ../.. && pnpm --filter @moon-maps/contracts generate",
+    "contracts:check": "cd apps/api && uv run python scripts/export_openapi.py --check && cd ../.. && pnpm --filter @moon-maps/contracts check",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.10.1",
+    "prettier-plugin-tailwindcss": "^0.8.1"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{ts,tsx}": [
+      "prettier --write",
+      "pnpm --filter web exec eslint --fix --no-warn-ignored"
+    ],
+    "apps/web/**/*.{css,json,md}": "prettier --write",
+    "apps/api/**/*.py": [
+      "sh -c 'cd apps/api && uv run ruff format . && uv run ruff check --fix .'"
+    ]
+  }
+}

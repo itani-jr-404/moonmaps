@@ -1,12 +1,12 @@
 # AI context
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-14.
 
 Read this first if you are an AI coding tool working in this repository. It is short on purpose. Follow the links for detail.
 
 ## Project in one paragraph
 
-Moon Maps answers one question: for a given place on the Moon and a given time range, when is the Sun above the local terrain horizon (power) and when is the Earth above it (direct radio link)? A Python API computes the positions of the Sun and the Earth as seen from the site, builds the terrain horizon from NASA elevation data, and returns time series, windows and metrics. A Next.js app shows the result in 3D scenes, a horizon panorama, a timeline and a comparison view, and includes a chat assistant that answers from a small knowledge base and from the API.
+Moon Maps answers one question: for a given place on the Moon and a given time range, when is the Sun above the local terrain horizon (power) and when is the Earth above it (direct radio link)? A Python API computes the positions of the Sun and the Earth as seen from the site, builds the terrain horizon from NASA elevation data, and returns time series, windows and metrics. A Next.js app shows the result on one page with 3D scenes, a verdict, a 30-day calendar and the best windows. A horizon panorama, a comparison view and a chat assistant are planned.
 
 ## Rules that must not be broken
 
@@ -25,10 +25,11 @@ The two standing rules of the repository are in [CLAUDE.md](../CLAUDE.md): **cit
 
 ## Architecture at a glance
 
-- `apps/web`: Next.js 16, React 19, TypeScript, Tailwind CSS v4, shadcn/ui, three.js through React Three Fiber.
-- `apps/api`: Python 3.12, FastAPI, Pydantic, Skyfield, numpy.
-- `packages/contracts`: `openapi.json` and the generated TypeScript types.
-- No database. Site list in a JSON file, horizon profiles cached on disk.
+- `apps/web`: Next.js 16, React 19, TypeScript 5.9, Tailwind CSS v4 (tokens in `src/app/globals.css`) with CSS modules for complex effects, three.js used directly (not React Three Fiber), GSAP and Lenis, TanStack Query over `openapi-fetch`, zustand. No shadcn/ui, no Chart.js. One page, `/`.
+- `apps/api`: Python 3.12 with uv, FastAPI, Pydantic, Skyfield, numpy. Routers `system`, `sites`, `analysis`; services `sites`, `horizons`, `analysis`, `sky`, `validation`; engines `ephemeris`, `terrain`, `horizon`, `visibility`.
+- `packages/contracts`: `openapi.json` exported from the API and `api.d.ts` generated from it.
+- No database. Site list in a JSON file, horizon profiles cached in memory and on disk.
+- Endpoints built: `/health`, `/sites`, `/analyze`, `/sky`, `/scene`, `/validation`. Not built: `/terrain`, `/assistant/chat`.
 
 ## Where to look for a task
 
@@ -46,21 +47,19 @@ The two standing rules of the repository are in [CLAUDE.md](../CLAUDE.md): **cit
 
 ## Cautions
 
-- These docs describe a design. Check [CURRENT_STATE.md](CURRENT_STATE.md) before assuming a file or endpoint exists.
+- Some docs describe parts that are planned, not built. Check [CURRENT_STATE.md](CURRENT_STATE.md) before assuming a file or endpoint exists.
 - Items marked "to confirm" have not been checked against the real file or library. Confirm them before relying on them, then update the doc.
 - The AI model behind the assistant is not chosen. Code against the `LLMClient` interface, not a vendor SDK.
 
 ## Checks to run before saying a change is done
 
 ```bash
-# web
-pnpm --filter web lint && pnpm --filter web typecheck && pnpm --filter web test
+# web (from the repository root)
+pnpm lint && pnpm typecheck && pnpm test
 # api
-cd apps/api && uv run ruff check . && uv run pytest
-# contract is up to date
+cd apps/api && uv run ruff check . && uv run ruff format --check . && uv run pytest
+# contract is up to date (from the repository root)
 pnpm contracts:check
-# documentation links (works today)
+# documentation links
 python3 scripts/check_docs_links.py
 ```
-
-These commands are the planned ones. Update this block when the repository is set up.

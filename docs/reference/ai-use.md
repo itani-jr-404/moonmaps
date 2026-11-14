@@ -18,13 +18,18 @@ No other part of the product uses AI. Positions, horizons, visibility and metric
 
 ## AI used to build the project
 
-Fill in as the work happens. Be specific.
+| Date | Area | Tool | How it was used | Who reviewed it |
+| --- | --- | --- | --- | --- |
+| 2026-11-14 | API code (`apps/api`) and its tests | Claude, an AI coding assistant made by Anthropic | Wrote the API (endpoints, ephemeris, terrain and horizon engines, visibility, scripts) and its tests from the team's design documents | The team lead |
+| 2026-11-14 | Web app (`apps/web`) | Claude | Ported the team's prototype into the Next.js app, following the team's design | The team lead |
+| 2026-11-14 | Documentation | Claude | Updated these documents to match the code, from the code and the sources listed in [references.md](references.md) | The team lead |
 
-| Area | Tool | How it was used | Who reviewed it |
-| --- | --- | --- | --- |
-| Code | (tool name) | (for example: drafting components and tests, which a team member then read, ran and corrected) | (name) |
-| Documentation | (tool name) | (for example: drafting and editing these documents from the team's decisions) | (name) |
-| Images, video | (tool name) | (which files) | (name) |
+How the output was checked:
+
+- The Sun and Earth angles are compared with JPL Horizons by an automated test (`apps/api/tests/test_horizons.py`): 16 cases, all within 0.05 degrees. See [science/validation.md](../science/validation.md).
+- The LOLA grid reading is checked by a test against a known crater (Shackleton) on the real grid.
+- Items the tool could not confirm against a source are marked "to confirm" in the documents.
+- AI-written code and text can still contain mistakes that the tests do not catch.
 
 Rules we follow:
 

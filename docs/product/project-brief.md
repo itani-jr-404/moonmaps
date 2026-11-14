@@ -89,7 +89,7 @@ A caution, so that we do not overstate it: we have compared ourselves only with 
 | Event | NASA Space Apps Challenge 2026, Beirut local event, 14 to 15 November 2026 |
 | Challenge | Lunar Landing Site Navigator |
 | Kind of product | A web app. It runs in a browser, with no login and nothing to install |
-| Web app | Next.js, React, TypeScript, Tailwind CSS, three.js through React Three Fiber |
+| Web app | Next.js, React, TypeScript, Tailwind CSS, three.js |
 | Calculations | Python, FastAPI, Skyfield, numpy |
 | NASA data | JPL ephemerides (positions), JPL Horizons (the reference we test against), LOLA elevation from the Lunar Reconnaissance Orbiter (terrain), PGDA illumination maps (a second check), CGI Moon Kit and Blue Marble (surfaces) |
 | Partner data | Canadian Space Agency, Moon Exploration portal (background for site descriptions and the assistant) |

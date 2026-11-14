@@ -1,6 +1,6 @@
 # Testing
 
-Status: Design. Last updated: 2026-11-14.
+Status: Built. Last updated: 2026-11-14.
 
 What we test, where, and what must pass before a change is merged. The reasoning behind the science checks is in [science/validation.md](../science/validation.md).
 
@@ -10,45 +10,48 @@ Everyone writes at least one test for the code they add. Calculations are also c
 
 ## API tests (pytest)
 
+In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-14, with the data downloaded, 36 tests pass.
+
 | File | Tests | Needs data files |
 | --- | --- | --- |
-| `tests/test_geometry.py` | Great-circle destination formula against hand-worked cases; the elevation-angle formula (a point at the same height at distance 0 is at 0 degrees; a tall point nearby is high; a point at the same height far away is negative) | No |
-| `tests/test_projection.py` | Latitude and longitude to pixel and back gives the same point; the pole maps to the grid centre | No |
-| `tests/test_horizon.py` | On a flat synthetic grid the profile is zero everywhere; with one synthetic mountain to the east the profile peaks at azimuth 90 with the expected angle | No |
-| `tests/test_visibility.py` | Clearance and visibility on small arrays; windows with interpolated edges; open windows at both ends of the range | No |
-| `tests/test_metrics.py` | Each metric on a synthetic series whose answer is known; the all-light and all-dark cases | No |
-| `tests/test_status.py` | Thresholds give the expected badge at and around each boundary | No |
-| `tests/test_horizons.py` | Our Sun and Earth angles against the saved JPL Horizons values, within 0.05 degrees | Kernels |
-| `tests/test_api.py` | Each endpoint returns its model; every limit returns its error code | Kernels; uses a small synthetic grid |
-| `tests/test_assistant.py` | With a fake model: a glossary question is answered without tools; a numeric question triggers the `analyze` tool; the tool-round limit holds; an unconfigured model returns `assistant_unavailable` | No |
+| `test_geometry.py` | Great-circle destination along a meridian, along the equator and from near the pole; the elevation-angle formula (same height close by is level, a tall point nearby is high, same height far away is below the horizontal); the sample distances cover the range in order | No |
+| `test_projection.py` | On a synthetic grid: the pole maps to the grid centre; longitude 0 points up and 90 E points right; heights are bilinear and NaN outside | No |
+| `test_horizon.py` | A flat synthetic grid gives a horizon just below level; one synthetic mountain to the east peaks at azimuth 90; `horizon_at` interpolates and wraps; the grid stack uses the first grid that covers a point | No |
+| `test_visibility.py` | Clearance uses the terrain in the body's direction; windows with interpolated edges and open at both ends; intersection; metrics for an all-light case and for next events; status thresholds | No |
+| `test_lola_grid.py` | On the real `LDEM_80S_80M`: the label values; Shackleton crater is a deep bowl and its mirror point is not; a point at 75 S is outside the grid | LOLA grid |
+| `test_horizons.py` | Every saved JPL Horizons case is within 0.05 degrees | Kernels |
+| `test_api.py` | Through the FastAPI test client with a synthetic grid: `/health`, `/sites`, `/analyze` for curated and custom sites, with and without the series, its error codes and the four-scenario limit, `/sky` and `/scene`, `/validation` | Kernels |
 
-Tests that need the downloaded kernels are marked and skipped with a clear message when the files are missing, so the pure tests always run.
+`tests/conftest.py` builds the synthetic grids and a temporary data folder. Tests that need the kernels or the real grid are skipped with a message when the files are missing, so the pure tests always run.
 
-Synthetic grids are built in the tests (a flat plane, a plane with one cone), so most tests are fast and independent of NASA files.
+## Web tests (Vitest)
 
-## Web tests (Vitest and Testing Library)
+In `apps/web/src`, next to the code, as `*.test.ts`. Run with `pnpm test` from the root. Vitest uses jsdom (`apps/web/vitest.config.ts`). The web app is being written, so this list changes; today the tests cover:
 
 | Area | Tests |
 | --- | --- |
-| `lib/format` | Angles, durations and dates format as expected, with units |
-| `lib/state` | A scenario round-trips through the URL; a bad URL falls back safely |
-| `features/panorama` | The path builder turns a profile and a series into the expected SVG points; hidden segments are marked |
-| `features/metrics` | Tiles show the API's values; the countdown follows the current time |
-| `features/time` | The sampler interpolates between two samples and clamps at the ends |
-| `features/sites` | The coordinate form accepts valid input and refuses invalid input with a message |
-| Design tokens | The colour pairs we rely on meet the contrast ratio |
+| `lib/format` | Durations, coordinates and angles format as expected |
+| `lib/state/url-sync` | A place and a time round-trip through the URL; a bad URL falls back safely |
+| `scene/units` | Unit and direction helpers for the 3D scenes |
+| `features/planner/lib/calendar` | Turning API windows into the 30-day calendar and the best windows |
+| `features/landing/lib` | The verdict for a point and the nearest curated site |
 
-3D scenes are not unit tested. Their math helpers (latitude and longitude to a point on the sphere, azimuth and elevation to a direction) are.
+3D scenes are not unit tested; their math helpers are.
 
 ## Contract check
 
-Planned, not in CI yet. Once `apps/api/scripts/export_openapi.py` exists, CI will export the OpenAPI file from the API and regenerate the TypeScript types. If either differs from what is committed, the build fails. This catches a model change that was not followed through.
+`pnpm contracts:check` from the root does two things:
+
+1. `apps/api/scripts/export_openapi.py --check` fails if `packages/contracts/openapi.json` differs from what the API's models produce.
+2. `pnpm --filter @moon-maps/contracts check` regenerates the types from `openapi.json` into a temporary file and fails if `api.d.ts` differs.
+
+CI runs the first step in the API job and the second step in the web job.
 
 ## What runs when
 
 | When | What |
 | --- | --- |
-| On commit | Format and lint of staged files |
+| On commit | The husky pre-commit hook runs lint-staged: Prettier and ESLint on staged web files, ruff on staged API files |
 | On every pull request and every push to `main` | The checks below, run by GitHub Actions |
 | Before a demo or submission | The checklist below, by hand |
 
@@ -59,8 +62,8 @@ The workflow is `.github/workflows/ci.yml` (GitHub Actions, https://docs.github.
 | Job | Runs when | Steps |
 | --- | --- | --- |
 | Documentation links | Always | `python3 scripts/check_docs_links.py`: every relative link in the repository's Markdown files must point at a file that exists. The saved copies of web pages under `research/` are skipped. |
-| Web app | Something changed under `apps/web` or `packages/contracts`, and `apps/web/package.json` exists | Install, then the `lint`, `typecheck`, `test` and `build` scripts, each only if the web app defines it. Works with pnpm or npm. |
-| API | Something changed under `apps/api`, and it has a `pyproject.toml` or `requirements.txt` | Install with uv, `ruff check`, `ruff format --check`, `pytest`. Finding no tests is not a failure. |
+| Web app | Something changed under `apps/web` or `packages/contracts`, or in the root `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml` | Node 22; `corepack enable` (which reads `packageManager`, pnpm 11.3.0); `pnpm install --frozen-lockfile`; the contract types check; then the web app's `lint`, `typecheck`, `test` and `build` scripts |
+| API | Something changed under `apps/api` | Python 3.12, install with uv, `ruff check`, `ruff format --check`, the contract check (`export_openapi.py --check`), `pytest`. The runner does not download the kernels or grids, so tests that need them are skipped |
 
 A change to the workflow file itself runs every job.
 
@@ -68,15 +71,15 @@ A change to the workflow file itself runs every job.
 
 ## Manual checklist before a demo
 
-1. Open a curated south pole site for a 30 day range. The panorama, timeline and metrics agree with each other.
-2. Drag the slider across a sunset. The marker passes behind the terrain, the timeline bar ends, the countdown reaches zero, and the 3D scene goes dark, all at the same moment.
-3. Enter custom coordinates. A result appears.
-4. Compare two sites, and one site at two dates.
-5. Open the accuracy page. Every case passes.
-6. Ask the assistant a glossary question and a "which site" question. Check that the numbers in its answer match the screen.
-7. Turn on reduced motion and reload the landing page.
-8. Open the app in a private window on a phone.
-9. Stop the API and reload a curated site. The fallback result and its notice appear.
+1. `GET /health` lists both grids, and `GET /validation` reports `all_passed: true`.
+2. Open a curated south pole site in the planner. The verdict, the calendar and the best windows agree with each other.
+3. Choose a point on the globe away from the curated sites. A result appears.
+4. Open a link with `?site=` and `?t=` in a new window. The same result appears.
+5. Turn on reduced motion and reload the page.
+6. Open the app in a private window on a phone.
+7. Stop the API and reload. Every section shows its error state, and nothing shows a number.
+
+Planned with the features they test: comparing scenarios, the accuracy page, the assistant, and fallback results when the API is down.
 
 ## When a test fails
 

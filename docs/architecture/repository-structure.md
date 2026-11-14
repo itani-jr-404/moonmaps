@@ -1,87 +1,95 @@
 # Repository structure
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-14.
 
-One repository holds the web app, the API and the contract between them.
+One repository holds the web app, the API and the contract between them. The root is a pnpm workspace (`pnpm-workspace.yaml`: `apps/web`, `packages/contracts`); the API is a separate uv project.
 
 ```text
 moon-maps/
   apps/
-    web/                          Next.js app
+    web/                          Next.js app (being written)
       src/
-        app/                      routes only: thin pages and layouts
-          page.tsx                landing page            /
-          explore/page.tsx        the app                 /explore
-          accuracy/page.tsx       comparison with JPL     /accuracy
-          about/page.tsx          credits, references     /about
-          layout.tsx
-          globals.css             design tokens as CSS variables
-        features/                 one folder per feature
-          sites/                  site list, search, custom coordinates
-          time/                   date range and time slider
-          panorama/               horizon panorama (SVG)
-          timeline/               Sun and Earth bars
-          metrics/                metric tiles and status badges
-          compare/                side by side table
-          solar-system/           3D scene
-          moon-globe/             3D scene
-          site-view/              3D terrain scene
-          assistant/              chat panel
-          landing/                landing page sections
-        scene/                    shared 3D pieces: canvas shell, camera rig, lights, units, textures
-        components/ui/            design system components
+        app/                      the one route: page.tsx (/), layout.tsx, providers.tsx,
+                                  globals.css (Tailwind v4 tokens)
+        features/                 one folder per page section
+          hero/                   opening section and its 3D scene
+          landing/                "choose a landing": globe and surface view
+          why/                    why the south pole
+          planner/                verdict, 30-day calendar, best windows, 3D diorama
+          about/                  what the app does and how
+          site-chrome/            navigation, footer, cursor, reveal effects
+        scene/                    shared three.js pieces: renderer, materials, models,
+                                  textures, decorative ground, units
+        components/ui/            small shared components (states, toast, icons)
         lib/
-          api/                    typed client and query hooks
-          design/                 token helpers
+          api/                    typed client (client.ts), query hooks (hooks.ts), /sky helper
+          state/                  zustand scenario store and URL sync
           format/                 dates, angles, durations
-          state/                  scenario store and URL sync
-        mocks/                    mock responses in the contract's shape
+          motion/                 reduced motion, smooth scrolling
       public/
-        textures/                 Moon, Earth and planet maps (web sizes)
-        fallback/                 precomputed results for the curated sites
+        textures/                 Moon colour and relief maps (web sizes)
+        models/                   NASA 3D models (.glb)
+      .env.example
     api/                          FastAPI app
       app/
-        main.py                   creates the app, mounts routers
-        routers/                  health, sites, analyze, scene, terrain, assistant, validation
-        schemas/                  Pydantic models: this is the contract
-        services/                 metrics, scene, terrain, sites, assistant
+        main.py                   creates the app: middleware, error handlers, routers
+        routers/                  system.py, sites.py, analysis.py, deps.py
+        schemas/                  common.py, analyze.py, sky.py, system.py: the contract
+        services/                 sites, horizons, analysis, sky, validation, container
         engines/                  ephemeris, terrain, horizon, visibility (no FastAPI imports)
         core/                     config, errors, cache
         data/
           sites.json              curated sites
-          knowledge/              markdown files for the assistant
-          validation/             saved JPL Horizons results
+          validation/             saved JPL Horizons results (horizons.json)
           kernels/                downloaded, not in git
           dem/                    downloaded, not in git
           cache/                  horizon profiles, not in git
-      scripts/                    download_data, precompute_horizons, export_openapi, fetch_horizons
+      scripts/                    download_data, precompute_horizons, fetch_horizons, export_openapi
       tests/
-      pyproject.toml
-      Dockerfile
+      pyproject.toml, uv.lock, .python-version
+      Dockerfile, .dockerignore
   packages/
     contracts/
       openapi.json                exported from the API
       api.d.ts                    generated from openapi.json
   docs/                           these documents
+  research/                       source notes, including site coordinates and web assets
+  team/                           team notes
   scripts/                        repository checks (documentation links)
   .github/workflows/ci.yml
-  README.md
-  LICENSE
+  .husky/pre-commit               runs lint-staged
+  package.json                    workspace scripts, lint-staged, packageManager pnpm@11.3.0
+  pnpm-workspace.yaml, pnpm-lock.yaml
+  .prettierrc.json, .prettierignore
+  README.md, LICENSE, CLAUDE.md, AGENTS.md
 ```
+
+Planned, not present yet: `apps/api/app/data/knowledge/` for the assistant, and the features for the assistant, comparison, panorama and accuracy page.
 
 ## Rules for where things go
 
-- **A feature folder** holds everything for one feature: `components/`, `hooks/`, `lib/` and tests. A feature does not import from inside another feature. Shared code moves to `components/ui`, `scene/` or `lib/`.
-- **`app/`** holds routes only. A page loads what it needs and renders one feature view.
+- **A feature folder** holds everything for one section: `components/`, `hooks/`, `lib/` and tests. A feature does not import from inside another feature. Shared code moves to `components/ui`, `scene/` or `lib/`.
+- **`app/`** holds the route only. The page puts the sections in order.
 - **`schemas/`** is the only place request and response shapes are defined. Routers and services import from it.
 - **`engines/`** is pure calculation. Functions take numbers and arrays and return numbers and arrays. They can be tested without starting the API.
 - **Downloaded data** (`kernels/`, `dem/`, `cache/`) is in `.gitignore`. `scripts/download_data.py` fetches it. See [data/sources.md](../data/sources.md).
 
+## Root scripts
+
+From `package.json`:
+
+| Script | Runs |
+| --- | --- |
+| `pnpm dev`, `pnpm build` | The web app's `next dev` and `next build` |
+| `pnpm lint`, `pnpm typecheck`, `pnpm test` | ESLint, `tsc --noEmit` and Vitest in `apps/web` |
+| `pnpm contracts:generate` | Exports `openapi.json` from the API, then regenerates `api.d.ts` |
+| `pnpm contracts:check` | Fails if either generated file differs from what the API and `openapi.json` produce |
+
+The pre-commit hook runs lint-staged: Prettier and ESLint on staged web files, and `ruff format` and `ruff check --fix` on staged API files. Prettier uses single quotes, semicolons, trailing commas, 80 columns and the Tailwind plugin (`.prettierrc.json`).
+
 ## How the contract moves
 
 1. Change a model in `apps/api/app/schemas/`.
-2. Run `scripts/export_openapi.py` to rewrite `packages/contracts/openapi.json`.
-3. Run `openapi-typescript` to rewrite `packages/contracts/api.d.ts`.
-4. The web app imports its types from `packages/contracts`. A breaking change now fails the TypeScript check.
-
-Once the export script exists, CI will run steps 2 and 3 and fail if the committed files differ from the output.
+2. Run `pnpm contracts:generate` from the root. It runs `apps/api/scripts/export_openapi.py` to rewrite `packages/contracts/openapi.json`, then `openapi-typescript` to rewrite `packages/contracts/api.d.ts`.
+3. The web app imports its types from `@moon-maps/contracts`. A breaking change fails the TypeScript check.
+4. Commit both generated files with the change. `pnpm contracts:check` fails if they are out of date; CI runs the `api.d.ts` part of it in the web job.

@@ -79,11 +79,11 @@ jobs:
         run: |
           # Works whether the web app is part of a pnpm workspace or stands alone with pnpm or npm.
           if [ -f pnpm-lock.yaml ]; then
-            corepack enable && corepack prepare pnpm@9 --activate
+            corepack enable
             pnpm install --frozen-lockfile
             echo "RUN=pnpm --dir apps/web run --if-present" >> "$GITHUB_ENV"
           elif [ -f apps/web/pnpm-lock.yaml ]; then
-            corepack enable && corepack prepare pnpm@9 --activate
+            corepack enable
             pnpm --dir apps/web install --frozen-lockfile
             echo "RUN=pnpm --dir apps/web run --if-present" >> "$GITHUB_ENV"
           elif [ -f apps/web/package-lock.json ]; then
@@ -93,6 +93,8 @@ jobs:
             npm --prefix apps/web install
             echo "RUN=npm --prefix apps/web run --if-present" >> "$GITHUB_ENV"
           fi
+      - name: Contract types up to date
+        run: pnpm --filter @moon-maps/contracts check
       - name: Lint
         run: $RUN lint
       - name: Type check
@@ -128,6 +130,8 @@ jobs:
         run: uvx ruff check .
       - name: Format check
         run: uvx ruff format --check .
+      - name: Contract is up to date with the API models
+        run: uv run python scripts/export_openapi.py --check
       - name: Test
         run: |
           set +e

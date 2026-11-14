@@ -1,0 +1,164 @@
+[
+  {
+    "id": "shackleton-ridge",
+    "name": "Shackleton–de Gerlache connecting ridge",
+    "lat": -89.684,
+    "lon": -163.261,
+    "kind": "artemis-candidate",
+    "description": "Representative point of a region: where the ridge between Shackleton and de Gerlache craters meets the rim of Shackleton, a spot LROC calls of high scientific interest. Connecting Ridge was one of NASA's 13 Artemis III candidate regions in 2022.",
+    "source_url": "https://lroc.im-ldi.com/images/1247"
+  },
+  {
+    "id": "malapert-massif",
+    "name": "Malapert Massif",
+    "lat": -86.0,
+    "lon": 0.0,
+    "kind": "artemis-candidate",
+    "description": "Representative point of a region: the flat area LROC calls the heart of the Malapert Massif Artemis III candidate landing region. The massif is thought to be a remnant of the South Pole-Aitken basin rim.",
+    "source_url": "https://lroc.im-ldi.com/images/1294"
+  },
+  {
+    "id": "haworth",
+    "name": "Haworth",
+    "lat": -86.8,
+    "lon": -22.0,
+    "kind": "artemis-candidate",
+    "description": "Representative point of a region: the centre of a NASA Ames terrain model of the area beyond the north rim of Haworth crater. Haworth is one of NASA's nine Artemis III candidate regions announced in 2024.",
+    "source_url": "https://astrogeology.usgs.gov/search/map/lunar_lro_nac_haworth_photoclinometry_dem_1m"
+  },
+  {
+    "id": "mons-mouton",
+    "name": "Mons Mouton",
+    "lat": -84.6,
+    "lon": 31.0,
+    "kind": "artemis-candidate",
+    "description": "Representative point of a region: the IAU centre of the mountain Mons Mouton. Mons Mouton is one of NASA's nine Artemis III candidate regions announced in 2024.",
+    "source_url": "https://planetarynames.wr.usgs.gov/Feature/16070"
+  },
+  {
+    "id": "nobile-rim-2",
+    "name": "Nobile Rim 2",
+    "lat": -84.20156,
+    "lon": 60.69989,
+    "kind": "artemis-candidate",
+    "description": "Representative point of a region: the best-ranked landing point in a 2024 multi-criteria study of the Artemis III candidate regions. Nobile Rim 2 is one of NASA's nine Artemis III candidate regions announced in 2024.",
+    "source_url": "https://arxiv.org/abs/2406.19863"
+  },
+  {
+    "id": "de-gerlache-rim-2",
+    "name": "de Gerlache Rim 2",
+    "lat": -88.51566,
+    "lon": -61.16732,
+    "kind": "artemis-candidate",
+    "description": "Representative point of a region: the best-ranked point in this region in a 2024 multi-criteria study of the Artemis III candidate regions. de Gerlache Rim 2 is one of NASA's nine Artemis III candidate regions announced in 2024.",
+    "source_url": "https://arxiv.org/abs/2406.19863"
+  },
+  {
+    "id": "amundsen-rim",
+    "name": "Amundsen Rim",
+    "lat": -84.19184,
+    "lon": 67.22904,
+    "kind": "artemis-candidate",
+    "description": "Representative point of a region: the best-ranked point in this region in a 2024 multi-criteria study of the Artemis III candidate regions. Amundsen Rim was one of NASA's 13 candidate regions in 2022 and is not in the 2024 list of nine.",
+    "source_url": "https://arxiv.org/abs/2406.19863"
+  },
+  {
+    "id": "cabeus-lcross",
+    "name": "Cabeus, LCROSS Centaur impact point",
+    "lat": -84.6796,
+    "lon": -48.7093,
+    "kind": "reference",
+    "description": "Where NASA's LCROSS mission crashed a spent Centaur rocket stage into a permanently shadowed area of Cabeus crater to look for water and other volatiles.",
+    "source_url": "https://arxiv.org/abs/1103.1687",
+    "mission_date": "2009-10-09"
+  },
+  {
+    "id": "south-pole-reference",
+    "name": "Near south pole reference point",
+    "lat": -89.9,
+    "lon": 0.0,
+    "kind": "reference",
+    "description": "A test point chosen by the team very close to the south pole, the same point used for the JPL Horizons check. It is not a landing site.",
+    "source_url": "https://ssd.jpl.nasa.gov/horizons/"
+  },
+  {
+    "id": "im-2",
+    "name": "IM-2 Athena, Mons Mouton",
+    "lat": -84.7906,
+    "lon": 29.1957,
+    "kind": "clps",
+    "description": "Where Intuitive Machines' Athena lander, carrying NASA CLPS instruments, came to rest on its side in a 20 m crater near the centre of Mons Mouton.",
+    "source_url": "https://lroc.im-ldi.com/images/1408",
+    "mission_date": "2025-03-06"
+  },
+  {
+    "id": "chandrayaan-3",
+    "name": "Chandrayaan-3 Vikram lander",
+    "lat": -69.3741,
+    "lon": 32.32,
+    "kind": "international",
+    "description": "Landing site of ISRO's Chandrayaan-3, about 600 km from the south pole. It shows the high southern latitudes beyond the polar candidate regions.",
+    "source_url": "https://lroc.im-ldi.com/images/1314",
+    "mission_date": "2023-08-23"
+  },
+  {
+    "id": "apollo-11",
+    "name": "Apollo 11, Tranquility Base",
+    "lat": 0.67416,
+    "lon": 23.47314,
+    "kind": "apollo",
+    "description": "First crewed landing on the Moon, in Mare Tranquillitatis. An equatorial near-side site for contrast with the poles.",
+    "source_url": "https://lroc.im-ldi.com/images/938",
+    "mission_date": "1969-07-20"
+  },
+  {
+    "id": "apollo-15",
+    "name": "Apollo 15, Hadley-Apennine",
+    "lat": 26.13239,
+    "lon": 3.6333,
+    "kind": "apollo",
+    "description": "Apollo 15 landing site at Hadley Rille, at the foot of the Apennine mountains. A mid-latitude near-side site for contrast with the poles.",
+    "source_url": "https://lroc.im-ldi.com/images/938",
+    "mission_date": "1971-07-30"
+  },
+  {
+    "id": "apollo-17",
+    "name": "Apollo 17, Taurus-Littrow",
+    "lat": 20.1911,
+    "lon": 30.7723,
+    "kind": "apollo",
+    "description": "Apollo 17 landing site in the Taurus-Littrow valley. A near-side valley site for contrast with the poles.",
+    "source_url": "https://lroc.im-ldi.com/images/938",
+    "mission_date": "1972-12-11"
+  },
+  {
+    "id": "slim",
+    "name": "SLIM, near Shioli crater",
+    "lat": -13.316,
+    "lon": 25.251,
+    "kind": "international",
+    "description": "Landing site of JAXA's Smart Lander for Investigating Moon, next to the small fresh crater Shioli. A low-latitude near-side site.",
+    "source_url": "https://lroc.im-ldi.com/images/1358",
+    "mission_date": "2024-01-19"
+  },
+  {
+    "id": "change-4",
+    "name": "Chang'e 4, Von Kármán crater",
+    "lat": -45.457,
+    "lon": 177.589,
+    "kind": "international",
+    "description": "Landing site of China's Chang'e 4 in Von Kármán crater on the lunar far side.",
+    "source_url": "https://lroc.im-ldi.com/images/1087",
+    "mission_date": "2019-01-03"
+  },
+  {
+    "id": "change-6",
+    "name": "Chang'e 6, Apollo basin",
+    "lat": -41.6385,
+    "lon": -153.9852,
+    "kind": "international",
+    "description": "Landing site of China's Chang'e 6 sample return mission, on a mare plain at the southern edge of the far-side Apollo basin.",
+    "source_url": "https://lroc.im-ldi.com/images/1374",
+    "mission_date": "2024-06-01"
+  }
+]

@@ -1,6 +1,6 @@
 # Validation
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-14.
 
 How we know the numbers are right. There are two independent checks, one for each half of the calculation.
 
@@ -8,9 +8,9 @@ How we know the numbers are right. There are two independent checks, one for eac
 
 JPL Horizons is NASA's reference service for the positions of solar system bodies, and it can place the observer on the Moon. It gives the azimuth and elevation of the Sun and the Earth for a smooth Moon. Our ephemeris engine, before terrain is applied, must give the same values.
 
-**How the reference values are obtained.** `scripts/fetch_horizons.py` calls the Horizons API for a fixed set of cases and saves the answers in `app/data/validation/`. The saved files are committed. Tests and the accuracy page read the files; nothing calls Horizons at run time.
+**How the reference values are obtained.** `apps/api/scripts/fetch_horizons.py` calls the Horizons API (https://ssd-api.jpl.nasa.gov/doc/horizons.html) for a fixed set of cases and saves the answers in `apps/api/app/data/validation/horizons.json`, which is committed. The test and `GET /validation` read that file; nothing calls Horizons at run time.
 
-The request, in outline (the full tested call is in [data/sources.md](../data/sources.md)):
+The request, in outline (a tested browser call is in [data/sources.md](../data/sources.md)):
 
 | Parameter | Value |
 | --- | --- |
@@ -20,18 +20,26 @@ The request, in outline (the full tested call is in [data/sources.md](../data/so
 | `COORD_TYPE` | `GEODETIC` |
 | `SITE_COORD` | east longitude, latitude, height in km |
 | `QUANTITIES` | `4` (apparent azimuth and elevation, airless) |
+| `ANG_FORMAT`, `CSV_FORMAT` | `DEG`, `YES` |
 
-**Cases.** At least two sites, each at several times spread over a lunar day, for both bodies:
+**Cases.** Fetched on 2026-11-14 at 16:15 UTC. 16 cases: 2 points, 2 bodies, 4 times.
 
-- one site very close to the south pole, where small errors in the Moon's orientation show most;
-- one site at a lower latitude, for example an Apollo site, where the Sun gets high.
+| Point | Latitude, longitude, height | Why |
+| --- | --- | --- |
+| Near the south pole | -89.9, 0.0, 0 km | Small errors in the Moon's orientation show most here |
+| Near Apollo 11 | 0.67416, 23.47314, 0 km | The Sun gets high here |
 
-**Tolerance.** Azimuth and elevation within 0.05 degrees. Near the zenith, azimuth is ill-defined, so cases with elevation above 85 degrees compare elevation only.
+Times: 2026-11-15, 2026-11-22, 2026-11-29 and 2026-12-06, each at 00:00 UTC, spread over one lunar day. Our side is computed with the observer on the sphere and no terrain, to match what Horizons computes.
+
+**Tolerance.** Azimuth and elevation within 0.05 degrees. Near the zenith azimuth is ill-defined, so cases where Horizons gives an elevation above 85 degrees compare elevation only (`TOLERANCE_DEG` and `ZENITH_LIMIT_DEG` in `app/services/validation.py`).
+
+**Result.** All 16 cases pass. The largest difference is 0.0123 degrees, in the Sun's azimuth near Apollo 11 on 2026-11-22, when the Sun is 83.8 degrees high. Every other difference is at most 0.0038 degrees. Example: at 89.9 S, 0 E on 2026-11-15 00:00 UTC we give the Sun at azimuth 114.4376 and elevation 1.5150; Horizons gives 114.4337 and 1.5150. These numbers come from running `ValidationService(...).report()` on 2026-11-14.
 
 **Where it shows.**
 
-- As a test: `tests/test_horizons.py` fails the build if any case is out of tolerance.
-- In the app: `GET /validation` feeds the accuracy page, which lists each case with our value, the Horizons value and the difference.
+- As a test: `apps/api/tests/test_horizons.py` fails if any case is out of tolerance. It is skipped when the kernels have not been downloaded.
+- In the API: `GET /validation` returns every case with our value, the Horizons value and the difference.
+- In the web app: an accuracy page that shows this report is planned, not built.
 
 ## Check 2: terrain against NASA's illumination maps
 
@@ -44,15 +52,15 @@ What agreement to expect:
 - Same order and same broad level: a site the map calls well lit should come out well lit.
 - Not identical numbers. Our range is shorter than 18.6 years, our profile is 1 degree wide, our observer stands 2 m up, and for the Earth we use the centre of the disc while the maps count any part of it.
 
-This check is a script and a table in the accuracy page, not a pass or fail test.
+This check is planned, not built. It will be a script and a table, not a pass or fail test.
 
 ## Check 3: unit tests on the pieces
 
-Listed in [developer/testing.md](../developer/testing.md): the projection (to pixel and back), the great-circle formulas, the elevation-angle formula against hand-worked cases, window finding on synthetic series, and the metrics.
+Listed in [developer/testing.md](../developer/testing.md): the projection on synthetic and real grids, the great-circle formulas, the elevation-angle formula against hand-worked cases, the horizon on synthetic terrain, window finding on synthetic series, the metrics and the status thresholds.
 
 ## Eyeball checks
 
-- Load a site in NASA's Moon Trek or in Quickmap and compare the look of the terrain with our 3D tile.
+- Load a site in NASA's Moon Trek or in Quickmap and compare the terrain with our horizon profile. Not done yet.
 - At a site on the near side, the Earth should stay in roughly the same part of the sky and move in a small loop over a month.
 - At the south pole, the Sun should circle the horizon once per lunar day, never more than a couple of degrees high.
 

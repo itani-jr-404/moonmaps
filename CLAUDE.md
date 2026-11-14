@@ -53,13 +53,13 @@ Plain, complete sentences. Simple words. No sales language and no claims about h
 
 ## Checks before saying a change is done
 
-These are the planned commands. Update this block when the tooling is in place.
+Run from the repository root:
 
 ```bash
-pnpm --filter web lint && pnpm --filter web typecheck && pnpm --filter web test
-cd apps/api && uv run ruff check . && uv run pytest
+pnpm lint && pnpm typecheck && pnpm test
+cd apps/api && uv run ruff check . && uv run ruff format --check . && uv run pytest && cd ../..
 pnpm contracts:check
-python3 scripts/check_docs_links.py   # works today
+python3 scripts/check_docs_links.py
 ```
 
 Then confirm: sources cited, documents updated.

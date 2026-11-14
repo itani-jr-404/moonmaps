@@ -1,12 +1,12 @@
 # Request lifecycle
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-14.
 
-Three flows cover almost everything the app does.
+Two flows cover what the app does today; the third, the assistant, is planned.
 
 ## 1. Analysing a scenario
 
-This is the core path. The panorama, the timeline, the metrics and the comparison all come from it.
+This is the core path. The planner's verdict, calendar and best windows come from it.
 
 ```mermaid
 sequenceDiagram
@@ -15,7 +15,7 @@ sequenceDiagram
   participant S as Scenario store and URL
   participant C as API client
   participant R as Router /analyze
-  participant M as Metrics service
+  participant M as Analysis service
   participant H as Horizon engine and cache
   participant E as Ephemeris engine
   participant X as Visibility engine
@@ -34,26 +34,25 @@ sequenceDiagram
   M-->>R: results with metrics and status
   R-->>C: JSON
   C-->>V: typed data
-  V-->>U: panorama, timeline, metrics
+  V-->>U: verdict, calendar, windows
 ```
 
 Notes:
 
-- Moving the time slider does not call the API. The response already holds the whole range, so the views read the sample for the current time from memory.
-- Changing the site, the range or the step does call the API. Results are cached in the browser by scenario, so going back to an earlier scenario is instant.
-- The horizon profile is cached on the API's disk by site, rounded to 0.001 degrees. The first request for a new custom site pays the cost; later ones do not.
+- Changing the site or the moment calls the API. Results are cached in the browser by scenario (TanStack Query) and in the API (200 results), so going back to an earlier scenario is fast.
+- The horizon profile is cached in memory and on the API's disk by point, rounded to 0.001 degrees. The first request for a new point pays the cost (tens of milliseconds for a south polar point); later ones do not.
 
-## 2. Loading a 3D scene
+## 2. One moment at one point
 
 | Scene | Calls | When |
 | --- | --- | --- |
-| Solar System | `GET /scene?t=` | On open, and when the date changes by a day or more |
-| Moon globe | `GET /sites`, `GET /scene?t=` (for the direction of sunlight) | On open |
-| Site view | `GET /terrain` for the height tile, plus the analysis already loaded | When the site changes |
+| Hero readout | `GET /sky` at 89.9 S, 0 E | On load, then once a minute |
+| Globe | `GET /sites`; `GET /sky` at the aimed point, rounded to 0.1 degree and 10 minutes | While aiming |
+| Surface view and planner diorama | `GET /sky` at the chosen point and moment | When the point or moment changes |
 
-The site view lights the terrain from the Sun's azimuth and elevation in the analysis. As the slider moves, only the light direction changes. See [frontend/3d-scenes.md](../frontend/3d-scenes.md).
+The scenes place the Sun and the Earth from the `/sky` answer and use its `visible` flags. They compute no positions ([ADR-011](../decisions/ADR-011-sky-endpoint.md)). A terrain tile from `GET /terrain` for a real 3D site view is planned. See [frontend/3d-scenes.md](../frontend/3d-scenes.md).
 
-## 3. Asking the assistant
+## 3. Asking the assistant (planned)
 
 ```mermaid
 sequenceDiagram
@@ -62,7 +61,7 @@ sequenceDiagram
   participant R as Router /assistant/chat
   participant A as Assistant service
   participant L as AI model
-  participant M as Metrics service
+  participant M as Analysis service
 
   U->>P: question
   P->>R: messages and the current scenarios
@@ -84,8 +83,8 @@ The assistant service limits the number of tool calls in one answer. See [backen
 
 | Failure | What the user sees |
 | --- | --- |
-| Invalid input | The field is marked before any request is sent |
+| Invalid input | The API answers `invalid_input` with the field's name; values from the URL are checked before use |
 | API returns an error | The panel shows the message from the error and a retry button; other panels keep their last good data |
-| API cannot be reached | For curated sites, the app loads the precomputed result from `public/fallback/` and says so; for custom sites it explains that live calculation is unavailable |
+| API cannot be reached | Each section shows its error state. Precomputed fallback results are planned, not built |
 | 3D cannot start (no WebGL, weak device) | The scene is replaced by a still image; the panorama and metrics still work |
-| Assistant fails | The chat panel shows an error; nothing else is affected |
+| Assistant fails (planned) | The chat panel shows an error; nothing else is affected |

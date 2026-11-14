@@ -1,0 +1,20 @@
+{
+  "name": "@moon-maps/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "types": "./api.d.ts",
+  "exports": {
+    ".": {
+      "types": "./api.d.ts"
+    }
+  },
+  "scripts": {
+    "generate": "openapi-typescript openapi.json -o api.d.ts",
+    "check": "openapi-typescript openapi.json -o .api.check.d.ts && cmp -s api.d.ts .api.check.d.ts; s=$?; rm -f .api.check.d.ts; [ $s -eq 0 ] || { echo 'api.d.ts is out of date; run pnpm contracts:generate'; exit 1; }"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3"
+  }
+}
