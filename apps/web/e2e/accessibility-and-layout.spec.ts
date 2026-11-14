@@ -66,6 +66,7 @@ test.describe('phone', () => {
 });
 
 test('every section is reachable from the navigation', async ({ page }) => {
+  const errors = collectPageErrors(page);
   await page.goto('/');
   await skipIntro(page);
   for (const [name, id] of [
@@ -84,4 +85,5 @@ test('every section is reachable from the navigation', async ({ page }) => {
     await waitForScrollToSettle(page);
     await expect(page.locator(`#${id}`)).toBeInViewport();
   }
+  expect(errors).toEqual([]);
 });

@@ -162,6 +162,7 @@ test('choosing another site and a quick date updates the answer from the API', a
 test('the planner shows an error with a retry when the API cannot be reached', async ({
   page,
 }) => {
+  const errors = collectPageErrors(page);
   await page.route('**/analyze', (route) => route.abort());
   await page.goto('/?site=haworth&t=2026-11-20T00:00Z');
   await skipIntro(page);
@@ -175,4 +176,5 @@ test('the planner shows an error with a retry when the API cannot be reached', a
   const analyze = page.waitForResponse(isApi('/analyze', 'POST'));
   await card.getByRole('button', { name: 'Try again' }).click();
   await expectPlannerMatches(page, (await (await analyze).json()) as Analyze);
+  expect(errors).toEqual([]);
 });

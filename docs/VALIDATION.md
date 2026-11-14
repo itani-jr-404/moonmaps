@@ -2,7 +2,7 @@
 
 Team Lunar Titans, NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". Last updated: 14 November 2026.
 
-Moon Maps tells you whether a place and a date on the Moon are good for landing: whether the Sun is above the terrain horizon (power) and whether the Earth is above it (a direct radio link). This report shows how we checked that the app works and that its numbers are right. Every result was produced by running the code on 14 November 2026, and each one names the command, dataset or publication behind it. For each comparison, the pass rule was fixed before the comparison was run. Section 10 lists what we have not yet checked.
+Moon Maps tells you whether a place and a date on the Moon are good for landing: whether the Sun is above the terrain horizon (power) and whether the Earth is above it (a direct radio link). This report shows how we checked that the app works and that its numbers are right. Every result was produced by running the code on 14 November 2026, and each one names the command, dataset or publication behind it. The 0.05 degree tolerance for the JPL Horizons comparisons was set in our design documents before any comparison ran, and the pass rule for NASA's maps was written into the script before its first run. Where a first comparison did not agree, the report says so. Section 10 lists what we have not yet checked.
 
 The repository is https://github.com/itani-jr-404/moonmaps. Links into it, including the test runs, open once the repository is public for the submission. The method behind the science checks is in [science/validation.md](science/validation.md).
 
@@ -89,7 +89,7 @@ Pass rule: within 0.05 degrees in azimuth and elevation. Result: **all 16 pass; 
 | 0.67416 N, 23.47314 E | 2026-11-29 00:00 | Earth | 262.1501 / 71.4074 | 262.1487 / 71.4070 | 0.0014 / 0.0004 |
 | 0.67416 N, 23.47314 E | 2026-12-06 00:00 | Earth | 287.9388 / 70.8555 | 287.9387 / 70.8558 | 0.0001 / 0.0003 |
 
-The largest difference (0.0123 degrees, in azimuth) is for the Sun 83.8 degrees high, where a small shift in position moves the azimuth a lot. Most Sun cases differ by about 0.0038 degrees in one coordinate; this is ten times smaller than the tolerance. Our ephemeris (DE421) is older than the one Horizons uses; [science/conventions-and-ephemeris.md](science/conventions-and-ephemeris.md) explains why this is acceptable.
+The largest difference (0.0123 degrees, in azimuth) is for the Sun 83.8 degrees high, where a small shift in position moves the azimuth a lot. Most Sun cases differ by about 0.0038 degrees in one coordinate; this is ten times smaller than the tolerance. Our ephemeris (DE421) is older than the one Horizons uses (DE441, as stated in each Horizons response, for example "Target body name: Sun (10) {source: DE441}"); [science/conventions-and-ephemeris.md](science/conventions-and-ephemeris.md) explains why this is acceptable.
 
 The point 0.67416 N, 23.47314 E is the Apollo 11 site position from LROC (https://lroc.im-ldi.com/images/938), used here as a low-latitude test point.
 
@@ -122,7 +122,7 @@ Pass rule: our value within 0.05 degrees of JPL Horizons. Result: **all 16 pass;
 | Apollo 17 | EVA-3 start | 163.50 | 1972-12-14 01:03 | 39.0 | 38.11 | 38.11 |
 | Apollo 17 | EVA-3 end | 170.75 | 1972-12-14 08:18 | 42.6 | 41.37 | 41.37 |
 
-For Apollo 11, and for the Apollo 15 stand-up EVA, the journal table agrees with us within 0.12 degrees. For the later Apollo 15 and 17 moonwalks it does not, but JPL Horizons gives exactly our values, so the difference lies in the table. The table's angles rise by 0.508 degrees an hour at both sites (13.0 to 44.3 degrees in 61.5 hours at Apollo 15; 15.3 to 42.6 degrees in 53.75 hours at Apollo 17). That rate is one full turn per synodic month of 29.53 days (NASA Moon Fact Sheet), the rate at the lunar equator. Horizons and our engine give slower climbs at these sites, at 26 N and 20 N (0.44 and 0.46 degrees an hour). The table does not state its method, so we report this as an observation, not as the table's error.
+Our script first compared our values with the journal table, allowing 0.3 degrees for its rounding: 6 of the 16 cases were within that. For Apollo 11, and for the Apollo 15 stand-up EVA, the journal table agrees with us within 0.12 degrees. For the later Apollo 15 and 17 moonwalks it does not, but JPL Horizons gives exactly our values, so the difference lies in the table. The table's angles rise by 0.508 degrees an hour at both sites (13.0 to 44.3 degrees in 61.5 hours at Apollo 15; 15.3 to 42.6 degrees in 53.75 hours at Apollo 17). That rate is one full turn per synodic month of 29.53 days (NASA Moon Fact Sheet), the rate at the lunar equator. Horizons and our engine give slower climbs at these sites, at 26 N and 20 N (0.44 and 0.46 degrees an hour). The table does not state its method, so we report this as an observation, not as the table's error.
 
 ### The LCROSS impact point is permanently dark
 
@@ -236,7 +236,7 @@ Measured on a laptop on 14 November 2026 against the running API (`uv run uvicor
 
 ### Automated end-to-end tests
 
-The tests in `apps/web/e2e/` (Playwright, https://playwright.dev/) open the production build of the web app in Chrome, with the real API running on its NASA data. Each test captures the API response the page itself received and checks that the screen shows exactly that answer. The browser runs in Beirut time with British English formats, so times on screen can be compared with the API's UTC times. Any uncaught error in the page fails the test.
+The tests in `apps/web/e2e/` (Playwright, https://playwright.dev/) open the production build of the web app in Chrome, with the real API running on its NASA data. The tests that check answers capture the API response the page itself received and check that the screen shows exactly that answer; the others check that the page shows and works at phone size, with reduced motion and through its navigation. The browser runs in Beirut time with British English formats, so times on screen can be compared with the API's UTC times. Any uncaught error in the page fails the test.
 
 | Test | What it proves |
 | --- | --- |
