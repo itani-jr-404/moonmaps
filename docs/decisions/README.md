@@ -1,0 +1,37 @@
+# Decision records
+
+Last updated: 2026-11-14.
+
+Each record states one decision, why it was made, and what follows from it. A record is not edited once accepted; if the decision changes, a new record replaces it and the old one is marked "Replaced by".
+
+| # | Decision | Status |
+| --- | --- | --- |
+| [ADR-001](ADR-001-python-backend.md) | The calculations run in a Python backend | Accepted |
+| [ADR-002](ADR-002-live-calculation.md) | Positions are calculated live; horizons are cached | Accepted |
+| [ADR-003](ADR-003-monorepo-and-contract.md) | One repository with a generated contract | Accepted |
+| [ADR-004](ADR-004-horizon-profile.md) | The horizon is a 360-value profile built from LOLA grids | Accepted |
+| [ADR-005](ADR-005-visibility-by-disc-centre.md) | A body is visible when its centre is above the terrain | Accepted |
+| [ADR-006](ADR-006-3d-shadows-and-distant-terrain.md) | 3D shadows come from the tile; distant terrain comes from the profile | Accepted |
+| [ADR-007](ADR-007-assistant.md) | The assistant uses a knowledge base first, behind a model interface | Accepted |
+| [ADR-008](ADR-008-no-login-no-database.md) | No login and no database; the URL holds the scenario | Accepted |
+| [ADR-009](ADR-009-columnar-series.md) | Time series are sent as parallel arrays | Accepted |
+
+## Template
+
+```markdown
+# ADR-NNN: Title
+
+Status: Proposed | Accepted | Replaced by ADR-NNN. Date: YYYY-MM-DD.
+
+## Context
+What problem or question made a decision necessary.
+
+## Decision
+What we decided, in one or two sentences.
+
+## Consequences
+What becomes easier, what becomes harder, what we must remember.
+
+## Alternatives considered
+Each alternative and why it was not chosen.
+```

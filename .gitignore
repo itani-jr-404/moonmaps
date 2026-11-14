@@ -1,0 +1,37 @@
+# local only: handoffs and private notes never go in the repository
+local/
+
+# operating system and editors
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# environment and secrets
+.env
+.env.*
+!.env.example
+
+# node
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+.pnpm-store/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# downloaded data and caches (fetched by apps/api/scripts/download_data.py)
+apps/api/app/data/kernels/
+apps/api/app/data/dem/
+apps/api/app/data/cache/
+*.bsp
+*.bpc
+*.IMG
