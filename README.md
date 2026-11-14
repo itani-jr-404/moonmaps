@@ -27,7 +27,7 @@ The design is written and the repository is set up. A first prototype of the web
 3. A body is visible when it is higher than the terrain in its direction. The Moon has no atmosphere, so nothing is bent.
 4. The web app draws the result: a panorama of the horizon, a timeline, metrics, a comparison, and 3D scenes lit by the Sun where it really is.
 
-More in [docs/architecture/system-overview.md](docs/architecture/system-overview.md).
+More in [docs/architecture/system-overview.md](docs/architecture/system-overview.md). A one-page summary of the features, the purpose and what sets the project apart is in [docs/product/project-brief.md](docs/product/project-brief.md).
 
 ## Running it
 

@@ -9,6 +9,7 @@ These documents describe the design we are building towards. Nothing here is bui
 | If you want to | Read |
 | --- | --- |
 | Know what exists today | [CURRENT_STATE.md](CURRENT_STATE.md) |
+| Explain the project in one page (features, purpose, what sets it apart) | [product/project-brief.md](product/project-brief.md) |
 | Understand what the app is for | [product/overview.md](product/overview.md) |
 | Understand the whole system in ten minutes | [architecture/system-overview.md](architecture/system-overview.md) |
 | Start coding | [developer/getting-started.md](developer/getting-started.md), then [developer/conventions.md](developer/conventions.md) |
@@ -20,7 +21,7 @@ These documents describe the design we are building towards. Nothing here is bui
 
 | Folder | Contents |
 | --- | --- |
-| [product/](product/) | [overview](product/overview.md), [challenge-coverage](product/challenge-coverage.md) |
+| [product/](product/) | [project-brief](product/project-brief.md), [overview](product/overview.md), [challenge-coverage](product/challenge-coverage.md) |
 | [architecture/](architecture/) | [system-overview](architecture/system-overview.md), [repository-structure](architecture/repository-structure.md), [application-layers](architecture/application-layers.md), [request-lifecycle](architecture/request-lifecycle.md) |
 | [backend/](backend/) | [api-reference](backend/api-reference.md), [service-layer](backend/service-layer.md), [assistant](backend/assistant.md) |
 | [science/](science/) | [conventions-and-ephemeris](science/conventions-and-ephemeris.md), [terrain-and-horizon](science/terrain-and-horizon.md), [visibility-and-metrics](science/visibility-and-metrics.md), [validation](science/validation.md) |
