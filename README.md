@@ -1,21 +1,21 @@
 # Moon Maps
 
-Moon Maps is a 3D web app for the NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". You pick a landing site on the Moon and a date, and it shows when the site has sunlight (power) and when it can see the Earth (a direct radio link), using real NASA terrain for the horizon. Sites and dates can be compared side by side, and a chat assistant explains the results.
+Moon Maps is a 3D web app for the NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". You pick a landing site on the Moon and a date, and it shows when the site has sunlight (power) and when it can see the Earth (a direct radio link), using real NASA terrain for the horizon near the south pole. A side-by-side comparison and a chat assistant are planned.
 
 Built by team Lunar Titans at the Beirut local event, 14 to 15 November 2026.
 
 ## Status
 
-The design is written and the repository is set up. A first prototype of the web app exists and is being brought into `apps/web`. See [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md) for what is real today.
+The API is built for the core calculation and is checked against JPL Horizons. The web app is a one-page port of the team's prototype and is still being written. Nothing is deployed yet. See [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md) for what is real today.
 
 ## Where things are
 
 | Folder | Contents |
 | --- | --- |
 | [docs/](docs/README.md) | The project documentation: architecture, API, science, frontend, features, decisions, developer guides. Start at [docs/README.md](docs/README.md). |
-| `apps/web` | The web app (Next.js, React, TypeScript, three.js) |
-| `apps/api` | The API and the calculations (Python, FastAPI, Skyfield) |
-| `packages/contracts` | The contract between them, generated from the API |
+| [apps/web](apps/web/README.md) | The web app (Next.js, React, TypeScript, three.js) |
+| [apps/api](apps/api/README.md) | The API and the calculations (Python, FastAPI, Skyfield) |
+| [packages/contracts](packages/contracts/README.md) | The contract between them, generated from the API |
 | [research/](research/README.md) | The source material we collected: the challenge page, the official Space Apps guides, the Beirut event page, notes on data sources |
 | [team/](team/) | Team notes, the build plan, the stack summary, the idea description |
 | [CLAUDE.md](CLAUDE.md) | Rules for AI coding tools working in this repository |
@@ -25,13 +25,23 @@ The design is written and the repository is set up. A first prototype of the web
 1. The API calculates where the Sun and the Earth are in the sky of the chosen site at each moment, from NASA JPL ephemeris files.
 2. It builds the horizon around the site from NASA LOLA elevation data.
 3. A body is visible when it is higher than the terrain in its direction. The Moon has no atmosphere, so nothing is bent.
-4. The web app draws the result: a panorama of the horizon, a timeline, metrics, a comparison, and 3D scenes lit by the Sun where it really is.
+4. The web app shows the result: a verdict for a moment, a 30-day calendar, the best windows, and 3D views with the Sun and the Earth where the API places them.
 
 More in [docs/architecture/system-overview.md](docs/architecture/system-overview.md). A one-page summary of the features, the purpose and what sets the project apart is in [docs/product/project-brief.md](docs/product/project-brief.md).
 
 ## Running it
 
-See [docs/developer/getting-started.md](docs/developer/getting-started.md).
+You need Node.js 22, pnpm (through `corepack enable`) and uv. From the repository root:
+
+```bash
+pnpm install
+cd apps/api && uv sync && uv run python scripts/download_data.py && uv run python scripts/precompute_horizons.py
+uv run uvicorn app.main:app --reload            # terminal 1: API on http://localhost:8000
+cp apps/web/.env.example apps/web/.env.local     # terminal 2, from the root
+pnpm dev                                          # web app on http://localhost:3000
+```
+
+Details and checks: [docs/developer/getting-started.md](docs/developer/getting-started.md).
 
 ## Two rules for every contributor
 
@@ -44,7 +54,7 @@ Ali Al Itani, Leonardo Khayyat, Hussein Alassaad, Sam Abou Zeid, Khalil Dandashl
 
 ## Data and credits
 
-Positions come from NASA JPL ephemerides, checked against JPL Horizons. Terrain comes from the Lunar Orbiter Laser Altimeter on NASA's Lunar Reconnaissance Orbiter. Surface maps come from NASA's Scientific Visualization Studio (CGI Moon Kit) and NASA's Blue Marble. The full list, with links and credit lines, is in [docs/data/sources.md](docs/data/sources.md) and [docs/reference/references.md](docs/reference/references.md).
+Positions come from NASA JPL ephemerides, checked against JPL Horizons. Terrain comes from the Lunar Orbiter Laser Altimeter on NASA's Lunar Reconnaissance Orbiter. Moon surface maps come from NASA's Scientific Visualization Studio (CGI Moon Kit), and 3D models from NASA 3D Resources. The full list, with links and credit lines, is in [docs/data/sources.md](docs/data/sources.md) and [docs/reference/references.md](docs/reference/references.md).
 
 NASA does not endorse this project.
 

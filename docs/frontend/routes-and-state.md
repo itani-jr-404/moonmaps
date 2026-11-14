@@ -1,118 +1,71 @@
 # Routes and state
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-14.
 
-How the web app is laid out, where state lives, and how data is fetched. Layering rules are in [architecture/application-layers.md](../architecture/application-layers.md).
+How the web app is laid out, where state lives, and how data is fetched. Layering rules are in [architecture/application-layers.md](../architecture/application-layers.md). The web app is being written, so this page describes the structure, not every detail.
 
 ## Routes
 
-| Path | Page | Notes |
+One page, `/` (`src/app/page.tsx`). Its sections, in order:
+
+| Section | Feature folder | What it does |
 | --- | --- | --- |
-| `/` | Landing page | Animated intro, see [landing-page.md](landing-page.md). Ends with a button to `/explore`. |
-| `/explore` | The app | One page with several views, chosen by the `view` parameter |
-| `/accuracy` | Accuracy | Our angles next to JPL Horizons, and the comparison with NASA's illumination maps |
-| `/about` | About | Team, data credits, references, how AI is used |
+| Hero | `hero` | Opening, with a live readout of the Sun and the Earth at the south pole |
+| Choose a landing | `landing` | A globe to aim at any point, then a surface view of that point |
+| Why | `why` | Why the south pole and why light and line of sight matter |
+| Planner | `planner` | Pick a site and a moment; a verdict, a 30-day calendar, the best windows and a 3D diorama |
+| About | `about` | What the app does and how; the footer carries the data credits |
 
-Views inside `/explore`:
+Navigation, the footer, the custom cursor and reveal effects are in `site-chrome`. A skip link jumps to the planner.
 
-| `view` | Centre of the screen | Panels |
-| --- | --- | --- |
-| `solar` | Solar System scene | Date |
-| `moon` | Moon globe with site pins | Site list, date |
-| `site` (default once a site is chosen) | 3D terrain of the site, with the horizon panorama under or beside it | Site list, metrics, time slider, timeline |
-| `compare` | Comparison table and stacked timelines | Scenario list |
-
-The assistant panel can be opened from any view.
-
-## Screen layout of `/explore`
-
-```text
-+--------------------------------------------------------------------+
-| Moon Maps   [Solar | Moon | Site | Compare]      date range   (?)  |
-+-----------+----------------------------------------+---------------+
-| Sites     |                                        | Metrics       |
-| search    |            3D scene                    | sunlight %    |
-| list      |                                        | Earth %       |
-| custom    |----------------------------------------| to sunset     |
-| lat, lon  |        Horizon panorama (SVG)          | to Earthset   |
-| + compare |                                        | status badges |
-+-----------+----------------------------------------+---------------+
-| Time slider and timeline: Sun bar, Earth bar, current time marker  |
-+--------------------------------------------------------------------+
-                                              [ Ask the assistant ]
-```
-
-On a narrow screen the side panels become sheets that slide over the scene, and the timeline stays at the bottom.
+Planned, not built: an accuracy page for `GET /validation`, a comparison view, a horizon panorama and the assistant panel.
 
 ## State
 
-There are three kinds of state, each with one home.
-
 | Kind | Examples | Home |
 | --- | --- | --- |
-| Scenario state | Selected scenarios (site, start, end, step), active view | The URL, mirrored in the scenario store |
-| Playback state | Current time on the slider, playing or paused, speed | The scenario store only (it changes many times a second) |
-| Server data | Sites, analysis results, scene positions, terrain tiles | The query cache |
-| Local UI state | Open panels, hover, form drafts | The component |
+| Scenario state | The chosen place (a curated site or a point) and moment | The zustand store in `src/lib/state/scenario-store.ts`, mirrored in the URL |
+| Server data | Sites, analysis results, sky answers | The TanStack Query cache |
+| Local UI state | Open panels, hover, the aimed point | The component or the scene |
 
 ### URL format
 
 ```text
-/explore?view=site&s=malapert-massif~2027-03-01~30&s=-89.45,222.7~2027-03-01~30&i=0
+/?site=shackleton-ridge&t=2026-11-14T14:56Z
+/?lat=-89.4500&lon=-137.3000&t=2026-11-14T14:56Z
 ```
 
-- Each `s` is one scenario: `<site>~<start date>~<days>`. `<site>` is a curated id or `lat,lon`.
-- `i` is the index of the scenario shown in the single-site views.
-- The step is chosen by the app from the length of the range (1 hour up to 60 days, 3 hours beyond) unless set with `step=`.
-
-A link therefore reproduces the same result on another machine.
-
-### Scenario store
-
-A small store in `src/lib/state` (zustand). It holds the scenarios, the active index, the current time and playback flags. Rules:
-
-- Changing a scenario writes the URL (replace, not push, while dragging; push on commit).
-- Loading the page reads the URL into the store.
-- 3D scenes read the current time from the store inside the render loop without re-rendering React, so the slider can be dragged smoothly.
+- `site` is a curated id (lower case letters, digits and hyphens), or `lat` and `lon` give a point. Longitudes from 180 to 360 are converted to -180 to 0.
+- `t` is the moment in UTC, to the minute.
+- Bad values are ignored and the defaults are used. The URL is updated with `replaceState` as the choice changes (`src/lib/state/url-sync.ts`), so a link reproduces the same result.
 
 ### Server data
 
-Fetched through hooks in `src/lib/api`, built on TanStack Query and the typed client.
+Hooks in `src/lib/api/hooks.ts`, built on TanStack Query and the typed client in `src/lib/api/client.ts` (`openapi-fetch` with the generated types from `@moon-maps/contracts`). The API's address is `NEXT_PUBLIC_API_URL`.
 
-| Hook | Endpoint | Cache key |
+| Hook | Endpoint | Notes |
 | --- | --- | --- |
-| `useSites()` | `GET /sites` | `sites` |
-| `useAnalysis(scenarios)` | `POST /analyze` | The normalised scenarios |
-| `useScene(t)` | `GET /scene` | `t` rounded to the hour |
-| `useTerrain(site)` | `GET /terrain` | Site, size, resolution |
-| `useValidation()` | `GET /validation` | `validation` |
-| `useAssistant()` | `POST /assistant/chat` | Not cached; a mutation |
+| `useSites()` | `GET /sites` | Kept for the whole visit |
+| `useAnalyze(scenarios)` | `POST /analyze` | Keyed by the scenarios; the planner sends two (the verdict span and the 30-day calendar), without series |
+| `useSky(point, t)` | `GET /sky` | Kept for a minute |
+| `useScene(t)` | `GET /scene` | Available; not used by a section yet |
+| `useValidation()` | `GET /validation` | Available; not used by a section yet |
 
-Every hook returns loading, error and data, and views must render all three.
+`fetchSkyRounded` in `src/lib/api/fetch-sky.ts` serves the globe while aiming: it rounds the point to 0.1 degree and the time to 10 minutes and caches answers in memory ([ADR-011](../decisions/ADR-011-sky-endpoint.md)).
 
-Moving the slider never refetches. `useSample(result, t)` picks the two samples around the current time from the analysis already in memory and interpolates between them.
-
-## Input checking
-
-Forms use zod schemas that mirror the API's limits (latitude and longitude ranges, range length). The message appears next to the field before any request is sent. The API checks again.
-
-## Mock data
-
-Until an endpoint exists, its hook can be pointed at a file in `src/mocks` by setting `NEXT_PUBLIC_USE_MOCKS=1`. Mock files have exactly the contract's shape and are typed with the generated types, so a contract change breaks them at compile time.
+An error from the API becomes an `ApiError` with the API's code and message. Every view handles loading, error and data; shared state components are in `src/components/ui/states.tsx`.
 
 ## States every view must have
 
 | State | What to show |
 | --- | --- |
-| Nothing selected | A short prompt: pick a site to begin |
-| Loading | A skeleton of the same size as the final content, so the layout does not jump |
-| Error | The message, and a retry button |
+| Loading | A placeholder of the same size as the final content, so the layout does not jump |
+| Error | The message, and a way to retry |
+| Nothing to show | A short prompt |
 | No terrain for this site | The result, with a notice that the horizon is a smooth Moon |
-| Fallback data | The result, with a notice that it is a precomputed copy |
 
 ## Accessibility
 
-- Everything works from the keyboard, including the time slider (arrow keys step, page keys jump a day).
-- Status is never shown by colour alone; badges carry a word.
-- The panorama and timeline have a text summary for screen readers (the metrics).
-- Reduced motion is respected: camera flights become cuts, the landing page shows stills.
+- Everything works from the keyboard.
+- Status is never shown by colour alone.
+- Reduced motion must be respected. The app reads the setting in `src/lib/motion/reduced-motion.ts`; smooth scrolling (Lenis) is not started when it is set.

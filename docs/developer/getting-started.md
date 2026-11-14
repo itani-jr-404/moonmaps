@@ -1,39 +1,42 @@
 # Getting started
 
-Status: Design. Last updated: 2026-11-14.
+Status: Built. Last updated: 2026-11-14.
 
-How to run the project on your machine. The repository does not exist yet, so the commands below are the planned ones. Correct them in the pull request that sets up the repository.
+How to run the project on your machine.
 
 ## You need
 
 | Tool | Version | For |
 | --- | --- | --- |
-| Node.js | 20 or newer | The web app |
-| pnpm | 9 or newer | Installing web packages |
-| Python | 3.12 | The API |
-| uv | Current | Python environments and packages |
+| Node.js | 22 or newer (`engines` in `package.json`) | The web app |
+| pnpm | 11.3.0, pinned by `packageManager` in `package.json`; `corepack enable` provides it | Installing web packages |
+| uv | Current | Python, the API's environment and packages |
+| Python | 3.12 (`apps/api/.python-version`); uv installs it if missing | The API |
 | Git | Any recent | |
 
 About 300 MB of free disk for the data files.
 
 ## First run
 
+On macOS with Homebrew:
+
 ```bash
+brew install uv
 git clone <repository url>
 cd moon-maps
 
-# web app
+# web app and contract packages; also installs the husky pre-commit hook
 pnpm install
 
 # API
 cd apps/api
 uv sync
-uv run python scripts/download_data.py      # kernels and elevation grids, about 240 MB
-uv run python scripts/precompute_horizons.py # horizon profiles for the curated sites
+uv run python scripts/download_data.py        # kernels and elevation grids, about 250 MB
+uv run python scripts/precompute_horizons.py  # horizon profiles for the curated sites
 cd ../..
 ```
 
-`download_data.py` is safe to run again; it skips files that are already there.
+`download_data.py` is safe to run again; it skips files that are already there. `--no-dem` skips the elevation grids; every site then uses a smooth Moon.
 
 ## Run it
 
@@ -45,70 +48,65 @@ cd apps/api
 uv run uvicorn app.main:app --reload
 
 # terminal 2: web app on http://localhost:3000
-pnpm --filter web dev
+cp apps/web/.env.example apps/web/.env.local
+pnpm dev
 ```
 
 Open http://localhost:3000 . The API's interactive documentation is at http://localhost:8000/docs .
 
 ## Environment variables
 
-Copy the example files and fill them in. Neither file is committed.
-
-`apps/web/.env.local`:
+`apps/web/.env.local` (copied from `apps/web/.env.example`, not committed):
 
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_USE_MOCKS=0        # set to 1 to work without the API
 ```
 
-`apps/api/.env`:
+The API needs no variables to run locally. Its defaults allow `http://localhost:3000` through CORS. To change a setting, set an `MM_` variable or put it in `apps/api/.env`, for example:
 
 ```bash
-CORS_ORIGINS=http://localhost:3000
-LLM_PROVIDER=                  # leave empty to run without the assistant
-LLM_MODEL=
-LLM_API_KEY=
+MM_CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
 ```
 
-The full list is in [deployment.md](deployment.md).
+The full list is in [backend/service-layer.md](../backend/service-layer.md) and [deployment.md](deployment.md).
 
-## Working on the web app without the API
+## Working without the API
 
-Set `NEXT_PUBLIC_USE_MOCKS=1`. Hooks then read from `apps/web/src/mocks`, which hold responses in exactly the contract's shape. This is how the frontend starts before the backend has endpoints.
+There is no mock mode. The web app shows its error state when the API cannot be reached.
 
 ## Working on the API without the data
 
-The engines' unit tests use small synthetic grids and do not need the downloaded files. The Horizons comparison and anything using real terrain do need them.
+The API does not start without the kernels; run `download_data.py --no-dem` at least. The unit tests of the engines use small synthetic grids. Tests that need the kernels or the real grids are skipped with a message when the files are missing.
 
 ## Changing the contract
 
 ```bash
 # after editing a model in apps/api/app/schemas
-cd apps/api && uv run python scripts/export_openapi.py
-cd ../.. && pnpm contracts:generate
+pnpm contracts:generate
 ```
 
 Commit the two regenerated files in `packages/contracts` with your change.
 
 ## Before you open a pull request
 
+From the repository root:
+
 ```bash
-pnpm --filter web lint
-pnpm --filter web typecheck
-pnpm --filter web test
-cd apps/api && uv run ruff check . && uv run ruff format --check . && uv run pytest
+pnpm lint && pnpm typecheck && pnpm test
+cd apps/api && uv run ruff check . && uv run ruff format --check . && uv run pytest && cd ../..
 pnpm contracts:check
-python3 scripts/check_docs_links.py   # from the repository root
+python3 scripts/check_docs_links.py
 ```
 
-CI runs the lint, type check, test and build steps and the link check on every pull request. See [testing.md](testing.md).
+CI runs these checks on every pull request. See [testing.md](testing.md).
 
 ## Common problems
 
 | Problem | Likely cause |
 | --- | --- |
-| `terrain_unavailable` from the API | `download_data.py` has not been run |
-| The first request for a custom site is slow | Its horizon profile is being built; later requests use the cache |
-| Type errors in the web app after pulling | The contract changed; run `pnpm install` so the workspace picks up `packages/contracts` |
-| The 3D scene is blank | WebGL is disabled or the browser is very old; the app should show a still image and a notice |
-| The assistant returns `assistant_unavailable` | No model is configured in `apps/api/.env` |
+| The API stops at start with `Missing kernels` | `download_data.py` has not been run |
+| `GET /health` shows `"dem": []` and every site says `sphere` | The elevation grids are missing; run `download_data.py` without `--no-dem` |
+| The first request for a new point is slower | Its horizon profile is being built; later requests use the cache |
+| Horizons look wrong after changing a grid | Delete `apps/api/app/data/cache/horizon/`; its file names do not include the grid |
+| Type errors in the web app after pulling | The contract changed; run `pnpm install`, and `pnpm contracts:generate` if you changed a schema |
+| The browser reports a CORS error | The web app's address is not in `MM_CORS_ORIGINS` |

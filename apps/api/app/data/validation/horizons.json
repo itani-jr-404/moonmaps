@@ -1,0 +1,166 @@
+{
+  "fetched_at": "2026-11-14T16:15:33+00:00",
+  "source": "JPL Horizons API (https://ssd.jpl.nasa.gov/api/horizons.api), quantity 4, observer coord@301, fetched by script",
+  "cases": [
+    {
+      "site_name": "Near the south pole",
+      "lat": -89.9,
+      "lon": 0.0,
+      "height_km": 0.0,
+      "t": "2026-11-15T00:00:00Z",
+      "body": "sun",
+      "az": 114.433749,
+      "el": 1.514992
+    },
+    {
+      "site_name": "Near the south pole",
+      "lat": -89.9,
+      "lon": 0.0,
+      "height_km": 0.0,
+      "t": "2026-11-22T00:00:00Z",
+      "body": "sun",
+      "az": 29.310852,
+      "el": 1.623521
+    },
+    {
+      "site_name": "Near the south pole",
+      "lat": -89.9,
+      "lon": 0.0,
+      "height_km": 0.0,
+      "t": "2026-11-29T00:00:00Z",
+      "body": "sun",
+      "az": 304.365452,
+      "el": 1.540163
+    },
+    {
+      "site_name": "Near the south pole",
+      "lat": -89.9,
+      "lon": 0.0,
+      "height_km": 0.0,
+      "t": "2026-12-06T00:00:00Z",
+      "body": "sun",
+      "az": 219.190451,
+      "el": 1.373577
+    },
+    {
+      "site_name": "Near the south pole",
+      "lat": -89.9,
+      "lon": 0.0,
+      "height_km": 0.0,
+      "t": "2026-11-15T00:00:00Z",
+      "body": "earth",
+      "az": 357.380211,
+      "el": -3.453001
+    },
+    {
+      "site_name": "Near the south pole",
+      "lat": -89.9,
+      "lon": 0.0,
+      "height_km": 0.0,
+      "t": "2026-11-22T00:00:00Z",
+      "body": "earth",
+      "az": 353.620541,
+      "el": 5.436348
+    },
+    {
+      "site_name": "Near the south pole",
+      "lat": -89.9,
+      "lon": 0.0,
+      "height_km": 0.0,
+      "t": "2026-11-29T00:00:00Z",
+      "body": "earth",
+      "az": 5.137159,
+      "el": 1.673061
+    },
+    {
+      "site_name": "Near the south pole",
+      "lat": -89.9,
+      "lon": 0.0,
+      "height_km": 0.0,
+      "t": "2026-12-06T00:00:00Z",
+      "body": "earth",
+      "az": 5.251456,
+      "el": -6.562712
+    },
+    {
+      "site_name": "Near Apollo 11",
+      "lat": 0.67416,
+      "lon": 23.47314,
+      "height_km": 0.0,
+      "t": "2026-11-15T00:00:00Z",
+      "body": "sun",
+      "az": 91.54587,
+      "el": -0.97674
+    },
+    {
+      "site_name": "Near Apollo 11",
+      "lat": 0.67416,
+      "lon": 23.47314,
+      "height_km": 0.0,
+      "t": "2026-11-22T00:00:00Z",
+      "body": "sun",
+      "az": 110.75455,
+      "el": 83.759241
+    },
+    {
+      "site_name": "Near Apollo 11",
+      "lat": 0.67416,
+      "lon": 23.47314,
+      "height_km": 0.0,
+      "t": "2026-11-29T00:00:00Z",
+      "body": "sun",
+      "az": 268.35883,
+      "el": 10.871584
+    },
+    {
+      "site_name": "Near Apollo 11",
+      "lat": 0.67416,
+      "lon": 23.47314,
+      "height_km": 0.0,
+      "t": "2026-12-06T00:00:00Z",
+      "body": "sun",
+      "az": 267.03851,
+      "el": -74.264933
+    },
+    {
+      "site_name": "Near Apollo 11",
+      "lat": 0.67416,
+      "lon": 23.47314,
+      "height_km": 0.0,
+      "t": "2026-11-15T00:00:00Z",
+      "body": "earth",
+      "az": 276.127538,
+      "el": 63.683491
+    },
+    {
+      "site_name": "Near Apollo 11",
+      "lat": 0.67416,
+      "lon": 23.47314,
+      "height_km": 0.0,
+      "t": "2026-11-22T00:00:00Z",
+      "body": "earth",
+      "az": 257.723805,
+      "el": 59.401657
+    },
+    {
+      "site_name": "Near Apollo 11",
+      "lat": 0.67416,
+      "lon": 23.47314,
+      "height_km": 0.0,
+      "t": "2026-11-29T00:00:00Z",
+      "body": "earth",
+      "az": 262.150105,
+      "el": 71.407444
+    },
+    {
+      "site_name": "Near Apollo 11",
+      "lat": 0.67416,
+      "lon": 23.47314,
+      "height_km": 0.0,
+      "t": "2026-12-06T00:00:00Z",
+      "body": "earth",
+      "az": 287.938781,
+      "el": 70.855531
+    }
+  ]
+}

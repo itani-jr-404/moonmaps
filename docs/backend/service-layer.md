@@ -1,91 +1,123 @@
 # Service layer
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-14.
 
-How the API is organised inside. The layering rules are in [architecture/application-layers.md](../architecture/application-layers.md).
+How the API in `apps/api` is organised inside. The layering rules are in [architecture/application-layers.md](../architecture/application-layers.md). The endpoints are in [api-reference.md](api-reference.md).
+
+## Start-up
+
+`app/main.py` has `create_app(settings, services)`. It adds gzip compression for responses over 1 KB, CORS (methods `GET` and `POST`, header `Content-Type`, origins from configuration), a middleware that logs one line per request and sets `x-request-id`, the error handlers, and the three routers. At start-up, the lifespan hook calls `build_services(settings)` in `app/services/container.py` once and stores the result on `app.state.services`.
+
+`build_services` loads the JPL kernels, memory-maps the elevation grids that are present (`LDEM_80S_80M`, then `LDEM_75S_120M`; a missing grid is logged as a warning and skipped), reads `sites.json`, and builds every service. Routers receive the `Services` object through the `Deps` dependency in `app/routers/deps.py`.
 
 ## Routers
 
-One file per resource in `app/routers`. A router function is a few lines: the Pydantic model validates the input, the function calls one service function, and the return value is a Pydantic model.
+One file per resource in `app/routers`. A router function validates input through the Pydantic models, calls one service function and returns a model. `deps.py` also declares the error shapes (404, 422, 500) that every route documents.
+
+| File | Routes |
+| --- | --- |
+| `system.py` | `GET /health`, `GET /validation` |
+| `sites.py` | `GET /sites` |
+| `analysis.py` | `POST /analyze`, `GET /sky`, `GET /scene` |
 
 ```python
 @router.post("/analyze", response_model=AnalyzeResponse)
-def analyze(body: AnalyzeRequest) -> AnalyzeResponse:
-    return metrics_service.run(body.scenarios)
+def analyze(body: AnalyzeRequest, services: Deps) -> AnalyzeResponse:
+    return services.analysis.run(body.scenarios)
 ```
+
+## Schemas
+
+The request and response models are in `app/schemas`: `common.py` (site, site reference, window, shared field types), `analyze.py` (scenario, result, series, metrics, limits), `sky.py` (`/sky` and `/scene`), `system.py` (health, errors, validation report). They are the contract; see [architecture/repository-structure.md](../architecture/repository-structure.md) for how it is exported.
 
 ## Services
 
-| Service | Main function | What it does |
-| --- | --- | --- |
-| `sites` | `list_sites()`, `resolve(site_ref)` | Loads `sites.json` once; turns `{id}` or `{lat, lon}` into a full site |
-| `metrics` | `run(scenarios)` | For each scenario: resolve the site, get the horizon, get positions, run visibility, compute metrics and status |
-| `scene` | `at(t)` | Planet positions and the Moon's sub-solar and sub-Earth points |
-| `terrain` | `tile(lat, lon, size_km, n)` | Resamples the elevation grid into a local tile |
-| `validation` | `report()` | Recomputes our angles for the saved cases and compares |
-| `assistant` | `answer(messages, context)` | See [assistant.md](assistant.md) |
+| Service | File | Main functions | What it does |
+| --- | --- | --- | --- |
+| `SiteService` | `services/sites.py` | `list()`, `resolve(ref)` | Loads `sites.json` once. Turns `{id}` into a curated site (or raises `unknown_site`), and `{lat, lon, name?}` into a site of kind `custom`, clamping latitude to 89.9999 and normalising longitude to -180..180 |
+| `HorizonService` | `services/horizons.py` | `get(lat, lon)` | Returns the horizon profile, its source grid and the ground height at the site, from the memory cache, the disk cache, or by building it |
+| `AnalysisService` | `services/analysis.py` | `run(scenarios)`, `run_one(scenario)` | Runs one scenario end to end; see below |
+| `SkyService` | `services/sky.py` | `at(lat, lon, t)`, `scene(t)` | The Sun and the Earth at one point and moment with clearance; the sub-solar and sub-Earth points |
+| `ValidationService` | `services/validation.py` | `report()` | Recomputes our angles for the saved JPL Horizons cases and compares them; the report is built once and kept |
 
-`metrics.run` in steps:
+`AnalysisService.run_one` in steps:
 
 1. `site = sites.resolve(scenario.site)`
-2. `profile = horizon_cache.get_or_build(site.lat, site.lon)` (see below)
-3. `times = time grid from start, end, step`
-4. `sun, earth = ephemeris.sun_earth_altaz(site, times)` (arrays of azimuth and elevation)
-5. `vis = visibility.evaluate(sun, earth, profile)` (clearance and visible arrays)
-6. `windows = visibility.windows(times, vis)`
-7. `metrics = visibility.metrics(times, vis, windows)`
-8. `status = visibility.status(metrics)`
-9. Build the `ScenarioResult` model.
+2. `check_range(start, end)`: refuses dates outside 1900-01-02 to 2050-12-30.
+3. Look up the result cache; on a miss, compute:
+4. `times = time_grid(start, end, step_minutes)`: every step from `start`, plus `end`; refuses more than 10,000 samples.
+5. `hz = horizons.get(site.lat, site.lon)`
+6. `pos = ephemeris.sun_earth_altaz(lat, lon, ground height + observer height, times)`
+7. `vis = visibility.evaluate(...)`, then `visibility.windows(...)` for the Sun and the Earth, `visibility.intersect(...)` for both, `visibility.metrics(...)` and `visibility.status(...)`.
+8. Build the `ScenarioResult`, leaving out `series` when `include_series` is false.
 
-Scenarios in one request are independent, so they can run one after another or in a thread pool.
+Scenarios in one request run one after another.
 
 ## Engines
 
-Pure functions, no web framework, no configuration lookups. Signatures are fixed early so people can work in parallel.
+Pure functions and small classes in `app/engines`. They do not import FastAPI or the schemas and do not read configuration.
 
-| Module | Functions |
+| Module | Main contents |
 | --- | --- |
-| `engines/ephemeris.py` | `sun_earth_altaz(lat, lon, height_m, times) -> (sun_az, sun_el, earth_az, earth_el)`; `planets_ecliptic(t)`; `moon_subpoints(t)` |
-| `engines/terrain.py` | `load_grid(name)`; `height_at(grid, lat, lon)` (bilinear, vectorised); `tile(grid, lat, lon, size_km, n)` |
-| `engines/horizon.py` | `profile(grid, lat, lon, observer_height_m=2.0, max_km=200) -> elevation_deg[360]` |
-| `engines/visibility.py` | `evaluate(...)`, `windows(...)`, `metrics(...)`, `status(...)` |
+| `ephemeris.py` | `Ephemeris(kernel_dir)` loads the kernels once; `sun_earth_altaz(lat, lon, height_m, unix_seconds)` returns azimuth and elevation arrays for the Sun and the Earth; `subpoints(unix_second)`; `EPHEMERIS_START`, `EPHEMERIS_END` |
+| `terrain.py` | `PolarGrid` (memory-mapped LOLA grid with `to_pixel` and bilinear `height_m`), `GridStack` (finest grid first, `height_m`, `source_for`), `read_label`, `load_polar_grid`, `MOON_RADIUS_M` |
+| `horizon.py` | `sample_distances_m(max_km)`, `destination(...)`, `elevation_angle_deg(...)`, `profile(height_fn, lat, lon, observer_height_m, max_km, az_step_deg)`, `smooth_sphere_profile()`, `horizon_at(profile, az)` |
+| `visibility.py` | `evaluate`, `windows`, `intersect`, `metrics`, `status`, `STATUS_THRESHOLDS` |
 
-Details of each calculation are in the `science/` documents.
+The calculations are described in the `science/` documents.
 
 ## Caching
 
 | What | Where | Key | Lifetime |
 | --- | --- | --- | --- |
-| Elevation grids | Memory-mapped file (`numpy.memmap`) | File name | Process |
-| Horizon profile | `app/data/cache/horizon/` as small `.npy` files, plus an in-memory dictionary | Grid name, lat and lon rounded to 0.001 degrees, observer height | Until the file is deleted |
-| Analysis result | In-memory LRU, about 200 entries | Site key, start, end, step | Process |
+| Elevation grids | `numpy.memmap` of the `.IMG` files | File name | Process |
+| JPL kernels | Loaded once by `Ephemeris` | None | Process |
+| Horizon profile, in memory | `LruCache` of 4,000 entries in `HorizonService` | Latitude and longitude rounded to 0.001 degrees | Process |
+| Horizon profile, on disk | `app/data/cache/horizon/*.npz` (profile, source, site height) | Rounded latitude and longitude, observer height, reach; for example `-89.684_-163.261_2m_200km.npz` | Until the file is deleted |
+| Analysis result | `LruCache` of 200 entries in `AnalysisService` | Rounded latitude and longitude, site id, start, end, step, `include_series` | Process |
+| Validation report | Built on first request | None | Process |
 | Site list | Loaded once | None | Process |
 
-`scripts/precompute_horizons.py` builds the profile of every curated site ahead of time, so the first visitor does not wait. It also writes the fallback results the web app ships in `public/fallback/`.
+`LruCache` is in `app/core/cache.py`; it is thread-safe. The disk file name does not include the grid, so after a grid is added or changed, delete `app/data/cache/horizon/`.
+
+`scripts/precompute_horizons.py` builds the profile of every curated site ahead of time, so the first visitor does not wait. The Dockerfile runs it during the image build.
 
 ## Limits
 
-Applied in the service, with the error codes from [api-reference.md](api-reference.md):
+Applied in the schemas and services, with the error codes from [api-reference.md](api-reference.md):
 
-- at most 4 scenarios per request;
-- at most 10,000 samples per scenario;
+- 1 to 4 scenarios per request (`MAX_SCENARIOS` in `schemas/analyze.py`);
+- at most 10,000 samples per scenario (`MAX_SAMPLES`);
 - step between 5 minutes and 1 day;
-- dates inside the kernel's range;
-- terrain tile size and resolution inside the documented range.
+- dates between 1900-01-02 and 2050-12-30 (`EPHEMERIS_START`, `EPHEMERIS_END` in `engines/ephemeris.py`);
+- a custom site name of at most 80 characters, a site id of at most 64.
+
+Not built: rate limiting per client, and the assistant service ([assistant.md](assistant.md)).
 
 ## Errors
 
+`app/core/errors.py`:
+
 ```python
 class AppError(Exception):
-    def __init__(self, code: str, message: str, status: int = 400): ...
+    def __init__(self, code: str, message: str, status: int = 400) -> None: ...
 ```
 
-Services and engines raise `AppError`. One exception handler in `main.py` turns it into `{ "error": { "code", "message" } }`. A second handler catches anything else, logs it with a request id, and returns `internal` with a generic message. Pydantic validation errors are mapped to `invalid_input`.
+Services raise `AppError`. `install_error_handlers` turns it into `{ "error": { "code", "message" } }` with its status. Pydantic validation errors become `invalid_input` (422), with a message naming the first failing field. Any other exception is logged with the request id and returned as `internal` (500) with a generic message.
 
 ## Configuration
 
-`app/core/config.py` reads environment variables once at start. The list is in [developer/deployment.md](../developer/deployment.md). Services receive configuration; engines never read it.
+`app/core/config.py` reads environment variables with the prefix `MM_` once at start, and also reads a `.env` file in the working directory if present (`apps/api/.env` when the API is started from `apps/api`). Services receive the values; engines never read them.
+
+| Setting | Variable | Default |
+| --- | --- | --- |
+| `data_dir` | `MM_DATA_DIR` | `apps/api/app/data` |
+| `cors_origins` | `MM_CORS_ORIGINS` | `["http://localhost:3000"]` (a JSON list) |
+| `cors_origin_regex` | `MM_CORS_ORIGIN_REGEX` | none |
+| `log_level` | `MM_LOG_LEVEL` | `INFO` |
+| `observer_height_m` | `MM_OBSERVER_HEIGHT_M` | 2.0 |
+| `horizon_max_km` | `MM_HORIZON_MAX_KM` | 200.0 |
 
 ## Logging
 
-One line per request: method, path, status, duration, request id. No request bodies are logged for the assistant endpoint beyond their length.
+One line per request: method, path, status, duration in milliseconds and request id. Building a new horizon profile logs one line with the point and the grid.

@@ -1,29 +1,47 @@
 # Current state
 
-Last updated: 2026-11-14, about 16:20 Beirut time.
+Last updated: 2026-11-14.
 
 This file says what is real today. Update it in every pull request that builds, removes or postpones something.
 
 ## Summary
 
-The design is written (these documents) and the repository is set up. A prototype of the web app, with its designs, exists outside the repository and has not been brought into `apps/web` yet. No part of the API is built.
+The API is built for the core calculation: sites, analysis of up to four scenarios, the sky at one moment, the Moon's sub-solar and sub-Earth points, and the comparison with JPL Horizons. The contract is generated from it. The web app is a one-page Next.js port of the team's prototype and is still being written; it reads everything from the API. CI checks the documentation links, the web app, the API and the contract. Nothing is deployed.
 
 ## Built
 
 | Part | State |
 | --- | --- |
-| Repository | Set up: structure, documents, rules, licence |
-| CI | Runs on every pull request and on `main`. The documentation link check runs now; the web and API checks start by themselves once those folders hold a project. See [developer/testing.md](developer/testing.md). |
-| Web: prototype | Exists outside the repository; to be moved into `apps/web` and described here |
-| API: ephemeris engine | Not started |
-| API: terrain and horizon engine | Not started |
-| API: metrics, endpoints | Not started |
-| API: assistant | Not started |
-| Web: app shell, design system | Not started |
-| Web: panorama, timeline, metrics | Not started |
-| Web: 3D scenes | Not started |
-| Web: landing page | Not started |
-| Deployment | Not started |
+| Repository and tooling | pnpm workspace (`apps/web`, `packages/contracts`), uv for the API, Prettier, ESLint, ruff, a husky pre-commit hook running lint-staged |
+| CI | GitHub Actions: documentation links always; the web job (contract check, lint, type check, test, build) and the API job (ruff, ruff format, pytest) when their folders change. See [developer/testing.md](developer/testing.md) |
+| Contract | `packages/contracts/openapi.json` exported from the API, `api.d.ts` generated from it, and a check that both are up to date |
+| API: endpoints | `GET /health`, `GET /sites`, `POST /analyze`, `GET /sky`, `GET /scene` (sub-solar and sub-Earth points only), `GET /validation`. See [backend/api-reference.md](backend/api-reference.md) |
+| API: ephemeris engine | Skyfield with DE421 and the lunar frame kernels; agrees with JPL Horizons within 0.0123 degrees on 16 saved cases |
+| API: terrain and horizon engine | Reads `LDEM_80S_80M` and `LDEM_75S_120M`; 360-value profiles to 200 km; smooth Moon for sites north of 75 S; cached in memory and on disk |
+| API: visibility, windows, metrics, status | Built, with the starting thresholds |
+| API: scripts | `download_data.py`, `precompute_horizons.py`, `fetch_horizons.py`, `export_openapi.py` |
+| API: tests | 36 tests pass (`uv run pytest -q`, 2026-11-14), including the JPL Horizons comparison |
+| API: Dockerfile | `apps/api/Dockerfile`; downloads the data and builds the site horizons at image build time. Not yet run on a host |
+| Sites | 17 curated sites in `apps/api/app/data/sites.json`. See [data/sites.md](data/sites.md) |
+| Web: page and sections | One page (`/`) with a hero, "choose a landing" (globe and surface view), why, the planner (verdict, 30-day calendar, best windows, 3D diorama) and about. Being written |
+| Web: data | TanStack Query hooks over a typed `openapi-fetch` client; a zustand scenario store kept in the URL (`?site=` or `?lat=&lon=`, and `?t=`) |
+| Web: 3D | three.js used directly ([ADR-010](decisions/ADR-010-threejs-directly.md)). The ground relief in the 3D views is decorative procedural noise, not LOLA terrain |
+| Web: assets | NASA textures and 3D models in `apps/web/public/`. See [data/sources.md](data/sources.md) |
+
+## Not built
+
+| Part | Notes |
+| --- | --- |
+| `GET /terrain` height tiles, and a 3D site view from real terrain | Planned |
+| Assistant (`POST /assistant/chat`) and its chat panel | Planned; the AI model is not chosen |
+| Rate limiting in the API | Planned |
+| Side-by-side comparison of sites or dates in the web app | The API accepts four scenarios; the planner analyses one site at a time |
+| Horizon panorama | Planned |
+| Accuracy page in the web app | `GET /validation` exists; no page shows it |
+| Solar System scene and planet positions in `/scene` | Planned |
+| Fallback results when the API is down | Planned; today the app shows an error state |
+| Check of sunlight percentages against NASA's illumination maps | Planned |
+| Deployment | Not started; the host for the API is not chosen |
 
 ## Decided
 
@@ -33,30 +51,30 @@ See [decisions/](decisions/README.md) for the reasons.
 - Positions are calculated live with Skyfield; JPL Horizons is the reference we test against.
 - The horizon comes from LOLA elevation grids; visibility is the body's centre against the terrain horizon.
 - No login and no database.
+- three.js is used directly; the web app never computes positions and uses `/sky` for single moments; styling is Tailwind tokens plus CSS modules.
 - The assistant answers from a knowledge base and from the API. Retrieval is added only if the knowledge base grows.
 
 ## Open questions
 
 | Question | Who decides | Blocks |
 | --- | --- | --- |
-| How the prototype's screens and stack line up with the design in these documents | Team, when the prototype is brought in | Web app |
-| Which AI model runs the assistant | Team | Assistant service only; the interface is fixed |
+| Which AI model runs the assistant | Team | Assistant |
 | Thresholds for go, caution and no-go | Team, after seeing real numbers | Badges |
-| Textures for the planets other than Earth and Moon, and their licence | Whoever builds the Solar System scene | Solar System scene |
 | Which host runs the API container | Whoever deploys | Deployment |
-| Final curated site list with confirmed coordinates | Site curator | Site picker, accuracy page |
+| Whether to add a terrain horizon for sites north of 75 S, and from which data | Team | Accuracy for Apollo and other non-polar sites |
+| Textures for the planets other than Earth and Moon, and their licence | Whoever builds a Solar System scene | Solar System scene |
+| Credit lines for the NASA 3D models | Team | About section |
 
 ## To confirm before relying on it
 
-These are written in the docs from memory or from a product page, not from running code.
+- Site coordinates have not been opened in Quickmap. See [data/sites.md](data/sites.md).
+- The height scale of the CGI Moon Kit `ldem_3_8bit.jpg` relief map (used for shading only).
+- The source of the Shackleton crater position used by a test, and of the rounded constants in [science/conventions-and-ephemeris.md](science/conventions-and-ephemeris.md).
+- Licences of uv, pnpm and the GitHub Actions used in CI. See [reference/references.md](reference/references.md).
 
-- Layout of the LOLA `.IMG` files (sample type, byte order, scale factor, projection offsets). Read the `.LBL` file. See [science/terrain-and-horizon.md](science/terrain-and-horizon.md).
-- Skyfield kernel file names and the frame name `MOON_ME_DE421`. See [science/conventions-and-ephemeris.md](science/conventions-and-ephemeris.md).
-- Layout and units of the global elevation files in NASA's CGI Moon Kit.
-- Coordinates in the starter site list. See [data/sites.md](data/sites.md).
+## Known limits
 
-## Known limits of the design
-
-- Dates are limited to what the DE421 kernel covers, about 1900 to 2050.
-- Shadows in the 3D site view come from terrain inside the loaded tile only. Blocking by distant terrain is applied through the horizon profile, not through the mesh.
-- For sites far from the south pole the horizon uses a much coarser global elevation map.
+- Dates are limited to 1900-01-02 to 2050-12-30, inside the lunar orientation kernel's coverage.
+- Sites north of 75 S use a smooth Moon: no terrain horizon.
+- Near 75 S, a horizon walk toward the north leaves both grids, and terrain beyond them is not seen.
+- The horizon has 1 degree resolution and a 200 km reach; the observer stands 2 m above the ground.

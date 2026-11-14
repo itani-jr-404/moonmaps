@@ -1,6 +1,6 @@
 # Application layers
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-14.
 
 Both sides of the app are layered, and calls go in one direction only. A layer may call the layer below it and nothing else.
 
@@ -12,22 +12,22 @@ page  ->  feature view  ->  hook  ->  API client  ->  (network)
 
 | Layer | Where | Does | Does not |
 | --- | --- | --- | --- |
-| Page | `src/app/**/page.tsx` | Reads the URL, renders one feature view | Fetch in the browser, hold UI state, contain logic |
-| Feature view | `src/features/<name>/components` | Renders, handles interaction, owns local UI state | Call `fetch` directly, compute visibility |
-| Hook | `src/features/<name>/hooks`, `src/lib/api` | Wraps one API call with caching, loading and error state | Render anything |
-| API client | `src/lib/api/client.ts` | The only place that talks to the network, typed from the contract | Know about React |
+| Page | `src/app/page.tsx` | Puts the sections of the one page in order | Fetch, hold UI state, contain logic |
+| Feature view | `src/features/<name>/components` | Renders, handles interaction, owns local UI state, mounts 3D scenes | Call `fetch` directly, compute positions or visibility |
+| Hook | `src/features/<name>/hooks`, `src/lib/api/hooks.ts` | Wraps API calls with caching, loading and error state (TanStack Query) | Render anything |
+| API client | `src/lib/api/client.ts` (and `fetch-sky.ts`, which uses it) | The only place that talks to the network, typed from the contract with `openapi-fetch` | Know about React |
 
 Shared pieces:
 
-- `src/lib/state`: the scenario store. It holds the selected scenarios and the current time, and keeps them in sync with the URL.
-- `src/scene`: 3D building blocks used by more than one scene.
-- `src/components/ui`: design system components. They take props and know nothing about features.
+- `src/lib/state`: the scenario store (zustand). It holds the selected place and time and keeps them in the URL (`?site=` or `?lat=&lon=`, and `?t=`).
+- `src/scene`: three.js building blocks used by more than one scene. Each scene itself is a plain module in its feature's `lib/` folder ([ADR-010](../decisions/ADR-010-threejs-directly.md)).
+- `src/components/ui`: small shared components. They take props and know nothing about features.
 
 Rules:
 
-- A 3D scene is a feature view like any other. It reads the same store and the same hooks as the panels, so the picture and the numbers cannot disagree.
-- A result from the API client is always `{ data }` or `{ error }`. A view must handle both.
-- Client-only code (anything with three.js) is loaded with a dynamic import so it never runs on the server.
+- A 3D scene gets its angles from the same hooks as the panels (`/sky`, `/analyze`), so the picture and the numbers cannot disagree. The web app never computes a position itself ([ADR-011](../decisions/ADR-011-sky-endpoint.md)).
+- An API call either returns data or throws an `ApiError` with the API's error code and message (`unwrap` in `client.ts`). A view must handle loading, error and data.
+- Code that uses three.js or the browser runs only in client components (`'use client'`) and inside effects, never on the server.
 
 ## API
 
@@ -44,12 +44,12 @@ router  ->  service  ->  engine  ->  data files
 
 Rules:
 
-- Input is checked twice on purpose: zod in the browser for a quick message to the user, Pydantic in the API because the API is public.
+- Input is checked in the API by Pydantic, because the API is public. The web app also limits what it sends (for example the URL parser refuses out-of-range coordinates).
 - Errors are raised as `AppError(code, message, status)` and turned into one JSON shape by a single handler. See [backend/service-layer.md](../backend/service-layer.md).
-- The assistant service calls the metrics service through the same function the router uses. It does not have its own copy of any calculation.
+- Planned: the assistant service will call the analysis service through the same function the router uses, with no copy of any calculation.
 
 ## Why this shape
 
 - The calculation can be tested without a browser or a server.
 - A change to the contract shows up as a type error in the web app.
-- Six people can work at once: frontend on mock data in the contract's shape, backend on engines behind fixed function signatures.
+- Several people can work at once: frontend against the contract's types, backend on engines behind fixed function signatures.

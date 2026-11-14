@@ -15,6 +15,9 @@ Each record states one decision, why it was made, and what follows from it. A re
 | [ADR-007](ADR-007-assistant.md) | The assistant uses a knowledge base first, behind a model interface | Accepted |
 | [ADR-008](ADR-008-no-login-no-database.md) | No login and no database; the URL holds the scenario | Accepted |
 | [ADR-009](ADR-009-columnar-series.md) | Time series are sent as parallel arrays | Accepted |
+| [ADR-010](ADR-010-threejs-directly.md) | three.js is used directly, not through React Three Fiber | Accepted |
+| [ADR-011](ADR-011-sky-endpoint.md) | A `/sky` endpoint for single moments; the web app never computes positions | Accepted |
+| [ADR-012](ADR-012-visual-styling.md) | Tailwind tokens plus CSS modules for complex effects; no shadcn/ui yet | Accepted |
 
 ## Template
 

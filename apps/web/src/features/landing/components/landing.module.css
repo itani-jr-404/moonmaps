@@ -1,0 +1,371 @@
+/*
+ * "Choose your landing". Sizes, colours and timings are copied from the
+ * prototype's .land rules. State comes in as data attributes:
+ * stage[data-mood=good|bad], stage[data-landed], lz[data-on|data-flip|data-up].
+ */
+
+.land {
+  position: relative;
+  z-index: 1;
+  padding-block: 72px 96px;
+  background: radial-gradient(
+    60% 50% at 50% 60%,
+    rgba(74, 127, 212, 0.07),
+    transparent 70%
+  );
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.head :global(.eyebrow)::after {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--accent-grad);
+}
+
+.head :global(.lead) {
+  text-align: center;
+}
+
+/* ---------- stage ---------- */
+
+.stage {
+  position: relative;
+  width: min(100% - 32px, 1180px);
+  aspect-ratio: 1;
+  margin: 24px auto 0;
+  overflow: hidden;
+  border-radius: 28px;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+@media (min-width: 800px) {
+  .stage {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+:global(html.aiming) .stage {
+  cursor: none;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: filter 0.45s var(--ease);
+}
+
+.stage[data-mood='good'] .canvas {
+  filter: brightness(1.25);
+}
+
+.stage[data-landed][data-mood='bad'] .canvas {
+  filter: brightness(0.7) saturate(0.7);
+}
+
+.hint {
+  position: absolute;
+  right: 0;
+  bottom: 4%;
+  left: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-faint);
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+
+.stage[data-landed] .hint {
+  opacity: 0;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.45s var(--ease),
+    background 0.45s;
+}
+
+.stage[data-mood='good'] .shade {
+  opacity: 1;
+  background: radial-gradient(
+    60% 60% at 50% 50%,
+    rgba(98, 214, 160, 0.16),
+    rgba(255, 255, 255, 0.04) 60%,
+    transparent 80%
+  );
+}
+
+.stage[data-mood='bad'] .shade {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.stage[data-landed][data-mood='good'] .shade {
+  background: radial-gradient(
+    80% 70% at 50% 40%,
+    rgba(255, 255, 255, 0.06),
+    transparent 70%
+  );
+}
+
+.stage[data-landed][data-mood='bad'] .shade {
+  background: radial-gradient(
+    90% 80% at 50% 45%,
+    rgba(0, 0, 0, 0.25),
+    rgba(0, 0, 0, 0.7)
+  );
+}
+
+.flash {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 50%,
+    #e6f0ff,
+    #4a7fd4 45%,
+    #070b14 85%
+  );
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  pointer-events: none;
+}
+
+/* ---------- aim card, follows the pointer ---------- */
+
+.lz {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  will-change: transform;
+}
+
+.lz[data-on] {
+  opacity: 1;
+}
+
+.card {
+  position: absolute;
+  top: -18px;
+  left: 24px;
+  display: grid;
+  gap: 4px;
+  min-width: 210px;
+  max-width: 300px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-line-2);
+  border-radius: 14px;
+  background: rgba(7, 11, 20, 0.88);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.lz[data-flip] .card {
+  right: 24px;
+  left: auto;
+}
+
+.lz[data-up] .card {
+  top: auto;
+  bottom: -18px;
+}
+
+.card b {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.card small {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--color-faint);
+}
+
+.place {
+  font-size: 14px;
+  color: var(--color-ink);
+}
+
+.verdict {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.verdict[data-state='checking'] {
+  font-size: 18px;
+  color: var(--color-accent-2);
+}
+
+.verdict[data-state='error'] {
+  font-size: 18px;
+  color: var(--color-warn);
+}
+
+.card.good {
+  border-color: rgba(98, 214, 160, 0.7);
+  background: rgba(10, 40, 32, 0.9);
+  box-shadow: 0 0 40px rgba(98, 214, 160, 0.45);
+}
+
+.card.good .verdict {
+  color: #eafff6;
+  text-shadow: 0 0 16px rgba(98, 214, 160, 0.9);
+}
+
+.card.bad {
+  border-color: rgba(232, 130, 106, 0.45);
+  background: rgba(3, 4, 8, 0.94);
+}
+
+.card.bad .verdict {
+  color: var(--color-warn);
+}
+
+.read {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.why {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-line);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-ink);
+}
+
+/* ---------- surface HUD ---------- */
+
+.hud {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 4;
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--color-line-2);
+  border-radius: 18px;
+  background: rgba(7, 11, 20, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: auto;
+}
+
+@media (min-width: 800px) {
+  .hud {
+    right: auto;
+    bottom: 24px;
+    left: 24px;
+    width: 420px;
+  }
+}
+
+.hudTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.hudTop b {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.hudTag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-grad);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-on-accent);
+}
+
+.hudVerdict {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.hudVerdict.good {
+  color: #eafff6;
+  text-shadow: 0 0 16px rgba(98, 214, 160, 0.9);
+}
+
+.hudVerdict.bad {
+  color: var(--color-warn);
+}
+
+.hudWhy {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-ink);
+}
+
+.hudRead {
+  display: grid;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.hudNight {
+  font-size: 12px;
+  color: var(--color-warn);
+}
+
+.hudActs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hudNote {
+  font-size: 11px;
+  color: var(--color-faint);
+}

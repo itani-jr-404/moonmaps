@@ -1,0 +1,59 @@
+/* The three About columns. Values copied from the Moon Maps prototype. */
+
+.grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1000px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.col {
+  padding: 32px;
+  border: 1px solid var(--color-line);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #0f182b, #0a1120);
+  min-width: 0;
+}
+.n {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--color-accent-2);
+}
+.col h3 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  margin: 8px 0 16px;
+}
+.col p {
+  color: var(--color-muted);
+  font-size: 15px;
+  margin-top: 12px;
+}
+.col p b {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.col ul {
+  display: grid;
+  gap: 12px;
+}
+.col li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--color-muted);
+  font-size: 15px;
+}
+.col li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 10px;
+  height: 2px;
+  background: var(--color-accent-2);
+}

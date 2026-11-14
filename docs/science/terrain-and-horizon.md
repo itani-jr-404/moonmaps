@@ -1,8 +1,8 @@
 # Terrain and horizon
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-14.
 
-How we go from NASA elevation data to (1) the horizon profile used for visibility and (2) the height tile used for the 3D site view.
+How we go from NASA elevation data to the horizon profile used for visibility. The code is `apps/api/app/engines/terrain.py` (reading the grids) and `apps/api/app/engines/horizon.py` (the profile). A height tile for a 3D site view is planned and described at the end.
 
 ## Why terrain matters
 
@@ -12,25 +12,48 @@ At the south pole the Sun is at most a couple of degrees above a flat horizon, a
 
 From the Lunar Orbiter Laser Altimeter (LOLA) on NASA's Lunar Reconnaissance Orbiter. Files and download addresses are in [data/sources.md](../data/sources.md).
 
-| Grid | Covers | Pixel | Used for |
-| --- | --- | --- | --- |
-| `LDEM_80S_80M` | 80 S to the pole | 80 m | Default for south pole sites |
-| `LDEM_75S_120M` | 75 S to the pole | 120 m | Sites between 80 S and about 77 S, and when a ray leaves the first grid |
-| Global map from the CGI Moon Kit | Whole Moon | about 470 m at the equator | Everything else (Apollo sites and other non-polar sites) |
+| Grid | Covers | Pixel | `horizon.source` | Used for |
+| --- | --- | --- | --- | --- |
+| `LDEM_80S_80M` | 80 S to the pole | 80 m | `lola-80s-80m` | First choice |
+| `LDEM_75S_120M` | 75 S to the pole | 120 m | `lola-75s-120m` | Sites between 75 S and 80 S, and samples of a horizon walk that leave the 80 m grid |
+| None | | | `sphere` | Every other site: a smooth Moon with a flat horizon |
 
-The polar grids are in polar stereographic projection. With `R = 1737.4 km`, latitude `phi` and longitude `lam` in radians:
+The grids are tried finest first (`GridStack` in `terrain.py`); a lookup uses the first grid that covers the point. Sites north of 75 S, including the Apollo sites, have no terrain horizon. The global elevation maps of NASA's CGI Moon Kit are not used for horizons.
+
+### File layout
+
+Read from the PDS labels of the two grids. `LDEM_80S_80M.LBL` was read at https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/LDEM_80S_80M.LBL on 2026-11-14; the values for `LDEM_75S_120M` are from the downloaded `apps/api/app/data/dem/LDEM_75S_120M.LBL` (same address pattern).
+
+| Label key | `LDEM_80S_80M` | `LDEM_75S_120M` |
+| --- | --- | --- |
+| `LINES` by `LINE_SAMPLES` | 7600 by 7600 | 7624 by 7624 |
+| `SAMPLE_TYPE`, `SAMPLE_BITS` | `LSB_INTEGER`, 16 | `LSB_INTEGER`, 16 |
+| `SCALING_FACTOR` | 0.5 (metres per stored unit) | 0.5 |
+| `OFFSET` | 1737400 m (reference sphere radius) | 1737400 m |
+| `MAP_PROJECTION_TYPE` | `POLAR STEREOGRAPHIC` | `POLAR STEREOGRAPHIC` |
+| `MAP_SCALE` | 80 m per pixel | 120 m per pixel |
+| `LINE_PROJECTION_OFFSET`, `SAMPLE_PROJECTION_OFFSET` | 3799.5, 3799.5 | 3811.5, 3811.5 |
+| `CENTER_LATITUDE` | -90 | -90 |
+| `MAXIMUM_LATITUDE` | -80 | -75 |
+| `COORDINATE_SYSTEM_NAME` | `MEAN EARTH/POLAR AXIS OF DE421` | `MEAN EARTH/POLAR AXIS OF DE421` |
+
+So a stored value times 0.5 is the height in metres above the 1737.4 km sphere, and the grids use the same Moon frame as the ephemeris (`MOON_ME_DE421`). The reader takes these values from the label at load time and refuses a file that is not 16-bit little-endian.
+
+### Projection
+
+From the LOLA catalogue file DSMAP_POLAR.CAT (https://imbrium.mit.edu/CATALOG/DSMAP_POLAR.CAT, read 2026-11-14): in the south polar grids, longitude 0 points up from the centre of the image and longitude 90 E points to the right. With `R = 1737.4 km`, latitude `phi` and east longitude `lam`, the code computes:
 
 ```text
-r = 2 R tan(pi/4 + phi/2)        (0 at the south pole, about 304 km at 80 S)
-x = r sin(lam)
-y = r cos(lam)
+r      = 2 R tan((90 - |phi|) / 2) / MAP_SCALE      (in pixels)
+line   = LINE_PROJECTION_OFFSET   - r cos(lam)
+sample = SAMPLE_PROJECTION_OFFSET + r sin(lam)
 ```
 
-`x` and `y` are then turned into a column and a row using the map scale and the projection offsets in the file's label.
+Lines and samples count from 0. The height at a point is interpolated between the four surrounding pixels (bilinear). A point outside the grid, or in the other hemisphere, has no height (NaN).
 
-To confirm from the `.LBL` file before writing the reader: sample type (expected 16-bit signed integer), byte order, the scaling factor that turns a stored value into metres (expected 0.5 m per unit), the image size (expected 7600 by 7600 for the 80 m grid), the projection offsets, and the direction of the `x` and `y` axes. A quick check: Shackleton crater should appear as a deep bowl right next to the pole.
+Checks, in `apps/api/tests/test_lola_grid.py`, on the real 80 m grid: the label values above are read correctly, and at 89.67 S, 129.78 E (Shackleton crater) the ground is a deep bowl, about 2.8 km below the reference sphere, while the mirrored point 89.67 S, 129.78 W is not. A mirrored projection would swap the two. `tests/test_projection.py` checks the same orientation on a synthetic grid.
 
-The grid is opened with `numpy.memmap`, so the 111 MB file is not copied into memory. `height_at(grid, lat, lon)` converts to pixel coordinates and interpolates between the four surrounding pixels. It accepts arrays.
+The grid is opened with `numpy.memmap`, so the 111 MB file is not copied into memory.
 
 ## Horizon profile
 
@@ -57,33 +80,39 @@ phi2 = asin(sin(phi1) cos(theta) + cos(phi1) sin(theta) cos(a))
 lam2 = lam1 + atan2(sin(a) sin(theta) cos(phi1), cos(theta) - sin(phi1) sin(phi2))
 ```
 
-Step size: 80 m (one pixel) for the first 10 km, then growing with distance (about `d / 150`), because a far feature covers a smaller angle per pixel. This is about 1,500 samples per direction, and all 360 directions are computed as one numpy operation.
+### Sampling
 
-Between whole degrees the profile is interpolated linearly.
+`sample_distances_m(200)` in `horizon.py`:
+
+- every 80 m (one pixel of the finer grid) from 80 m to 10 km: 125 samples;
+- then distances that grow by a factor of 1 + 1/150 at each step, from 10 km out to 200 km: 450 samples, the last at about 198.9 km.
+
+That is 575 samples per direction and 207,000 for the 360 directions, computed as one numpy operation. On the development laptop a new profile took about 17 to 35 ms on 2026-11-14 (four south polar sites, measured with `time.perf_counter`).
+
+### Samples outside the grids
+
+A sample that no loaded grid covers has no height (NaN). It is ignored: its angle is set to -90 degrees before the maximum is taken, so it can never raise the horizon. It is not treated as height 0. If the site itself is outside every grid, no walk is made and the profile is all zeros (`source` `sphere`, `site_height_m` null).
+
+Between whole degrees the profile is interpolated linearly (`horizon_at`), wrapping at 360.
 
 ### Choices and their limits
 
-- **200 km reach.** A 5 km high mountain disappears below the horizon of a ball this size at roughly 130 km, more when the observer is also high. 200 km covers the cases that matter at the pole.
-- **1 degree resolution.** The Sun's disc is about half a degree wide, so narrow gaps between peaks are smoothed. Good enough for windows that last hours or days. The engine takes the step as a parameter if finer is needed.
-- **Leaving the grid.** If the walk leaves the grid's coverage, the remaining samples use the wider grid if loaded, otherwise height 0. The response's `horizon.source` says which grid was used.
-- **Observer height.** 2 m above the surface, standing in for a lander's mast. It is a parameter.
+- **200 km reach.** A 5 km high mountain disappears below the horizon of a ball this size at roughly 130 km, more when the observer is also high. 200 km covers the cases that matter at the pole. It is the setting `MM_HORIZON_MAX_KM`.
+- **1 degree resolution.** The Sun's disc is about half a degree wide, so narrow gaps between peaks are smoothed. Good enough for windows that last hours or days. The engine takes the step as a parameter.
+- **Edges of the grids.** For sites near 75 S, a walk toward the north leaves both grids, and terrain beyond them is not seen. The horizon in those directions can be too low.
+- **Observer height.** 2 m above the surface, standing in for a lander's mast. It is the setting `MM_OBSERVER_HEIGHT_M`.
+- **Smooth Moon elsewhere.** For sites north of 75 S the horizon is flat at 0 degrees. The response says so through `horizon.source` = `sphere`.
 
-## Height tile for the 3D site view
+## Caching
 
-`terrain.tile(grid, lat, lon, size_km, n)` returns an `n` by `n` array of heights on a local grid centred on the site:
+A profile is cached in memory (4,000 entries) and on disk in `apps/api/app/data/cache/horizon/` as an `.npz` file named by latitude and longitude rounded to 0.001 degrees, the observer height and the reach. `scripts/precompute_horizons.py` builds the profiles of all curated sites. See [backend/service-layer.md](../backend/service-layer.md).
 
-- columns run west to east, rows run north to south;
-- sample `(i, j)` is at `east = (j - c) * spacing`, `north = (c - i) * spacing`, with `c = (n - 1) / 2`;
-- each sample's latitude and longitude come from the great-circle formulas above, then `height_at` reads the height.
+## Height tile for a 3D site view (planned, not built)
 
-This gives the web app a simple square tile it can drop onto a plane, with no knowledge of map projections. The curvature of the Moon across a 40 km tile (about 115 m of drop at the edges) is ignored in the mesh; it does not matter for a picture.
+The design for `GET /terrain`: an `n` by `n` array of heights on a local grid centred on the site.
 
-## Performance
+- Columns run west to east, rows run north to south.
+- Sample `(i, j)` is at `east = (j - c) * spacing`, `north = (c - i) * spacing`, with `c = (n - 1) / 2`.
+- Each sample's latitude and longitude come from the great-circle formulas above, then the grid gives the height.
 
-| Operation | Expected cost |
-| --- | --- |
-| Horizon profile for a new site | Well under a second (about 540,000 interpolated samples in numpy) |
-| Height tile, 257 by 257 | A few milliseconds |
-| Cached profile | A file read |
-
-Profiles for the curated sites are computed ahead of time by `scripts/precompute_horizons.py`.
+The 3D ground in the web app today is procedural noise for decoration, not this tile.
