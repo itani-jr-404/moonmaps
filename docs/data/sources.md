@@ -13,7 +13,7 @@ Every dataset the app uses, where it comes from, how we use it, and how it must 
 | LOLA elevation grids | NASA LRO | Horizon profiles | Yes | Downloaded by script |
 | CGI Moon Kit | NASA SVS | Moon colour map and a greyscale relief map for the web app's globe | Yes | Web-size copies committed |
 | NASA 3D Resources | NASA | Lunar module, spacesuit and astronaut models in the web app | Yes | Committed |
-| PGDA illumination maps | NASA Goddard | Checking our sunlight percentages | No, planned | No |
+| PGDA illumination maps | NASA Goddard | Checking our sunlight and Earth-visibility percentages (script only) | Downloaded by script with `--pgda` | No |
 | Blue Marble | NASA | Earth surface map | No, planned | No |
 | Quickmap | Arizona State University, with NASA LRO data | Checking site coordinates by hand | Not yet (the check is still to do) | No |
 | Moon Trek | NASA | Visual comparison of terrain and horizons | No | No |
@@ -97,7 +97,14 @@ https://pgda.gsfc.nasa.gov/products/69 (Mazarico et al., 2011, Icarus 211, 1066-
 
 Maps of the lunar poles giving the average share of time the Sun is visible, the permanently shadowed areas, and the average share of time the Earth is visible, averaged over 18.6 years. Available at 240 m (65 S to the pole), 120 m (75 S) and 60 m (85 S), as GeoTIFF among other formats.
 
-They are long-term averages, so they cannot answer "what about this date". The plan is to use them to check that our terrain step gives sensible percentages. Not downloaded yet.
+They are long-term averages, so they cannot answer "what about this date". We use them to check our terrain step: `apps/api/scripts/compare_pgda.py` compares our long-term shares with theirs (results in [VALIDATION.md](../VALIDATION.md#4-sunlight-and-earth-visibility-against-nasas-polar-maps)). The app itself does not read them.
+
+| File | Covers | Pixel | Size | Address |
+| --- | --- | --- | --- | --- |
+| `AVGVISIB_75S_120M_201608.IMG` and `.LBL` | Sun, 75 S to the pole | 120 m | 116 MB | https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/ |
+| `AVGVISIB_75S_120M_201608_EARTH.IMG` and `.LBL` | Earth, 75 S to the pole | 120 m | 116 MB | Same |
+
+Both are 7624 by 7624 little-endian 16-bit integers with a scaling factor of 0.00004 (so 25,000 means 1), in the same polar stereographic projection as the LOLA grids (pole at pixel 3811.5), read 2026-11-14. They are stored in `apps/api/app/data/dem/pgda/`, which is not in git. Citation requested by the product page: Mazarico et al. (2011), doi:10.1016/j.icarus.2010.10.030.
 
 The Earth counts as visible in these maps when any part of its disc shows. Ours uses the centre of the disc. See [science/visibility-and-metrics.md](../science/visibility-and-metrics.md).
 

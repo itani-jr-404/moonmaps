@@ -36,7 +36,7 @@ uv run python scripts/precompute_horizons.py  # horizon profiles for the curated
 cd ../..
 ```
 
-`download_data.py` is safe to run again; it skips files that are already there. `--no-dem` skips the elevation grids; every site then uses a smooth Moon.
+`download_data.py` is safe to run again; it skips files that are already there. `--no-dem` skips the elevation grids; every site then uses a smooth Moon. `--pgda` also downloads NASA Goddard's illumination maps (232 MB), which only `scripts/compare_pgda.py` needs.
 
 ## Run it
 

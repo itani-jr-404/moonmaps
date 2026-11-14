@@ -20,7 +20,8 @@ The API is built for the core calculation: sites, analysis of up to four scenari
 | API: terrain and horizon engine | Reads `LDEM_80S_80M` and `LDEM_75S_120M`; 360-value profiles to 200 km; smooth Moon for sites north of 75 S; cached in memory and on disk |
 | API: visibility, windows, metrics, status | Built, with the starting thresholds |
 | API: scripts | `download_data.py`, `precompute_horizons.py`, `fetch_horizons.py`, `export_openapi.py` |
-| API: tests | 36 tests pass (`uv run pytest -q`, 2026-11-14), including the JPL Horizons comparison |
+| API: tests | 37 tests pass (`uv run pytest -q`, 2026-11-14), including the JPL Horizons comparisons for 2026 and for the Apollo moonwalks |
+| Validation | Positions match JPL Horizons (32 cases, 1969 to 2026); long-term sunlight and Earth visibility match NASA Goddard's polar maps at 310 points (mean absolute difference 0.006). See [VALIDATION.md](VALIDATION.md). |
 | API: Dockerfile | `apps/api/Dockerfile`; downloads the data and builds the site horizons at image build time. Not yet run on a host |
 | Sites | 17 curated sites in `apps/api/app/data/sites.json`. See [data/sites.md](data/sites.md) |
 | Web: page and sections | One page (`/`) with a hero, "choose a landing" (globe and surface view), why, the planner (verdict, 30-day calendar, best windows, 3D diorama) and about. Being written |
@@ -64,7 +65,6 @@ See [decisions/](decisions/README.md) for the reasons.
 | Whether to add a terrain horizon for sites north of 75 S, and from which data | Team | Accuracy for Apollo and other non-polar sites |
 | Textures for the planets other than Earth and Moon, and their licence | Whoever builds a Solar System scene | Solar System scene |
 | Credit lines for the NASA 3D models | Team | About section |
-| Why some curated points (for example `de-gerlache-rim-2`) get little sunlight: local slope, the chosen point, or an error. Needs the comparison with NASA's PGDA illumination maps | Team | Trust in per-site percentages; see [VALIDATION.md](VALIDATION.md#7-year-long-results-and-an-open-finding) |
 
 ## To confirm before relying on it
 
