@@ -255,7 +255,7 @@ There are 20 tests in 5 files (`apps/web/e2e/`). On 15 November 2026 **20 of 20 
 
 ### Checks by hand
 
-The production build (`pnpm build`, then `next start`) was opened by hand against the running API on 14 November 2026, and the deployed app (https://moonmaps.vercel.app with https://moonmaps-api.vercel.app) on 15 November 2026. The API's log showed every request the page made answered with status 200, and no errors. The planner rows below are from the deployed app on 15 November, in Beirut time (UTC+2).
+The production build (`pnpm build`, then `next start`) was opened by hand against the running API on 14 November 2026, and the deployed app (https://moonmaps.vercel.app with the API at https://moonmaps-api.vercel.app/docs) on 15 November 2026. The API's log showed every request the page made answered with status 200, and no errors. The planner rows below are from the deployed app on 15 November, in Beirut time (UTC+2).
 
 | What was checked | Result |
 | --- | --- |
