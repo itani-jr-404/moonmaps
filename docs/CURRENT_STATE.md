@@ -6,7 +6,7 @@ This file says what is real today. Update it in every pull request that builds, 
 
 ## Summary
 
-The API is built for the core calculation: sites, analysis of up to four scenarios, the sky at one moment, the Moon's sub-solar and sub-Earth points, and the comparison with JPL Horizons. It also runs the chat assistant, which needs a model key to be switched on. The contract is generated from it. The web app is a one-page Next.js port of the team's prototype; it reads everything from the API. The evidence that it works, and what is not yet validated, is in [VALIDATION.md](VALIDATION.md). CI checks the documentation links, the web app, the API and the contract. Nothing is deployed.
+The API is built for the core calculation: sites, analysis of up to four scenarios, the sky at one moment with the distance to the Earth, the Moon's sub-solar and sub-Earth points, terrain horizons from NASA LOLA grids for every site (polar grids near the south pole, a global grid elsewhere), an elevation tile around a point, accuracy figures, past missions and leave-Earth times, and the comparison with JPL Horizons. It also runs the chat assistant, which needs a model key to be switched on. The contract is generated from it. The web app is a Next.js site with separate pages (home, choose a landing, planner, sites with a page per site, accuracy, about); it reads everything from the API. The evidence that it works, and what is not yet validated, is in [VALIDATION.md](VALIDATION.md). CI checks the documentation links, the web app, the API, the contract and the browser tests. The web app and the API are deployed on Vercel: https://moonmaps.vercel.app and https://moonmaps-api.vercel.app (see [developer/deployment.md](developer/deployment.md)).
 
 ## Built
 
