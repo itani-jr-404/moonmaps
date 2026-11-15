@@ -154,7 +154,9 @@ test('choosing another site and a quick date updates the answer from the API', a
   body = (await (await analyze).json()) as Analyze;
   await expectPlannerMatches(page, body);
   await expect(
-    page.getByText('Smooth Moon: no terrain data at this latitude'),
+    page.getByText(
+      'Horizon from NASA LOLA terrain (global grid, 16 pixels per degree)',
+    ),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });

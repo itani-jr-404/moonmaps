@@ -75,8 +75,9 @@ export function AboutSection() {
               <li>Made for the NASA Space Apps Challenge 2026.</li>
               <li>A planning and learning tool, not flight software.</li>
               <li>
-                The horizon uses real LOLA terrain within about 15 degrees of
-                the south pole. Elsewhere the Moon is treated as a smooth ball.
+                The horizon uses real LOLA terrain: fine maps within about 15
+                degrees of the south pole, and a coarser global map (about 1.9
+                km per pixel) everywhere else.
               </li>
               <li>
                 The south pole matters because ice hides in its dark craters.

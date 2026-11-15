@@ -1,5 +1,6 @@
 """Horizon profiles for sites, built from the LOLA grids and cached in memory and on disk."""
 
+import hashlib
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -42,6 +43,10 @@ class HorizonService:
         self._observer_height_m = observer_height_m
         self._max_km = max_km
         self._memory: LruCache[tuple[float, float], SiteHorizon] = LruCache(4000)
+        # The disk cache names the set of grids, so adding or removing a grid never serves a
+        # profile built from other terrain (for example an old smooth-Moon file).
+        names = "+".join(g.name for g in grids.grids)
+        self._grids_tag = hashlib.sha1(names.encode()).hexdigest()[:8]
 
     @property
     def observer_height_m(self) -> float:
@@ -54,7 +59,10 @@ class HorizonService:
     def _path(self, lat: float, lon: float) -> Path | None:
         if self._cache_dir is None:
             return None
-        name = f"{lat:+.3f}_{lon:+.3f}_{self._observer_height_m:g}m_{self._max_km:g}km.npz"
+        name = (
+            f"{lat:+.3f}_{lon:+.3f}_{self._observer_height_m:g}m_{self._max_km:g}km"
+            f"_{self._grids_tag}.npz"
+        )
         return self._cache_dir / name
 
     def _load_or_build(self, lat: float, lon: float) -> SiteHorizon:

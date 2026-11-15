@@ -1,6 +1,6 @@
 # Sites
 
-Status: Built. Last updated: 2026-11-14.
+Status: Built. Last updated: 2026-11-15.
 
 The curated site list is one file, `apps/api/app/data/sites.json`. The API serves it at `GET /sites`. It is the only place site coordinates are defined.
 
@@ -36,7 +36,7 @@ The curated site list is one file, `apps/api/app/data/sites.json`. The API serve
 2. Longitude is converted to east-positive, -180 to 180. Many sources give 0 to 360 or use W. Write the conversion in the pull request.
 3. Open the coordinates in Quickmap and check that the point is where the name says it is.
 4. For a region (an Artemis candidate region is an area, not a point), choose one representative point, say so in the description, and prefer the point a published study uses.
-5. A site with no terrain grid available still goes in; the app will say the horizon is a smooth Moon.
+5. Every point on the Moon is covered by the global elevation grid, so every site gets a terrain horizon.
 
 ## The list today
 
@@ -62,7 +62,7 @@ The curated site list is one file, `apps/api/app/data/sites.json`. The API serve
 | `change-4` | Chang'e 4, Von Kármán crater | -45.457 | 177.589 | international |
 | `change-6` | Chang'e 6, Apollo basin | -41.6385 | -153.9852 | international |
 
-The 10 sites south of 80 S have a terrain horizon from the 80 m LOLA grid (`lola-80s-80m`). The other 7 (Chandrayaan-3, the three Apollo sites, SLIM and both Chang'e sites) are north of 75 S and use a smooth Moon (`sphere`); see [science/terrain-and-horizon.md](../science/terrain-and-horizon.md).
+The 10 sites south of 80 S have a terrain horizon from the 80 m LOLA grid (`lola-80s-80m`). The other 7 (Chandrayaan-3, the three Apollo sites, SLIM and both Chang'e sites) are north of 75 S and have a terrain horizon from the global LOLA grid (`lola-global-16ppd`, about 1.9 km per pixel at the equator); see [science/terrain-and-horizon.md](../science/terrain-and-horizon.md).
 
 Still to confirm:
 

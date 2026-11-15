@@ -1,6 +1,6 @@
 # Visibility and metrics
 
-Status: Built. Last updated: 2026-11-14.
+Status: Built. Last updated: 2026-11-15.
 
 How positions and the horizon profile become "visible or not", windows, metrics and a status. The code is `apps/api/app/engines/visibility.py`.
 
@@ -129,4 +129,4 @@ Checking it by hand:
 | Sun up for the whole range | One window from `start` to `end`; `next_sunset` is `null`; `longest_dark_hours` is 0 |
 | Sun down for the whole range | No windows; fractions are 0; `longest_dark_hours` is the length of the range |
 | Body skims the horizon and flickers between samples | Windows shorter than one step can be missed. Use a smaller step for a short range |
-| No terrain data for the site | The profile is all zeros (smooth Moon), `horizon.source` is `sphere` and `horizon.site_height_m` is null |
+| No elevation grid loaded (the global grid covers every site once it is downloaded) | The profile is all zeros (smooth Moon), `horizon.source` is `sphere` and `horizon.site_height_m` is null |

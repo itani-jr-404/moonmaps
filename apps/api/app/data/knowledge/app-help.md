@@ -29,6 +29,7 @@ Open it from a card on Sites, from "See everything about this spot" in the landi
 - "Is it a good landing site, and for how long?": if good now, until when; if not, when it is next good and for how long; the next good windows.
 - "Can a lander stay, or must it leave?": next sunset or sunrise, next Earthset or Earthrise, the longest dark spell and the longest time without the Earth in view in the next 30 days.
 - "Sky forecast": the next 14 days, day by day, with hours of Sun, Earth and both; and a horizon panorama with the terrain skyline and the paths of the Sun and the Earth over the next 3 days.
+- "The ground": a shaded elevation map of the ground 60 km across around the site, north up, with the site as a dot in the middle, a colour legend in metres, a north arrow, a scale bar, and the lowest, highest and site heights. Heights are metres above a 1737.4 km sphere. The shading uses a light from the north-west only to show the shape of the ground; it is not the Sun.
 - "Getting there": how long past missions took from launch to landing, with sources, and the mission that landed at this site if any.
 - "How sure are we": a link to the Accuracy page.
 - An unknown site or bad coordinates show "We do not know this site" or "This spot is not on the Moon map".
@@ -111,7 +112,9 @@ Up to four of the longest stretches in the next 30 days when both are visible, i
 A block of ground around the place with the lander, a compass ring, and beams: amber for "Direction of the Sun", teal for "Direction of Earth". "Drag to turn, scroll to zoom". It turns slowly by itself after a few seconds without input. The line below says where the horizon came from:
 
 - "Horizon from NASA LOLA terrain (80 m grid)" or "(120 m grid)": real terrain was used, from the 80 m grid south of 80 S or the 120 m grid between 75 S and 80 S.
-- "Smooth Moon: no terrain data at this latitude": the place is north of 75 S, so the Moon is treated as a smooth ball. The ground is decorative, with heights exaggerated two times.
+- "Horizon from NASA LOLA terrain (global grid, 16 pixels per degree)": real terrain from the global grid, about 1.9 km per pixel, used everywhere north of 75 S.
+- "Smooth Moon: no terrain data loaded for this place": only if the elevation data is missing on the server; the Moon is then treated as a smooth ball.
+- In every case the 3D ground itself is decorative, with heights exaggerated two times.
 
 ## About (`/about`)
 
@@ -156,7 +159,7 @@ If the device asks for reduced motion, there is no intro, everything shows at on
 ## Limits
 
 - Dates from 1900-01-02 to 2050-12-30. The answer card looks 35 days ahead, so it works up to about 25 November 2050.
-- Real terrain only from 75 S to the pole; elsewhere a smooth Moon. The 3D ground in all views is decorative.
+- Terrain is 80 m or 120 m per pixel from 75 S to the pole, and about 1.9 km per pixel elsewhere, so nearby hills there are smoothed. The 3D ground in all views is decorative.
 - The planner samples every 30 minutes; rise and set times between samples are interpolated.
 - The globe card uses the time rounded down to 10 minutes and the point rounded to 0.1 degree.
 - The globe needs a mouse or touch; it has no keyboard control. The planner works with a keyboard.
@@ -171,7 +174,7 @@ If the device asks for reduced motion, there is no intro, everything shows at on
 
 **Why does the 3D ground not match photos?** It is decorative. The answer uses the real LOLA horizon.
 
-**Why is Apollo 11 marked "Smooth Moon"?** It is near the equator, outside the terrain maps.
+**Why is the Apollo 11 horizon from a "global grid"?** It is near the equator, outside the fine south polar maps, so its horizon comes from NASA's global LOLA map, about 1.9 km per pixel.
 
 **What does "Good for some hours (5)" mean?** About 5 hours that day with both visible.
 

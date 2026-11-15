@@ -9,11 +9,14 @@ describe('horizonText', () => {
     expect(horizonText('lola-75s-120m')).toBe(
       'Horizon from NASA LOLA terrain (120 m grid)',
     );
+    expect(horizonText('lola-global-16ppd')).toBe(
+      'Horizon from NASA LOLA terrain (global grid, 16 pixels per degree)',
+    );
   });
 
   it('says when there is no terrain', () => {
     expect(horizonText('sphere')).toBe(
-      'Smooth Moon: no terrain data at this latitude',
+      'Smooth Moon: no terrain data loaded for this place',
     );
   });
 });

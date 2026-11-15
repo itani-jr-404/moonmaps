@@ -146,6 +146,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/terrain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Terrain */
+        get: operations["terrain_terrain_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/validation": {
         parameters: {
             query?: never;
@@ -433,7 +450,7 @@ export interface components {
             site_height_m?: number | null;
             /**
              * Source
-             * @description Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)
+             * @description Elevation grid behind the horizon: lola-80s-80m or lola-75s-120m in the south polar region, lola-global-16ppd everywhere else, or sphere when no grid is loaded (smooth Moon)
              */
             source: string;
         };
@@ -722,7 +739,7 @@ export interface components {
             earth: components["schemas"]["BodyInSky"];
             /**
              * Horizon Source
-             * @description Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)
+             * @description Elevation grid behind the horizon: lola-80s-80m or lola-75s-120m in the south polar region, lola-global-16ppd everywhere else, or sphere when no grid is loaded (smooth Moon)
              */
             horizon_source: string;
             /**
@@ -741,6 +758,70 @@ export interface components {
              * Format: date-time
              */
             t: string;
+        };
+        /**
+         * TerrainTile
+         * @description Ground heights on a square around a point, for the elevation picture. Read-only.
+         *
+         *     Row 0 is the north edge and column 0 the west edge; the point is the centre sample.
+         *     Sample (i, j) lies at east = (j - c) * spacing_m, north = (c - i) * spacing_m, with
+         *     c = (n - 1) / 2, measured along great circles from the centre.
+         */
+        TerrainTile: {
+            /**
+             * Centre M
+             * @description Height at the centre point, in metres
+             */
+            centre_m: number;
+            /**
+             * Heights M
+             * @description n rows of n heights in metres, rounded to 1 m; null where no grid covers
+             */
+            heights_m: (number | null)[][];
+            /**
+             * Lat
+             * @description Latitude in degrees, south negative
+             */
+            lat: number;
+            /**
+             * Lon
+             * @description East longitude, -180 to 180
+             */
+            lon: number;
+            /** Max M */
+            max_m: number;
+            /** Min M */
+            min_m: number;
+            /**
+             * N
+             * @description Samples per side
+             */
+            n: number;
+            /**
+             * Radius Km
+             * @description Half the width of the square, in km
+             */
+            radius_km: number;
+            /**
+             * Reference Radius Km
+             * @description Heights are metres above a sphere of this radius (the LOLA labels' OFFSET)
+             */
+            reference_radius_km: number;
+            /**
+             * Resolution M
+             * @description Pixel size of that grid in metres (MAP_SCALE; for the global grid, at the equator)
+             */
+            resolution_m: number;
+            /**
+             * Source
+             * @description Elevation grid that covers the centre: lola-80s-80m, lola-75s-120m or lola-global-16ppd. Samples outside it come from the next grid that covers them
+             */
+            source: string;
+            /**
+             * Spacing M
+             * @description Distance between neighbouring samples, in metres
+             */
+            spacing_m: number;
         };
         /** ValidationCase */
         ValidationCase: {
@@ -1197,6 +1278,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SkyResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    terrain_terrain_get: {
+        parameters: {
+            query: {
+                /** @description Latitude in degrees, south negative */
+                lat: number;
+                /** @description East longitude in degrees, -180 to 360 */
+                lon: number;
+                /** @description Half the width of the square, in km */
+                radius_km?: number;
+                /** @description Samples per side */
+                n?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TerrainTile"];
                 };
             };
             /** @description Not Found */

@@ -11,7 +11,7 @@ Where the app will run and how it gets there. Nothing is deployed yet, and the D
 | Web app | Vercel, Next.js | `apps/web` |
 | API | Vercel, container runtime (beta) | `apps/api/Dockerfile`, forced by `apps/api/vercel.json` |
 
-Both are Vercel projects imported from the same repository, one per folder. Vercel's container runtime is "in beta on all plans"; it builds the Dockerfile, serves it from a function that scales with traffic, listens on port 80 unless `PORT` is set, and scales to zero after five minutes without traffic in production ([Running Docker on Vercel](https://vercel.com/kb/guide/docker), read 2026-11-15). The API cannot run as a plain Vercel Python function without changes, because its NASA data (about 250 MB) is downloaded at build time and is not in git. If the container runtime fails, the same Dockerfile runs on any container host.
+Both are Vercel projects imported from the same repository, one per folder. Vercel's container runtime is "in beta on all plans"; it builds the Dockerfile, serves it from a function that scales with traffic, listens on port 80 unless `PORT` is set, and scales to zero after five minutes without traffic in production ([Running Docker on Vercel](https://vercel.com/kb/guide/docker), read 2026-11-15). The API cannot run as a plain Vercel Python function without changes, because its NASA data (about 285 MB) is downloaded at build time and is not in git. If the container runtime fails, the same Dockerfile runs on any container host.
 
 ## First deployment, step by step
 
@@ -60,7 +60,7 @@ What the host must provide:
 
 | Need | Why |
 | --- | --- |
-| About 1 GB of disk for the image | The kernels and the two grids are about 250 MB, plus Python and the libraries |
+| About 1 GB of disk for the image | The kernels and the three grids are about 285 MB, plus Python and the libraries |
 | Memory | The grids are memory-mapped, so they are not loaded whole. The amount needed is to measure |
 | A public HTTPS address | The browser calls it directly |
 | A `PORT` variable, or port 8000 | The start command reads `PORT` |

@@ -16,7 +16,7 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | 6 | Comparison | Planned | `POST /analyze` (built) |
 | 7 | Accuracy page | Built: `/accuracy` with error rates and learning from past data | `GET /accuracy` (built) |
 | 8 | Moon globe | Building: the globe in "choose a landing" | `GET /sites`, `GET /sky` (built) |
-| 9 | Site view in 3D | Building: surface view and planner diorama with decorative ground; real terrain planned | `GET /sky` (built), `GET /terrain` (not built) |
+| 9 | Site view in 3D | Building: surface view and planner diorama with decorative ground; real terrain planned | `GET /sky` (built), `GET /terrain` (built) |
 | 10 | Solar System view | Planned | Planet positions in `GET /scene` (not built) |
 | 11 | Landing page | Building: hero, why and about sections on the one page | None |
 | 12 | Assistant | Built: chat panel on every screen; needs at least one model provider key on the API | `POST /assistant/chat` (built) |
@@ -26,6 +26,7 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | 16 | Earth to Moon distance on screen (judges' feedback) | Built on each site's page | `GET /scene` (built) |
 | 17 | Travel time to the Moon for past missions (judges' feedback) | Built: "Getting there" on each site's page | `GET /missions` (built) |
 | 18 | Sky forecast for each site: where the Earth and the Sun will be over the coming days (judges' feedback) | Built: 14-day forecast and horizon panorama on each site's page | `POST /analyze` (built) |
+| 19 | Terrain everywhere and an elevation map of each site (team test notes) | Built: every site has a terrain horizon from LOLA (polar grids near the south pole, the global grid elsewhere), and each site's page shows a shaded elevation map | `GET /terrain`, `POST /analyze` (built) |
 
 The web app is one page, `/`, with the sections hero, choose a landing, why, planner and about. Its code is in `apps/web/src/features/` (`hero`, `landing`, `why`, `planner`, `about`, `site-chrome`). The "Code" paths in the sections below are planned folders; where a feature is built inside one of the folders above, that folder is where to look. The API side of every built endpoint is described in [backend/api-reference.md](../backend/api-reference.md).
 
@@ -162,6 +163,17 @@ Download what is on screen.
 - The file states the site, the range, the step, the data sources and the date it was generated.
 
 Code: `features/metrics`. No new endpoint; the browser writes the file from the analysis it already holds.
+
+## 19. Terrain everywhere and an elevation map
+
+From the team's test notes: the horizon far from the pole must use terrain, and the site page should show the elevation of the ground.
+
+- The API uses the LOLA south polar grids where they cover a point and the global 16 pixel-per-degree grid everywhere else ([ADR-015](../decisions/ADR-015-global-terrain-grid.md)). The horizon text in the planner names the grid.
+- "The ground" on each site's page: a 60 km square around the site, coloured by height and shaded, with a legend in metres, a north arrow, a scale bar and the lowest, highest and site heights as text.
+
+Code: `apps/api/app/engines/relief.py`, `apps/api/app/services/terrain.py`, `apps/web/src/features/sites/components/terrain-map.tsx`, `apps/web/src/features/sites/lib/relief.ts`. Method: [science/terrain-and-horizon.md](../science/terrain-and-horizon.md).
+
+Done when: Apollo 11 shows a terrain horizon named as the global grid, and its page shows the elevation map with its heights from the API.
 
 ---
 

@@ -31,7 +31,7 @@ These are optional [1]. Ephemeris (positions of bodies over time) can come from 
 Status as the project documents give it on 2026-11-15 [5][6]. "Planned" means not built yet.
 
 - **Positions.** Built. The API calculates Sun and Earth positions with JPL ephemeris files and the Skyfield library. It is tested against JPL Horizons [5].
-- **Terrain horizon.** Built in the API for sites south of 75 degrees south, from two LOLA elevation grids. Sites farther north use a smooth Moon with no terrain [5].
+- **Terrain horizon.** Built in the API for every site: two fine LOLA elevation grids from 75 degrees south to the pole, and the global LOLA grid (about 1.9 km per pixel) everywhere else. Each site's page also shows a shaded elevation map of the ground around it [5].
 - **No atmosphere, real orientation.** No refraction is used. The Moon's real orientation over time, which includes libration, is part of the calculation [7].
 - **Sites.** 17 curated sites: Artemis candidate regions, a CLPS landing, Apollo sites, missions of other countries, and reference points. Any latitude and longitude can also be given, or a point chosen on the globe [5][6].
 - **Metrics.** Built in the API: share of time in sunlight, share of time with Earth in view, longest dark period, longest gap in contact, next sunset, sunrise, Earthset and Earthrise, Sun elevation, and a power and communication status [8]. The web planner shows a verdict, a 30-day calendar and the best windows [6].
