@@ -48,3 +48,9 @@ These are the team's proposals, not tested plans.
 ## 6. Limitation and next step
 
 Moon Maps checks the direct link between the landing site and the Earth. It does not yet count relay satellites, which could keep a lander connected even when the Earth is hidden. Adding relay coverage is the next step we are working on, and it opens the tool to missions that plan to use a relay.
+
+## 7. Future scope
+
+- **Relay satellites.** Count relay coverage alongside the direct Earth link, so a site hidden from the Earth can still be shown as connected.
+- **Watching the site during the flight.** Check the target again and again against new orbital images and hazard data, such as a fresh impact crater, so the crew can change site before landing.
+- **The best spot in an area.** From 4 corners and 2 dates, find the point and start date with the longest run of good days, with a coarse-to-fine quadtree search and a sliding window over time.
