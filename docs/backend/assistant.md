@@ -44,8 +44,8 @@ It must not:
    | --- | --- | --- |
    | `list_sites` | `SiteService.list` | id, name, coordinates and kind of each site |
    | `analyze_site` | `AnalysisService.run_one`, 1 to 365 days, no series | visibility at the start, percentages of time, next rise and set times, longest dark spell and gap without Earth, status, the first five windows with both |
-   | `sky_at` | `SkyService.at` | azimuth, elevation, terrain horizon and visibility of the Sun and the Earth at one moment |
-   | `moon_scene` | `SkyService.scene` | sub-solar and sub-Earth points, Earth to Moon distance |
+   | `sky_at` | `SkyService.at` | azimuth, elevation, terrain horizon and visibility of the Sun and the Earth at one moment; the distance from the site to the Earth's centre and to the nearest point of its surface |
+   | `moon_scene` | `SkyService.scene` | sub-solar and sub-Earth points, Earth to Moon distance centre to centre |
    | `accuracy_report` | `AccuracyService.report` | the error-rate headline and items, and the calibration summary (`GET /accuracy`) |
    | `past_missions` | `AccuracyService.missions` | each past landing's launch and landing time (UTC), travel hours, site id and source page (`GET /missions`) |
 

@@ -104,6 +104,35 @@ def test_sky_and_scene(client):
     scene = client.get("/scene", params={"t": "2026-11-15T00:00:00Z"}).json()
     assert abs(scene["subsolar_lat"]) < 1.6
     assert 356_000 < scene["earth_distance_km"] < 407_000
+    surface, centre = body["earth_surface_distance_km"], body["earth_centre_distance_km"]
+    assert surface == pytest.approx(centre - 6378.137, abs=0.11)
+
+
+MOON_RADIUS_KM = 1737.4  # BODY301_RADII in pck00008.tpc (docs/science/conventions-and-ephemeris.md)
+EARTH_RADIUS_KM = 6378.137  # NASA NSSDCA Earth Fact Sheet, equatorial radius
+
+
+def test_sky_distances_to_earth(client):
+    """Seen from the sub-Earth point, the Earth is one Moon radius nearer than centre to centre;
+    from the opposite point it is one Moon radius farther."""
+    t = "2026-11-15T00:00:00Z"
+    scene = client.get("/scene", params={"t": t}).json()
+    lat, lon = scene["subearth_lat"], scene["subearth_lon"]
+    near = client.get("/sky", params={"lat": lat, "lon": lon, "t": t}).json()
+    centre_to_centre = scene["earth_distance_km"]
+    # Both distances are geometric, so only the rounding to 0.1 km separates them.
+    assert near["earth_centre_distance_km"] == pytest.approx(
+        centre_to_centre - MOON_RADIUS_KM, abs=0.2
+    )
+    assert near["earth_surface_distance_km"] == pytest.approx(
+        centre_to_centre - EARTH_RADIUS_KM - MOON_RADIUS_KM, abs=0.2
+    )
+    far_lon = lon + 180 if lon < 0 else lon - 180
+    far = client.get("/sky", params={"lat": -lat, "lon": far_lon, "t": t}).json()
+    assert far["earth_centre_distance_km"] == pytest.approx(
+        centre_to_centre + MOON_RADIUS_KM, abs=0.2
+    )
+    assert near["earth"]["el"] > 89 and far["earth"]["el"] < -89
 
 
 def test_validation_endpoint(client):

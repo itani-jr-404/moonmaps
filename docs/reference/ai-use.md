@@ -25,11 +25,12 @@ Positions, horizons, visibility and metrics are deterministic calculations from 
 | 2026-11-14 | Documentation | Claude | Updated these documents to match the code, from the code and the sources listed in [references.md](references.md) | The team lead |
 | 2026-11-15 | Assistant (`apps/api/app/services/assistant.py` and related files, `apps/web/src/features/assistant`) and its tests | Claude | Wrote the chat endpoint, its guardrails, the chat panel and their tests from [backend/assistant.md](../backend/assistant.md) | The team lead |
 | 2026-11-15 | Pages, site page, site assistant, accuracy page, learning from past data (`/accuracy`, `scripts/train_calibration.py`), missions | Claude | Wrote the code, tests and docs from the team's requests and the judges' feedback | The team lead |
+| 2026-11-15 | Distance from a site to the Earth's surface, leave-Earth times for the next good window (`GET /missions/departures`), the About page's accuracy sentence | Claude | Wrote the code, tests and docs from the team's test notes; recomputed the JPL Horizons differences by running the validation service | The team lead |
 | 2026-11-15 | Assistant knowledge base (`apps/api/app/data/knowledge/`) | Claude | Wrote the files from the app's code, the repository's documents and the official Space Apps and NASA pages listed in each file | The team lead |
 
 How the output was checked:
 
-- The Sun and Earth angles are compared with JPL Horizons by an automated test (`apps/api/tests/test_horizons.py`): 16 cases, all within 0.05 degrees. See [science/validation.md](../science/validation.md).
+- The Sun and Earth angles are compared with JPL Horizons by an automated test (`apps/api/tests/test_horizons.py`): 16 cases (2 places, Sun and Earth, 4 dates in November and December 2026), all within the 0.05 degree pass rule; the largest difference is 0.0123 degrees. See [science/validation.md](../science/validation.md).
 - The LOLA grid reading is checked by a test against a known crater (Shackleton) on the real grid.
 - Items the tool could not confirm against a source are marked "to confirm" in the documents.
 - AI-written code and text can still contain mistakes that the tests do not catch.

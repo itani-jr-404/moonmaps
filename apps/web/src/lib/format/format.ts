@@ -75,6 +75,25 @@ export function fmtDate(t: number | Date): string {
   });
 }
 
+/** A UTC date and time, "Tue, 1 Dec 2026, 12:00 UTC". */
+export function fmtUtc(t: number | Date): string {
+  const s = new Date(t).toLocaleString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'UTC',
+  });
+  return `${s} UTC`;
+}
+
+/** A trip length in days with one decimal, "4.3 days", from hours. */
+export function fmtTravelDays(hours: number): string {
+  return `${(hours / 24).toFixed(1)} days`;
+}
+
 /** A distance in whole kilometres with thousands separators, "384,400 km". */
 export function fmtKm(km: number): string {
   return `${Math.round(km).toLocaleString('en-US')} km`;

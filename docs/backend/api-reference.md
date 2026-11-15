@@ -20,6 +20,7 @@ Base URL: set per environment, see [developer/deployment.md](../developer/deploy
 | GET | `/validation` | Our angles next to saved JPL Horizons values | Built |
 | GET | `/accuracy` | Error rates against NASA references and the calibration learned from past data | Built |
 | GET | `/missions` | Past landings with launch and landing times and the travel time | Built |
+| GET | `/missions/departures` | When to leave Earth to land at a given time, for each past mission's travel time | Built |
 | GET | `/terrain` | A height tile around a site for a 3D site view | Planned, not built |
 | POST | `/assistant/chat` | One assistant answer | Built; off when no model key is set |
 
@@ -205,12 +206,16 @@ Response (`SkyResponse`), real output for the Shackleton ridge point at 2026-11-
   "lon": -163.261,
   "horizon_source": "lola-80s-80m",
   "sun": { "az": 277.6875, "el": 1.5986, "horizon_el": -1.0858, "clearance": 2.6844, "visible": true },
-  "earth": { "az": 160.6351, "el": -3.8515, "horizon_el": -0.0424, "clearance": -3.8092, "visible": false }
+  "earth": { "az": 160.6351, "el": -3.8515, "horizon_el": -0.0424, "clearance": -3.8092, "visible": false },
+  "earth_centre_distance_km": 404862.6,
+  "earth_surface_distance_km": 398484.5
 }
 ```
 
 - `lat` and `lon` are returned after the same clamping and normalising as for `/analyze`.
 - `horizon_el` is the terrain horizon at the body's azimuth; `clearance` is `el - horizon_el`; `visible` is `clearance > 0`.
+- `earth_centre_distance_km` is the distance from the site to the Earth's centre, in km, rounded to 0.1 km. The site is taken on the Moon's 1737.4 km reference sphere (height 0, terrain not counted), so it does not change with the elevation grid. It is geometric (both bodies at the same instant), like `earth_distance_km` in `/scene`.
+- `earth_surface_distance_km` is `earth_centre_distance_km` minus the Earth's equatorial radius, 6378.137 km (NASA NSSDCA Earth Fact Sheet, https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html , read 2026-11-15): the distance to the nearest point of the Earth taken as a sphere. The Earth's polar radius is 6356.752 km on the same page, so on the real, flattened Earth the nearest point can be up to about 21 km farther.
 - The first call for a new point builds its horizon profile; later calls for the same point (rounded to 0.001 degrees) use the cache. See [service-layer.md](service-layer.md).
 
 ## GET /scene
@@ -231,7 +236,7 @@ Response (`SceneResponse`), real output for 2026-11-15 00:00 UTC:
 ```
 
 - `subsolar_*` and `subearth_*` are the points on the Moon, in the Mean Earth frame, directly under the Sun and under the Earth. Longitudes are -180 to 180.
-- `earth_distance_km` is the distance from the Moon's centre to the Earth's centre.
+- `earth_distance_km` is the distance from the Moon's centre to the Earth's centre, not surface to surface. For the distance from a site to the Earth's surface, use `earth_surface_distance_km` in `/sky`.
 - Planet positions for a Solar System scene are not part of this response. They are planned, not built.
 
 ## GET /validation
@@ -280,6 +285,32 @@ Returns `AccuracyReport`, built once at start-up from saved files; nothing is fe
 ## GET /missions
 
 Returns `MissionsResponse`: `missions`, a list of `{ id, name, site_id, launch, landing, travel_hours, source_url }`. Times are UTC. `site_id` is the curated site id, or `null` when the site is not in `sites.json`. `landing` is `null` when we have no official landing time to the minute; `travel_hours` is computed from `launch` and `landing` and is `null` with it. The data is in `apps/api/app/data/missions.json`, with a note quoting the source page for each mission. SLIM's long low-energy route makes its travel time much longer than Apollo's, so the two are not comparable.
+
+## GET /missions/departures
+
+When to leave Earth to land on the Moon at a given time, using each past mission's time from launch to landing. The site page uses it with the start of the next window with the Sun and the Earth both in view.
+
+Query:
+
+| Parameter | Rule |
+| --- | --- |
+| `arrival` | Required date-time with a time zone, between 1900-01-02 and 2050-12-30 (the kernel range, as for `/analyze`) |
+
+Response (`DeparturesResponse`), real output for `arrival=2026-12-01T12:00:00Z`, shortened to two of seven:
+
+```json
+{
+  "arrival": "2026-12-01T12:00:00Z",
+  "departures": [
+    { "mission_id": "apollo-11", "name": "Apollo 11", "travel_hours": 102.76, "depart": "2026-11-27T05:14:20Z", "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059A" },
+    { "mission_id": "slim", "name": "SLIM", "travel_hours": 3231.63, "depart": "2026-07-19T20:22:11Z", "source_url": "https://global.jaxa.jp/press/2024/01/20240120-1_e.html" }
+  ]
+}
+```
+
+- `depart` is `arrival` minus that mission's landing time minus its launch time, to the second, from `apps/api/app/data/missions.json`. Missions with no landing time (Chandrayaan-3 for now) are left out.
+- The list is sorted by `travel_hours`, shortest first. A past mission's trip length is an example, not a plan: a real trip depends on the rocket, the path and the launch window.
+- An `arrival` without a time zone returns `422 invalid_input`; one outside the kernel range returns `422 out_of_ephemeris_range`.
 
 ## Planned, not built
 

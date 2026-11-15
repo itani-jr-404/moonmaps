@@ -60,6 +60,37 @@ def test_missions_endpoint(client):
             assert m["travel_hours"] == pytest.approx(hours, abs=0.01)
 
 
+def test_departures_endpoint(client):
+    arrival = "2026-12-01T12:00:00Z"
+    r = client.get("/missions/departures", params={"arrival": arrival})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert datetime.fromisoformat(body["arrival"]) == datetime.fromisoformat(arrival)
+    deps = {d["mission_id"]: d for d in body["departures"]}
+    # Chandrayaan-3 has no landing time in missions.json, so it has no departure.
+    assert "chandrayaan-3" not in deps
+    # Apollo 11: 1969-07-16 13:32:00 to 1969-07-20 20:17:40 UT is 4 days 6 h 45 min 40 s.
+    assert datetime.fromisoformat(deps["apollo-11"]["depart"]) == datetime.fromisoformat(
+        "2026-11-27T05:14:20Z"
+    )
+    assert deps["apollo-11"]["travel_hours"] == pytest.approx(102.76, abs=0.01)
+    # SLIM: 2023-09-06 23:42:11 to 2024-01-19 15:20:00 UTC.
+    assert deps["slim"]["travel_hours"] == pytest.approx(3231.63, abs=0.01)
+    hours = [d["travel_hours"] for d in body["departures"]]
+    assert hours == sorted(hours)
+    for d in body["departures"]:
+        gap = datetime.fromisoformat(arrival) - datetime.fromisoformat(d["depart"])
+        assert gap.total_seconds() / 3600 == pytest.approx(d["travel_hours"], abs=0.01)
+
+
+def test_departures_rejects_bad_times(client):
+    assert client.get("/missions/departures").status_code == 422
+    r = client.get("/missions/departures", params={"arrival": "2026-12-01T12:00:00"})
+    assert r.status_code == 422
+    r = client.get("/missions/departures", params={"arrival": "2099-01-01T00:00:00Z"})
+    assert r.status_code == 422 and r.json()["error"]["code"] == "out_of_ephemeris_range"
+
+
 def test_calibration_file_shape():
     cal = json.loads((DATA / "validation" / "calibration.json").read_text())
     assert cal["points"] == 300 and cal["folds"] >= 2 and isinstance(cal["seed"], int)

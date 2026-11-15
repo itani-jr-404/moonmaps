@@ -23,8 +23,8 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | 13 | Planner and Explorer modes | Planned | None |
 | 14 | Data export | Planned | `POST /analyze` (built) |
 | 15 | Checks against past landings (judges' feedback) | Built on `/accuracy`, with learning from past data; started: 16 Apollo moonwalk times, LCROSS and SLIM in [VALIDATION.md](../VALIDATION.md); Chandrayaan-3 and robotic south pole landers planned | `GET /sky`, `POST /analyze` (built) |
-| 16 | Earth to Moon distance on screen (judges' feedback) | Built on each site's page | `GET /scene` (built) |
-| 17 | Travel time to the Moon for past missions (judges' feedback) | Built: "Getting there" on each site's page | `GET /missions` (built) |
+| 16 | Earth to Moon distance on screen (judges' feedback) | Built on each site's page: from the site to the nearest point of the Earth's surface, and centre to centre | `GET /sky`, `GET /scene` (built) |
+| 17 | Travel time to the Moon for past missions (judges' feedback) | Built: "Getting there" on each site's page, with when to leave Earth to land as the next good window opens | `GET /missions`, `GET /missions/departures` (built) |
 | 18 | Sky forecast for each site: where the Earth and the Sun will be over the coming days (judges' feedback) | Built: 14-day forecast and horizon panorama on each site's page | `POST /analyze` (built) |
 
 The web app is one page, `/`, with the sections hero, choose a landing, why, planner and about. Its code is in `apps/web/src/features/` (`hero`, `landing`, `why`, `planner`, `about`, `site-chrome`). The "Code" paths in the sections below are planned folders; where a feature is built inside one of the folders above, that folder is where to look. The API side of every built endpoint is described in [backend/api-reference.md](../backend/api-reference.md).

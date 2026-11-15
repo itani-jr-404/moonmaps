@@ -141,7 +141,8 @@ TOOLS: list[dict[str, Any]] = [
             "description": (
                 "Where the Sun and the Earth are in the sky at one site and one moment: "
                 "azimuth, elevation, the terrain horizon in that direction, and whether each "
-                "is visible. Give site_id, or lat and lon."
+                "is visible; also the distance from the site to the centre of the Earth and to "
+                "the nearest point of the Earth's surface. Give site_id, or lat and lon."
             ),
             "parameters": {
                 "type": "object",
@@ -161,8 +162,8 @@ TOOLS: list[dict[str, Any]] = [
         "function": {
             "name": "moon_scene",
             "description": (
-                "The Moon's sub-solar and sub-Earth points and the Earth to Moon distance at "
-                "one moment."
+                "The Moon's sub-solar and sub-Earth points and the Earth to Moon distance, "
+                "centre to centre, at one moment."
             ),
             "parameters": {
                 "type": "object",
@@ -391,6 +392,8 @@ class AssistantService:
                     }
                     for key, b in (("sun", sky.sun), ("earth", sky.earth))
                 },
+                "site_to_earth_centre_km": round(sky.earth_centre_distance_km),
+                "site_to_earth_surface_km": round(sky.earth_surface_distance_km),
             }, link
         if name == "moon_scene":
             sc = self._sky.scene(self._time(args["t"]))
@@ -400,7 +403,7 @@ class AssistantService:
                 "subsolar_lon": round(sc.subsolar_lon, 2),
                 "subearth_lat": round(sc.subearth_lat, 2),
                 "subearth_lon": round(sc.subearth_lon, 2),
-                "earth_distance_km": round(sc.earth_distance_km),
+                "earth_to_moon_centre_to_centre_km": round(sc.earth_distance_km),
             }, None
         if name in ("accuracy_report", "past_missions"):
             if self._accuracy is None:

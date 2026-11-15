@@ -7,7 +7,10 @@ import { errorMessage, type SkyResponse } from '@/lib/api/client';
 import { useScene, useSky } from '@/lib/api/hooks';
 import { compassWord, fmtDeg, fmtKm, fmtShort } from '@/lib/format/format';
 
-/** "Right now": the Sun and the Earth over this site (GET /sky) and the Earth's distance (GET /scene). */
+/**
+ * "Right now": the Sun and the Earth over this site (GET /sky), the distance from this site to
+ * the Earth's surface (GET /sky) and the centre-to-centre Earth–Moon distance (GET /scene).
+ */
 export function RightNow({
   point,
   nowIso,
@@ -46,28 +49,34 @@ export function RightNow({
           </div>
         )}
       </div>
-      <div className="mt-6 border-t border-line pt-5 text-[14px]">
-        <span className="text-faint">
-          Distance from the Earth to the Moon (centre to centre):{' '}
-        </span>
-        {scene.isPending ? (
-          <span className="text-faint">loading…</span>
-        ) : scene.isError ? (
-          <span className="text-warn">
-            could not load.{' '}
-            <button
-              type="button"
-              className="underline"
-              onClick={() => void scene.refetch()}
-            >
-              Try again
-            </button>
-          </span>
-        ) : (
-          <b className="mono" data-testid="earth-distance">
-            {fmtKm(scene.data.earth_distance_km)}
-          </b>
-        )}
+      <div className="mt-6 border-t border-line pt-5">
+        <h3 className="text-[13px] font-bold tracking-[0.16em] text-faint uppercase">
+          How far away is the Earth?
+        </h3>
+        <dl className="mt-3 grid gap-4 text-[14px]">
+          <DistanceRow
+            label="From this site to the nearest point on Earth's surface"
+            note="From this spot at the Moon's reference radius (local hills not counted) to the closest point of the Earth, taken as a ball of its equatorial radius."
+            testId="earth-surface-distance"
+            query={{
+              isPending: sky.isPending,
+              isError: sky.isError,
+              km: sky.data?.earth_surface_distance_km,
+              retry: () => void sky.refetch(),
+            }}
+          />
+          <DistanceRow
+            label="Centre of the Earth to centre of the Moon"
+            note="The usual Earth–Moon distance, between the centres of the two bodies. It is the same for every site."
+            testId="earth-distance"
+            query={{
+              isPending: scene.isPending,
+              isError: scene.isError,
+              km: scene.data?.earth_distance_km,
+              retry: () => void scene.refetch(),
+            }}
+          />
+        </dl>
       </div>
     </section>
   );
@@ -103,6 +112,47 @@ function BodyCard({
         <dt className="text-faint">Above the terrain by</dt>
         <dd>{fmtDeg(body.clearance)}</dd>
       </dl>
+    </div>
+  );
+}
+
+/** One labelled distance with its one-line meaning; loading and error states included. */
+export function DistanceRow({
+  label,
+  note,
+  testId,
+  query,
+}: {
+  label: string;
+  note: string;
+  testId: string;
+  query: {
+    isPending: boolean;
+    isError: boolean;
+    km: number | undefined;
+    retry: () => void;
+  };
+}) {
+  return (
+    <div>
+      <dt className="text-faint">{label}</dt>
+      <dd className="mt-0.5">
+        {query.isPending ? (
+          <span className="text-faint">loading…</span>
+        ) : query.isError || query.km === undefined ? (
+          <span className="text-warn">
+            could not load.{' '}
+            <button type="button" className="underline" onClick={query.retry}>
+              Try again
+            </button>
+          </span>
+        ) : (
+          <b className="mono" data-testid={testId}>
+            {fmtKm(query.km)}
+          </b>
+        )}
+        <span className="mt-0.5 block text-[13px] text-faint">{note}</span>
+      </dd>
     </div>
   );
 }

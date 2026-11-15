@@ -95,6 +95,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/missions/departures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Departures
+         * @description When to leave Earth to land at `arrival`, using each past mission's travel time.
+         */
+        get: operations["departures_missions_departures_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/scene": {
         parameters: {
             query?: never;
@@ -376,6 +396,43 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** Departure */
+        Departure: {
+            /**
+             * Depart
+             * Format: date-time
+             * @description When to leave Earth to land at the arrival time with that travel time, UTC
+             */
+            depart: string;
+            /** Mission Id */
+            mission_id: string;
+            /** Name */
+            name: string;
+            /** Source Url */
+            source_url: string;
+            /**
+             * Travel Hours
+             * @description That mission's hours from launch to landing
+             */
+            travel_hours: number;
+        };
+        /**
+         * DeparturesResponse
+         * @description Leave-Earth times for one landing time, one per past mission with a known travel time.
+         */
+        DeparturesResponse: {
+            /**
+             * Arrival
+             * Format: date-time
+             * @description The landing time asked for, UTC
+             */
+            arrival: string;
+            /**
+             * Departures
+             * @description Shortest travel time first
+             */
+            departures: components["schemas"]["Departure"][];
+        };
         /** ErrorDetail */
         ErrorDetail: {
             /** Code */
@@ -623,7 +680,10 @@ export interface components {
          * @description Where the Sun and the Earth stand over the Moon at one moment, for the globe's lighting.
          */
         SceneResponse: {
-            /** Earth Distance Km */
+            /**
+             * Earth Distance Km
+             * @description Centre of the Moon to centre of the Earth, km (not surface to surface)
+             */
             earth_distance_km: number;
             /** Subearth Lat */
             subearth_lat: number;
@@ -720,6 +780,16 @@ export interface components {
          */
         SkyResponse: {
             earth: components["schemas"]["BodyInSky"];
+            /**
+             * Earth Centre Distance Km
+             * @description From the site, on the Moon's 1737.4 km reference sphere (terrain not counted), to the centre of the Earth, km
+             */
+            earth_centre_distance_km: number;
+            /**
+             * Earth Surface Distance Km
+             * @description From the site to the nearest point of the Earth's surface, km: earth_centre_distance_km minus the Earth's equatorial radius, 6378.137 km (NASA NSSDCA Earth Fact Sheet), so the Earth is taken as a sphere
+             */
+            earth_surface_distance_km: number;
             /**
              * Horizon Source
              * @description Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)
@@ -1046,6 +1116,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MissionsResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    departures_missions_departures_get: {
+        parameters: {
+            query: {
+                /** @description Wanted landing time on the Moon, UTC */
+                arrival: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeparturesResponse"];
                 };
             };
             /** @description Not Found */

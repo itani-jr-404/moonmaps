@@ -42,6 +42,7 @@ Used for the assistant's knowledge files `challenge.md` and `space-apps.md`. Not
 14c. NASA NSSDCA spacecraft pages for Apollo 11, Apollo 15 and Apollo 17 (launch and landing times). https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-096A (read 2026-11-14).
 14d. Brian W. Lawrence, "Sun Angles", Apollo Lunar Surface Journal, last revised 8 February 1999. https://www.apollojournals.org/alsj/sunangles.html (read 2026-11-14).
 14e. LOLA polar illumination and Earth-visibility maps (PGDA product 69): `AVGVISIB_75S_120M_201608` and `AVGVISIB_75S_120M_201608_EARTH`. https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/ (downloaded 2026-11-14).
+14f. NASA NSSDCA, Earth Fact Sheet, Dr. David R. Williams, last updated 15 November 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html (read 2026-11-15). The Earth's equatorial radius, 6378.137 km (polar radius 6356.752 km), used for the distance from a site to the Earth's surface in `GET /sky`.
 14a. NASA NSSDCA, Moon Fact Sheet, Dr. David R. Williams, last updated 11 January 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html (read 2026-11-14). Used for the distance and radius checks in [VALIDATION.md](../VALIDATION.md).
 
 ## Site coordinates
