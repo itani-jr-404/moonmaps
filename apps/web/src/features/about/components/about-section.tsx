@@ -91,6 +91,37 @@ export function AboutSection() {
             </ul>
           </div>
         </div>
+        <h2 className="h3 mt-16 mb-8" id="future-h" data-reveal>
+          Future scope
+        </h2>
+        <p className="mb-8" data-reveal>
+          Planned, not built yet.
+        </p>
+        <div className={styles.grid} aria-labelledby="future-h">
+          <div className={styles.col} data-reveal>
+            <span className={styles.n}>04</span>
+            <h3>Watching the site during the flight</h3>
+            <p>
+              The Sun and the Earth move on schedule, so a good landing time
+              stays good unless the landing slips. The ground can still change.
+              During the trip, the site would be checked again and again against
+              new orbital images and hazard data, such as a fresh impact crater,
+              so the crew can pick another site before landing.
+            </p>
+          </div>
+          <div className={styles.col} data-reveal>
+            <span className={styles.n}>05</span>
+            <h3>The best spot in an area</h3>
+            <p>
+              You mark an area with 4 corners and pick a start and end date.
+              Moon Maps finds the point and the date that give the longest run
+              of good days. Points close together usually behave alike, so a
+              coarse-to-fine quadtree search narrows the area step by step, and
+              a sliding window over time finds the longest good run at each
+              point.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

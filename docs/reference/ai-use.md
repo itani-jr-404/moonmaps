@@ -36,6 +36,7 @@ Positions, horizons, visibility and metrics are deterministic calculations from 
 | 2026-11-15 | Assistant answer style in `apps/api/app/services/assistant_prompt.md` (direct first sentence, length and words fitted to the person) | Claude | Rewrote the style rules from the team lead's request | The team lead |
 | 2026-11-15 | Documentation sweep after the testers' results (`docs/backend`, `docs/frontend`, `docs/science`, `docs/data`, `docs/reference` and the assistant's knowledge files) | Claude | Compared the documents with the code and corrected the statements that no longer matched | The team lead, to review |
 | 2026-11-15 | The Apollo Journal note on the Accuracy page, the smaller shadow map on weaker devices (`apps/web/src/scene/renderer.ts`) and the matching updates in `docs/VALIDATION.md` | Claude | Wrote the code, tests and text from the team lead's requests and the testers' notes; checked the figures against `GET /accuracy` and the deployed app | The team lead |
+| 2026-11-15 | About page "Future scope" section (`apps/web/src/features/about/components/about-section.tsx`) | Claude | Wrote the section's text from the team's two ideas (watching the site during the flight; best spot in an area by quadtree and sliding window) | The team lead |
 
 How the output was checked:
 

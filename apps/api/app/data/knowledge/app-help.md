@@ -121,6 +121,8 @@ A block of ground around the place with the lander, a compass ring, and beams: a
 
 Three columns: "What it does for you", "The simple idea behind it" and "Good to know". It says the app is a planning and learning tool, not flight software.
 
+Below them, "Future scope" lists two ideas that are planned and not built: watching the site during the flight against new orbital images and hazard data, such as a fresh impact crater; and finding the best spot in an area marked by 4 corners between two dates, the point and date with the longest run of good days, with a coarse-to-fine quadtree search and a sliding window over time. Moon Maps cannot do either yet.
+
 ## Sharing a link
 
 On the Planner page, the address keeps the place and time:
