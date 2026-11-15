@@ -4,7 +4,7 @@ import styles from './why-section.module.css';
 /** "Why the south pole": three plain facts, each with a small animated drawing. */
 export function WhySection() {
   return (
-    <section className="section bg-bg" id="why" aria-labelledby="why-h">
+    <section className="section" id="why" aria-labelledby="why-h">
       <div className="wrap">
         <div className="mb-16">
           <p className="eyebrow" data-reveal>

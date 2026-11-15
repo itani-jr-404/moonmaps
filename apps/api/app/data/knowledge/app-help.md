@@ -8,11 +8,11 @@ All Sun and Earth answers come from the Moon Maps API. In the 3D views only the 
 
 ## The pages
 
-Moon Maps has separate pages. The menu at the top links to them: Explore, Planner, Sites, Accuracy and About, plus the "Open the planner" button. On a phone, the menu button opens the same links (Home, Choose a landing, Planner, Sites, How sure are we, About). "Skip to main content" is the first link for keyboard users.
+Moon Maps has separate pages. The menu at the top links to them: Home, Explore, Planner, Sites, Accuracy and About, plus the "Open the planner" button. The page you are on is underlined. On a phone, the menu button opens the same links (Home, Choose a landing, Planner, Sites, How sure are we, About). "Skip to main content" is the first link for keyboard users.
 
 | Page | Address | What it is for |
 | --- | --- | --- |
-| Home | `/` | Headline, the live south pole readout, why the south pole matters, and cards that open each page ("What you can do") |
+| Home | `/` | Headline, the live south pole readout, cards that open each page ("What you can do"), then why the south pole matters |
 | Choose a landing | `/explore` | A 3D Moon to aim at and land on |
 | Planner | `/planner` | Pick a place and a date; the answer, the 30-day calendar, the best times and a 3D view |
 | Sites | `/sites` | Every curated landing site as a card, grouped by kind, with a "right now" line |
@@ -69,7 +69,7 @@ The south polar region faces you at the start. Small dots mark the curated sites
 
 ## Why the south pole (on Home, `/#why`)
 
-Three cards: "There is ice", "The Sun stays low", "Earth comes and goes".
+Near the end of the home page, after the "What you can do" cards. Three cards: "There is ice", "The Sun stays low", "Earth comes and goes".
 
 ## The planner (`/planner`)
 

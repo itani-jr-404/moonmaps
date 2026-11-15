@@ -1,11 +1,9 @@
 import Link from 'next/link';
 
 import { LogoMark } from '@/components/ui/icons';
-import { PAGES } from '@/lib/routes';
+import { NAV_PAGES } from '@/lib/routes';
 import { FooterWatermark } from './footer-watermark';
 import styles from './site-footer.module.css';
-
-const EXPLORE = [{ href: '/', label: 'Home' }, ...PAGES] as const;
 
 /*
   Credit lines for the material the site uses. Each source is listed in
@@ -52,7 +50,7 @@ export function SiteFooter() {
           <div className={styles.col}>
             <h4>Explore</h4>
             <ul>
-              {EXPLORE.map((l) => (
+              {NAV_PAGES.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href}>{l.label}</Link>
                 </li>

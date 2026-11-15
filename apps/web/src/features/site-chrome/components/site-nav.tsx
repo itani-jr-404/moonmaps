@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { LogoMark } from '@/components/ui/icons';
 import { useReducedMotion } from '@/lib/motion/reduced-motion';
 import { useSmoothScroll } from '@/lib/motion/smooth-scroll';
-import { isActive, PAGES } from '@/lib/routes';
+import { isActive, NAV_PAGES } from '@/lib/routes';
 import { useIntroStore } from '@/lib/state/intro-store';
 import { useMagnetic } from './magnetic';
 import styles from './site-nav.module.css';
@@ -162,7 +162,7 @@ export function SiteNav() {
           </Link>
           <nav aria-label="Primary">
             <ul className={styles.links}>
-              {PAGES.map((l) => (
+              {NAV_PAGES.map((l) => (
                 <li key={l.href}>
                   <Link
                     href={l.href}
@@ -206,18 +206,8 @@ export function SiteNav() {
         aria-hidden={!menuOpen}
       >
         <ol>
-          <li style={{ '--i': 0 } as CSSProperties}>
-            <Link
-              href="/"
-              aria-current={pathname === '/' ? 'page' : undefined}
-              tabIndex={menuOpen ? undefined : -1}
-              onClick={() => setMenuOpen(false)}
-            >
-              Home
-            </Link>
-          </li>
-          {PAGES.map((l, i) => (
-            <li key={l.href} style={{ '--i': i + 1 } as CSSProperties}>
+          {NAV_PAGES.map((l, i) => (
+            <li key={l.href} style={{ '--i': i } as CSSProperties}>
               <Link
                 href={l.href}
                 aria-current={isActive(pathname, l.href) ? 'page' : undefined}

@@ -9,7 +9,7 @@ import styles from './about-section.module.css';
 export function AboutSection() {
   return (
     <section
-      className="section border-t border-line bg-bg-2"
+      className="section border-t border-line"
       id="about"
       aria-labelledby="about-h"
     >

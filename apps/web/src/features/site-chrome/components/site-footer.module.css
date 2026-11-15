@@ -5,7 +5,8 @@
   overflow: hidden;
   border-top: 1px solid var(--color-line);
   padding-top: 80px;
-  background: var(--color-bg);
+  /* A slightly darker band than the page; the star field still shows through. */
+  background: color-mix(in srgb, var(--color-bg) 70%, transparent);
 }
 .grid {
   display: grid;

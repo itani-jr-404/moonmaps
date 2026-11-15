@@ -28,8 +28,17 @@ function useIsClient(): boolean {
   );
 }
 
+/*
+  iOS Safari gives native date and time inputs a minimum width from their content, so on a
+  phone they stuck out of the card. Removing the native appearance, capping the width at the
+  card and left-aligning the value lets them shrink to the column.
+*/
 const inputCls =
-  'h-[52px] w-full min-w-0 rounded-[14px] border border-line-2 bg-white/[.03] px-3.5 text-base text-ink [color-scheme:dark] focus:border-accent focus:outline-none';
+  'box-border block h-[52px] w-full max-w-full min-w-0 appearance-none rounded-[14px] border border-line-2 bg-white/[.03] px-3.5 text-left text-base text-ink [color-scheme:dark] focus:border-accent focus:outline-none [&::-webkit-date-and-time-value]:text-left';
+
+/** The label is a one-column grid whose column may shrink below the input's own width. */
+const labelCls =
+  'grid min-w-0 grid-cols-[minmax(0,1fr)] gap-1.5 text-xs text-faint';
 
 /** Step 2: date and time in the visitor's own time zone, plus quick choices. */
 export function WhenPicker() {
@@ -47,7 +56,7 @@ export function WhenPicker() {
   return (
     <PlannerStep n={2} title="When?">
       <div className="mb-3 grid grid-cols-1 gap-3 min-[480px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <label className="grid min-w-0 gap-1.5 text-xs text-faint">
+        <label className={labelCls}>
           <span>Date</span>
           <input
             type="date"
@@ -56,7 +65,7 @@ export function WhenPicker() {
             onChange={(e) => apply(e.target.value, timeValue(d))}
           />
         </label>
-        <label className="grid min-w-0 gap-1.5 text-xs text-faint">
+        <label className={labelCls}>
           <span>Time</span>
           <input
             type="time"

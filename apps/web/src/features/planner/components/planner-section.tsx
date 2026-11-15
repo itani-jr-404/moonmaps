@@ -17,7 +17,7 @@ export function PlannerSection() {
 
   return (
     <section
-      className="section border-y border-line bg-bg-2"
+      className="section border-y border-line"
       id="navigator"
       aria-labelledby="nv-h"
     >

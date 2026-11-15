@@ -12,7 +12,7 @@ export function PlannerStep({
 }) {
   return (
     <div
-      className="grid grid-cols-[48px_minmax(0,1fr)] gap-4 rounded-3xl border border-line bg-[linear-gradient(180deg,#0f182b,#0a1120)] p-5 sm:gap-5 sm:p-7"
+      className="grid grid-cols-[48px_minmax(0,1fr)] gap-4 rounded-3xl border border-line-2 bg-(image:--card-grad) p-5 sm:gap-5 sm:p-7"
       data-reveal
     >
       <span
