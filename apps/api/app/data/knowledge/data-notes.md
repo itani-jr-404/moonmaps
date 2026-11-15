@@ -37,7 +37,7 @@ NASA Goddard's PGDA polar illumination maps were used by a script to check the a
 
 | Check | Pass rule | Result |
 | --- | --- | --- |
-| Sun and Earth positions against JPL Horizons, 16 cases in November and December 2026 at 89.9 S, 0 E and at the Apollo 11 site | Within 0.05 degrees | 16 of 16 pass; largest difference 0.0123 degrees |
+| Sun and Earth positions against JPL Horizons, 16 cases in November and December 2026 at 89.9 S, 0 E and at the Apollo 11 site | Within 0.05 degrees | 16 of 16 pass; largest difference 0.0001 degrees |
 | Sun elevation at 16 Apollo moonwalk times (1969 to 1972) against JPL Horizons | Within 0.05 degrees | 16 of 16 pass; every difference under 0.005 degrees |
 | Long-term sunlight against NASA Goddard's polar illumination map, 300 random points | Mean absolute difference at most 0.10, correlation at least 0.90 | Mean absolute difference 0.006, correlation 0.992 |
 | Long-term Earth visibility against NASA Goddard's Earth-visibility map | Same rule | Mean absolute difference 0.006, correlation 0.999 |

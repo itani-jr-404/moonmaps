@@ -450,7 +450,7 @@ export function createHeroScene(
       0.12 + P.py * 0.12 + Math.sin(t * 0.5) * 0.05,
       -0.55 +
         (1 - a) * 1.2 +
-        (1 - P.spin) * Math.PI * 6 +
+        (1 - P.spin) * Math.PI * 2 +
         P.px * 0.35 +
         Math.sin(t * 0.3) * 0.08,
       -0.32 + Math.sin(t * 0.4) * 0.06,

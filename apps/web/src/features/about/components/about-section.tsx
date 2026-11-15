@@ -4,7 +4,7 @@ import styles from './about-section.module.css';
   What the app does, the idea behind it, and its limits. Keep this text true to the app:
   - JPL ephemeris files and LOLA polar maps: docs/data/sources.md.
   - The JPL Horizons check: 16 cases (2 places, Sun and Earth, 4 dates in 2026), pass rule
-    0.05 degrees, largest difference 0.0123 degrees. From apps/api/app/data/validation/horizons.json,
+    0.05 degrees, largest difference 0.0001 degrees. From apps/api/app/data/validation/horizons.json,
     apps/api/tests/test_horizons.py and docs/science/validation.md; recomputed 2026-11-15.
 */
 export function AboutSection() {
@@ -70,7 +70,7 @@ export function AboutSection() {
               Apollo 11 landing site, at 00:00 UTC on 15, 22 and 29 November and
               6 December 2026. A case passes when azimuth and elevation are each
               within 0.05 degrees. All 16 pass, and the largest difference is
-              0.0123 degrees. Like Horizons, this check uses a smooth Moon, so
+              0.0001 degrees. Like Horizons, this check uses a smooth Moon, so
               it tests the positions, not the terrain horizon.
             </p>
           </div>

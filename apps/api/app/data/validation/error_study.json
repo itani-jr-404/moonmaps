@@ -1,0 +1,3797 @@
+{
+ "generated_at": "2026-11-15T11:48:09+00:00",
+ "script": "apps/api/scripts/error_study.py",
+ "note": "research/error-study.md explains every number",
+ "seed": 20261115,
+ "reference_series": "2027-01-01 plus 365 days at 1-minute steps",
+ "global_grid": "LDEM_16 (1895 m/pixel)",
+ "kpi_rules": {
+  "position_max_deg": 0.05,
+  "timing_p95_s": 60.0,
+  "sampling_p95_min": 5.0,
+  "sampling_missed_share": 0.01,
+  "pgda_within_0_05_share": 0.9,
+  "class_agreement_share": 0.9
+ },
+ "kpis": [
+  {
+   "id": "position_error",
+   "name": "Sun and Earth position error against JPL Horizons",
+   "definition": "Largest great-circle angle between our direction and Horizons' (quantity 4) over all cases",
+   "kind": "measured",
+   "value_today": 0.006,
+   "value_after_time_fix": 8e-05,
+   "unit": "degrees",
+   "threshold": "<= 0.05",
+   "pass_today": true,
+   "data": "420 cases, 7 points, 1900-2050 (horizons_wide.json)"
+  },
+  {
+   "id": "timing_from_positions",
+   "name": "Rise and set timing error from the positions",
+   "definition": "Position error converted to seconds of the body's own motion; 95th percentile over all cases, worse of Sun and Earth",
+   "kind": "measured",
+   "value_today": 30.79,
+   "value_after_time_fix": 1.14,
+   "unit": "seconds",
+   "threshold": "p95 <= 60",
+   "pass_today": true,
+   "data": "same cases"
+  },
+  {
+   "id": "sampling_30min",
+   "name": "Window-edge error from the 30-minute time step",
+   "definition": "Rise and set times from the step, against a 1-minute series; 95th percentile of the absolute error, and the share of edges lost (windows shorter than a step), worst group of sites",
+   "kind": "measured",
+   "value_today": {
+    "p95_min": 1.75,
+    "missed_share": 0.0019
+   },
+   "unit": "minutes, share",
+   "threshold": "p95 <= 5 min and missed <= 1%",
+   "pass_today": true,
+   "data": "17 curated sites and 40 random polar points, 2027 (polar_sun, polar_earth, polar-random_sun, polar-random_earth)"
+  },
+  {
+   "id": "sampling_60min",
+   "name": "Window-edge error from the 60-minute time step",
+   "definition": "Rise and set times from the step, against a 1-minute series; 95th percentile of the absolute error, and the share of edges lost (windows shorter than a step), worst group of sites",
+   "kind": "measured",
+   "value_today": {
+    "p95_min": 5.98,
+    "missed_share": 0.005
+   },
+   "unit": "minutes, share",
+   "threshold": "p95 <= 5 min and missed <= 1%",
+   "pass_today": false,
+   "data": "17 curated sites and 40 random polar points, 2027 (polar_sun, polar_earth, polar-random_sun, polar-random_earth)"
+  },
+  {
+   "id": "pgda_within_5_points_centre",
+   "name": "Long-term visibility within 5 percentage points of NASA's maps (centre rule)",
+   "definition": "Share of 300 random south polar points where our 18.6-year share is within 0.05 of NASA Goddard's PGDA map",
+   "kind": "measured",
+   "value_today": {
+    "sun": 0.99,
+    "earth": 0.7067
+   },
+   "unit": "share of points",
+   "threshold": ">= 90% for each body",
+   "pass_today": false,
+   "data": "pgda_comparison.json"
+  },
+  {
+   "id": "pgda_class_agreement_centre",
+   "name": "Same go / caution / no-go class as NASA's maps (centre rule)",
+   "definition": "Share of points whose long-term share falls in the same class as the map's, with the badge thresholds (Sun 0.30 / 0.70, Earth 0.10 / 0.50)",
+   "kind": "measured",
+   "value_today": {
+    "sun": 0.9567,
+    "earth": 0.8933
+   },
+   "unit": "share of points",
+   "threshold": ">= 90% for each body",
+   "pass_today": false,
+   "data": "pgda_comparison.json"
+  },
+  {
+   "id": "pgda_within_5_points_any_part",
+   "name": "Long-term visibility within 5 percentage points of NASA's maps (any part rule)",
+   "definition": "Share of 300 random south polar points where our 18.6-year share is within 0.05 of NASA Goddard's PGDA map",
+   "kind": "measured",
+   "value_today": {
+    "sun": 0.9867,
+    "earth": 0.9767
+   },
+   "unit": "share of points",
+   "threshold": ">= 90% for each body",
+   "pass_today": true,
+   "data": "pgda_comparison.json"
+  },
+  {
+   "id": "pgda_class_agreement_any_part",
+   "name": "Same go / caution / no-go class as NASA's maps (any part rule)",
+   "definition": "Share of points whose long-term share falls in the same class as the map's, with the badge thresholds (Sun 0.30 / 0.70, Earth 0.10 / 0.50)",
+   "kind": "measured",
+   "value_today": {
+    "sun": 0.9833,
+    "earth": 0.9933
+   },
+   "unit": "share of points",
+   "threshold": ">= 90% for each body",
+   "pass_today": true,
+   "data": "pgda_comparison.json"
+  },
+  {
+   "id": "terrain_band_grid",
+   "name": "Terrain uncertainty band: 80 m against 120 m LOLA grid",
+   "definition": "How much the answer changes under this change of the terrain input: yes/no agreement over every minute of 2027, the median and 95th percentile shift of rise and set times, and the 95th percentile change of the yearly share (mean over the directions where there are several)",
+   "kind": "bound (sensitivity, not an error against the truth)",
+   "value_today": {
+    "sun": {
+     "instant_agreement_mean": 0.99569,
+     "edge_shift_median_min": 3.1,
+     "edge_shift_p95_min": 179.3,
+     "fraction_abs_diff_p95": 0.0157
+    },
+    "earth": {
+     "instant_agreement_mean": 0.99833,
+     "edge_shift_median_min": 7.1,
+     "edge_shift_p95_min": 109.0,
+     "fraction_abs_diff_p95": 0.0034
+    }
+   },
+   "unit": "share of minutes, minutes, share",
+   "threshold": "none; shown as an uncertainty band",
+   "pass_today": null,
+   "data": "50 south polar points, 2027 at 1-minute steps"
+  },
+  {
+   "id": "terrain_band_site_position",
+   "name": "Terrain uncertainty band: site moved by one 80 m pixel (north, east, south, west)",
+   "definition": "How much the answer changes under this change of the terrain input: yes/no agreement over every minute of 2027, the median and 95th percentile shift of rise and set times, and the 95th percentile change of the yearly share (mean over the directions where there are several)",
+   "kind": "bound (sensitivity, not an error against the truth)",
+   "value_today": {
+    "sun": {
+     "instant_agreement_mean": 0.98693,
+     "edge_shift_median_min": 29.9,
+     "edge_shift_p95_min": 372.3,
+     "fraction_abs_diff_p95": 0.0406
+    },
+    "earth": {
+     "instant_agreement_mean": 0.99088,
+     "edge_shift_median_min": 58.0,
+     "edge_shift_p95_min": 493.5,
+     "fraction_abs_diff_p95": 0.0306
+    }
+   },
+   "unit": "share of minutes, minutes, share",
+   "threshold": "none; shown as an uncertainty band",
+   "pass_today": null,
+   "data": "50 south polar points, 2027 at 1-minute steps"
+  }
+ ],
+ "ephemeris": {
+  "horizons.json": {
+   "all": {
+    "cases": 16,
+    "separation_now_deg": {
+     "n": 16,
+     "median": 0.00221,
+     "p95": 0.0038,
+     "max": 0.0038
+    },
+    "separation_fixed_deg": {
+     "n": 16,
+     "median": 1e-05,
+     "p95": 1e-05,
+     "max": 1e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 16,
+     "median": 26.97,
+     "p95": 27.51,
+     "max": 27.52
+    },
+    "time_equivalent_fixed_s": {
+     "n": 16,
+     "median": 0.12,
+     "p95": 0.51,
+     "max": 0.52
+    },
+    "signed_time_equivalent_now_median_s": -26.97
+   },
+   "sun": {
+    "cases": 8,
+    "separation_now_deg": {
+     "n": 8,
+     "median": 0.0038,
+     "p95": 0.0038,
+     "max": 0.0038
+    },
+    "separation_fixed_deg": {
+     "n": 8,
+     "median": 1e-05,
+     "p95": 1e-05,
+     "max": 1e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 8,
+     "median": 26.98,
+     "p95": 26.98,
+     "max": 26.98
+    },
+    "time_equivalent_fixed_s": {
+     "n": 8,
+     "median": 0.02,
+     "p95": 0.03,
+     "max": 0.03
+    },
+    "signed_time_equivalent_now_median_s": -26.98
+   },
+   "earth": {
+    "cases": 8,
+    "separation_now_deg": {
+     "n": 8,
+     "median": 0.00047,
+     "p95": 0.00063,
+     "max": 0.00063
+    },
+    "separation_fixed_deg": {
+     "n": 8,
+     "median": 1e-05,
+     "p95": 1e-05,
+     "max": 1e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 8,
+     "median": 26.77,
+     "p95": 27.52,
+     "max": 27.52
+    },
+    "time_equivalent_fixed_s": {
+     "n": 8,
+     "median": 0.31,
+     "p95": 0.52,
+     "max": 0.52
+    },
+    "signed_time_equivalent_now_median_s": -26.77
+   },
+   "sun_1972-2050": {
+    "cases": 8,
+    "separation_now_deg": {
+     "n": 8,
+     "median": 0.0038,
+     "p95": 0.0038,
+     "max": 0.0038
+    },
+    "separation_fixed_deg": {
+     "n": 8,
+     "median": 1e-05,
+     "p95": 1e-05,
+     "max": 1e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 8,
+     "median": 26.98,
+     "p95": 26.98,
+     "max": 26.98
+    },
+    "time_equivalent_fixed_s": {
+     "n": 8,
+     "median": 0.02,
+     "p95": 0.03,
+     "max": 0.03
+    },
+    "signed_time_equivalent_now_median_s": -26.98
+   },
+   "worst_fixed_case": {
+    "site": "Near the south pole",
+    "t": "2026-11-29T00:00:00Z",
+    "body": "sun",
+    "sep_fixed_deg": 1.3368800540514497e-05
+   }
+  },
+  "horizons_wide.json": {
+   "all": {
+    "cases": 420,
+    "separation_now_deg": {
+     "n": 420,
+     "median": 0.00061,
+     "p95": 0.00381,
+     "max": 0.006
+    },
+    "separation_fixed_deg": {
+     "n": 420,
+     "median": 1e-05,
+     "p95": 2e-05,
+     "max": 8e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 420,
+     "median": 18.56,
+     "p95": 30.77,
+     "max": 42.47
+    },
+    "time_equivalent_fixed_s": {
+     "n": 420,
+     "median": 0.1,
+     "p95": 0.85,
+     "max": 2.15
+    },
+    "signed_time_equivalent_now_median_s": 2.68
+   },
+   "sun": {
+    "cases": 210,
+    "separation_now_deg": {
+     "n": 210,
+     "median": 0.00257,
+     "p95": 0.00434,
+     "max": 0.006
+    },
+    "separation_fixed_deg": {
+     "n": 210,
+     "median": 1e-05,
+     "p95": 5e-05,
+     "max": 8e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 210,
+     "median": 18.31,
+     "p95": 30.79,
+     "max": 42.47
+    },
+    "time_equivalent_fixed_s": {
+     "n": 210,
+     "median": 0.03,
+     "p95": 0.33,
+     "max": 0.58
+    },
+    "signed_time_equivalent_now_median_s": 2.28
+   },
+   "earth": {
+    "cases": 210,
+    "separation_now_deg": {
+     "n": 210,
+     "median": 0.00029,
+     "p95": 0.00064,
+     "max": 0.00091
+    },
+    "separation_fixed_deg": {
+     "n": 210,
+     "median": 1e-05,
+     "p95": 2e-05,
+     "max": 3e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 210,
+     "median": 18.6,
+     "p95": 30.62,
+     "max": 41.85
+    },
+    "time_equivalent_fixed_s": {
+     "n": 210,
+     "median": 0.39,
+     "p95": 1.14,
+     "max": 2.15
+    },
+    "signed_time_equivalent_now_median_s": 3.0
+   },
+   "sun_1900-1961": {
+    "cases": 91,
+    "separation_now_deg": {
+     "n": 91,
+     "median": 0.00252,
+     "p95": 0.00523,
+     "max": 0.006
+    },
+    "separation_fixed_deg": {
+     "n": 91,
+     "median": 1e-05,
+     "p95": 2e-05,
+     "max": 3e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 91,
+     "median": 17.8,
+     "p95": 37.22,
+     "max": 42.47
+    },
+    "time_equivalent_fixed_s": {
+     "n": 91,
+     "median": 0.05,
+     "p95": 0.12,
+     "max": 0.14
+    },
+    "signed_time_equivalent_now_median_s": 17.8
+   },
+   "sun_1962-1971": {
+    "cases": 17,
+    "separation_now_deg": {
+     "n": 17,
+     "median": 0.00064,
+     "p95": 0.00112,
+     "max": 0.00113
+    },
+    "separation_fixed_deg": {
+     "n": 17,
+     "median": 7e-05,
+     "p95": 8e-05,
+     "max": 8e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 17,
+     "median": 4.56,
+     "p95": 7.98,
+     "max": 8.03
+    },
+    "time_equivalent_fixed_s": {
+     "n": 17,
+     "median": 0.48,
+     "p95": 0.55,
+     "max": 0.58
+    },
+    "signed_time_equivalent_now_median_s": 4.56
+   },
+   "sun_1972-2050": {
+    "cases": 102,
+    "separation_now_deg": {
+     "n": 102,
+     "median": 0.00338,
+     "p95": 0.00382,
+     "max": 0.00383
+    },
+    "separation_fixed_deg": {
+     "n": 102,
+     "median": 1e-05,
+     "p95": 1e-05,
+     "max": 1e-05
+    },
+    "time_equivalent_now_s": {
+     "n": 102,
+     "median": 24.0,
+     "p95": 27.01,
+     "max": 27.05
+    },
+    "time_equivalent_fixed_s": {
+     "n": 102,
+     "median": 0.01,
+     "p95": 0.05,
+     "max": 0.06
+    },
+    "signed_time_equivalent_now_median_s": -24.0
+   },
+   "worst_fixed_case": {
+    "site": "chandrayaan-3",
+    "t": "1966-02-22T17:32:00Z",
+    "body": "sun",
+    "sep_fixed_deg": 8.297178459536795e-05
+   }
+  }
+ },
+ "series": {
+  "polar_sun": {
+   "sites": 10,
+   "edges": 398,
+   "minutes_per_0_01_deg": {
+    "n": 398,
+    "median": 8.17,
+    "p95": 25.8,
+    "max": 187.11
+   },
+   "share_edges_over_1_min_per_0_01_deg": 1.0,
+   "leap_bias_s": {
+    "n": 398,
+    "median": 27.0,
+    "p95": 27.0,
+    "max": 29.5
+   },
+   "leap_bias_signed_median_s": 27.0,
+   "disc_rule_shift_min": {
+    "n": 317,
+    "median": 204.9,
+    "p95": 549.4,
+    "max": 709.7
+   },
+   "disc_rule_shift_linear_estimate_min": {
+    "n": 398,
+    "median": 215.8,
+    "p95": 685.9,
+    "max": 4901.5
+   },
+   "disc_rule_missed_edges": 81,
+   "disc_rule_instant_disagreement": 0.0235,
+   "disc_rule_fraction_gap_mean": 0.0235,
+   "near_edge_share_0_001_deg": 0.000169,
+   "near_edge_share_0_01_deg": 0.001655,
+   "sampling": {
+    "5": {
+     "edge_error_min": {
+      "n": 398,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.98
+     },
+     "reference_edges": 398,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "10": {
+     "edge_error_min": {
+      "n": 398,
+      "median": 0.0,
+      "p95": 0.14,
+      "max": 2.27
+     },
+     "reference_edges": 398,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0001
+     }
+    },
+    "30": {
+     "edge_error_min": {
+      "n": 398,
+      "median": 0.0,
+      "p95": 1.75,
+      "max": 16.89
+     },
+     "reference_edges": 398,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0001,
+      "max": 0.0006
+     }
+    },
+    "60": {
+     "edge_error_min": {
+      "n": 396,
+      "median": 0.03,
+      "p95": 5.98,
+      "max": 23.98
+     },
+     "reference_edges": 398,
+     "missed_share": 0.005,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0003,
+      "max": 0.0007
+     }
+    },
+    "120": {
+     "edge_error_min": {
+      "n": 386,
+      "median": 1.2,
+      "p95": 16.38,
+      "max": 58.94
+     },
+     "reference_edges": 398,
+     "missed_share": 0.0302,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0001,
+      "p95": 0.0012,
+      "max": 0.0027
+     }
+    },
+    "360": {
+     "edge_error_min": {
+      "n": 372,
+      "median": 10.9,
+      "p95": 99.05,
+      "max": 244.96
+     },
+     "reference_edges": 398,
+     "missed_share": 0.0653,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0005,
+      "p95": 0.0055,
+      "max": 0.0094
+     }
+    }
+   }
+  },
+  "polar_earth": {
+   "sites": 10,
+   "edges": 267,
+   "minutes_per_0_01_deg": {
+    "n": 267,
+    "median": 10.38,
+    "p95": 18.24,
+    "max": 24.54
+   },
+   "share_edges_over_1_min_per_0_01_deg": 1.0,
+   "leap_bias_s": {
+    "n": 267,
+    "median": 27.0,
+    "p95": 27.0,
+    "max": 27.0
+   },
+   "leap_bias_signed_median_s": 27.0,
+   "disc_rule_shift_min": {
+    "n": 0,
+    "median": null,
+    "p95": null,
+    "max": null
+   },
+   "disc_rule_shift_linear_estimate_min": {
+    "n": 267,
+    "median": 956.3,
+    "p95": 1681.8,
+    "max": 2401.7
+   },
+   "disc_rule_missed_edges": 267,
+   "disc_rule_instant_disagreement": 0.0575,
+   "disc_rule_fraction_gap_mean": 0.0575,
+   "near_edge_share_0_001_deg": 0.000115,
+   "near_edge_share_0_01_deg": 0.001155,
+   "sampling": {
+    "5": {
+     "edge_error_min": {
+      "n": 267,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     },
+     "reference_edges": 267,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "10": {
+     "edge_error_min": {
+      "n": 267,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.01
+     },
+     "reference_edges": 267,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "30": {
+     "edge_error_min": {
+      "n": 267,
+      "median": 0.0,
+      "p95": 0.03,
+      "max": 0.19
+     },
+     "reference_edges": 267,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "60": {
+     "edge_error_min": {
+      "n": 267,
+      "median": 0.01,
+      "p95": 0.12,
+      "max": 0.34
+     },
+     "reference_edges": 267,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "120": {
+     "edge_error_min": {
+      "n": 267,
+      "median": 0.05,
+      "p95": 0.46,
+      "max": 0.88
+     },
+     "reference_edges": 267,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "360": {
+     "edge_error_min": {
+      "n": 267,
+      "median": 0.54,
+      "p95": 3.99,
+      "max": 6.45
+     },
+     "reference_edges": 267,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 120,
+      "median": 0.0,
+      "p95": 0.0002,
+      "max": 0.0004
+     }
+    }
+   }
+  },
+  "non-polar_sun": {
+   "sites": 7,
+   "edges": 168,
+   "minutes_per_0_01_deg": {
+    "n": 168,
+    "median": 1.32,
+    "p95": 3.37,
+    "max": 3.38
+   },
+   "share_edges_over_1_min_per_0_01_deg": 1.0,
+   "leap_bias_s": {
+    "n": 168,
+    "median": 27.0,
+    "p95": 27.0,
+    "max": 27.0
+   },
+   "leap_bias_signed_median_s": 27.0,
+   "disc_rule_shift_min": {
+    "n": 168,
+    "median": 35.0,
+    "p95": 90.0,
+    "max": 91.7
+   },
+   "disc_rule_shift_linear_estimate_min": {
+    "n": 168,
+    "median": 35.0,
+    "p95": 90.0,
+    "max": 91.7
+   },
+   "disc_rule_missed_edges": 0,
+   "disc_rule_instant_disagreement": 0.002,
+   "disc_rule_fraction_gap_mean": 0.002,
+   "near_edge_share_0_001_deg": 1.3e-05,
+   "near_edge_share_0_01_deg": 0.000148,
+   "sampling": {
+    "5": {
+     "edge_error_min": {
+      "n": 168,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     },
+     "reference_edges": 168,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "10": {
+     "edge_error_min": {
+      "n": 168,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     },
+     "reference_edges": 168,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "30": {
+     "edge_error_min": {
+      "n": 168,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     },
+     "reference_edges": 168,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "60": {
+     "edge_error_min": {
+      "n": 168,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     },
+     "reference_edges": 168,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "120": {
+     "edge_error_min": {
+      "n": 168,
+      "median": 0.0,
+      "p95": 0.01,
+      "max": 0.02
+     },
+     "reference_edges": 168,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "360": {
+     "edge_error_min": {
+      "n": 168,
+      "median": 0.01,
+      "p95": 0.09,
+      "max": 0.18
+     },
+     "reference_edges": 168,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    }
+   }
+  },
+  "non-polar_earth": {
+   "sites": 7,
+   "edges": 0,
+   "minutes_per_0_01_deg": {
+    "n": 0,
+    "median": null,
+    "p95": null,
+    "max": null
+   },
+   "share_edges_over_1_min_per_0_01_deg": 0.0,
+   "leap_bias_s": {
+    "n": 0,
+    "median": null,
+    "p95": null,
+    "max": null
+   },
+   "leap_bias_signed_median_s": 0.0,
+   "disc_rule_shift_min": {
+    "n": 0,
+    "median": null,
+    "p95": null,
+    "max": null
+   },
+   "disc_rule_shift_linear_estimate_min": {
+    "n": 0,
+    "median": null,
+    "p95": null,
+    "max": null
+   },
+   "disc_rule_missed_edges": 0,
+   "disc_rule_instant_disagreement": 0.0,
+   "disc_rule_fraction_gap_mean": 0.0,
+   "near_edge_share_0_001_deg": 0.0,
+   "near_edge_share_0_01_deg": 0.0,
+   "sampling": {
+    "5": {
+     "edge_error_min": {
+      "n": 0,
+      "median": null,
+      "p95": null,
+      "max": null
+     },
+     "reference_edges": 0,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "10": {
+     "edge_error_min": {
+      "n": 0,
+      "median": null,
+      "p95": null,
+      "max": null
+     },
+     "reference_edges": 0,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "30": {
+     "edge_error_min": {
+      "n": 0,
+      "median": null,
+      "p95": null,
+      "max": null
+     },
+     "reference_edges": 0,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "60": {
+     "edge_error_min": {
+      "n": 0,
+      "median": null,
+      "p95": null,
+      "max": null
+     },
+     "reference_edges": 0,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "120": {
+     "edge_error_min": {
+      "n": 0,
+      "median": null,
+      "p95": null,
+      "max": null
+     },
+     "reference_edges": 0,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "360": {
+     "edge_error_min": {
+      "n": 0,
+      "median": null,
+      "p95": null,
+      "max": null
+     },
+     "reference_edges": 0,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 84,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    }
+   }
+  },
+  "polar-random_sun": {
+   "sites": 40,
+   "edges": 1052,
+   "minutes_per_0_01_deg": {
+    "n": 1052,
+    "median": 6.93,
+    "p95": 23.76,
+    "max": 287.2
+   },
+   "share_edges_over_1_min_per_0_01_deg": 1.0,
+   "leap_bias_s": {
+    "n": 1052,
+    "median": 27.0,
+    "p95": 27.0,
+    "max": 30.1
+   },
+   "leap_bias_signed_median_s": 27.0,
+   "disc_rule_shift_min": {
+    "n": 951,
+    "median": 178.4,
+    "p95": 468.3,
+    "max": 709.4
+   },
+   "disc_rule_shift_linear_estimate_min": {
+    "n": 1052,
+    "median": 184.7,
+    "p95": 630.9,
+    "max": 7665.7
+   },
+   "disc_rule_missed_edges": 101,
+   "disc_rule_instant_disagreement": 0.0126,
+   "disc_rule_fraction_gap_mean": 0.0126,
+   "near_edge_share_0_001_deg": 9.4e-05,
+   "near_edge_share_0_01_deg": 0.000921,
+   "sampling": {
+    "5": {
+     "edge_error_min": {
+      "n": 1052,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 1.51
+     },
+     "reference_edges": 1052,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "10": {
+     "edge_error_min": {
+      "n": 1052,
+      "median": 0.0,
+      "p95": 0.05,
+      "max": 2.78
+     },
+     "reference_edges": 1052,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0001
+     }
+    },
+    "30": {
+     "edge_error_min": {
+      "n": 1050,
+      "median": 0.0,
+      "p95": 0.77,
+      "max": 16.47
+     },
+     "reference_edges": 1052,
+     "missed_share": 0.0019,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0004
+     }
+    },
+    "60": {
+     "edge_error_min": {
+      "n": 1050,
+      "median": 0.03,
+      "p95": 3.65,
+      "max": 33.79
+     },
+     "reference_edges": 1052,
+     "missed_share": 0.0019,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0001,
+      "max": 0.0013
+     }
+    },
+    "120": {
+     "edge_error_min": {
+      "n": 1044,
+      "median": 0.81,
+      "p95": 13.17,
+      "max": 74.82
+     },
+     "reference_edges": 1052,
+     "missed_share": 0.0076,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0005,
+      "max": 0.0028
+     }
+    },
+    "360": {
+     "edge_error_min": {
+      "n": 1012,
+      "median": 7.14,
+      "p95": 74.74,
+      "max": 693.8
+     },
+     "reference_edges": 1052,
+     "missed_share": 0.038,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0003,
+      "p95": 0.0023,
+      "max": 0.0082
+     }
+    }
+   }
+  },
+  "polar-random_earth": {
+   "sites": 40,
+   "edges": 484,
+   "minutes_per_0_01_deg": {
+    "n": 484,
+    "median": 10.9,
+    "p95": 27.31,
+    "max": 194.95
+   },
+   "share_edges_over_1_min_per_0_01_deg": 1.0,
+   "leap_bias_s": {
+    "n": 484,
+    "median": 27.0,
+    "p95": 27.0,
+    "max": 27.0
+   },
+   "leap_bias_signed_median_s": 27.0,
+   "disc_rule_shift_min": {
+    "n": 16,
+    "median": 677.2,
+    "p95": 717.3,
+    "max": 719.3
+   },
+   "disc_rule_shift_linear_estimate_min": {
+    "n": 484,
+    "median": 1019.9,
+    "p95": 2601.5,
+    "max": 18741.0
+   },
+   "disc_rule_missed_edges": 468,
+   "disc_rule_instant_disagreement": 0.0294,
+   "disc_rule_fraction_gap_mean": 0.0294,
+   "near_edge_share_0_001_deg": 7e-05,
+   "near_edge_share_0_01_deg": 0.000704,
+   "sampling": {
+    "5": {
+     "edge_error_min": {
+      "n": 484,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.02
+     },
+     "reference_edges": 484,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "10": {
+     "edge_error_min": {
+      "n": 484,
+      "median": 0.0,
+      "p95": 0.01,
+      "max": 0.04
+     },
+     "reference_edges": 484,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "30": {
+     "edge_error_min": {
+      "n": 484,
+      "median": 0.01,
+      "p95": 0.05,
+      "max": 0.57
+     },
+     "reference_edges": 484,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+     }
+    },
+    "60": {
+     "edge_error_min": {
+      "n": 484,
+      "median": 0.02,
+      "p95": 0.22,
+      "max": 1.66
+     },
+     "reference_edges": 484,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0001
+     }
+    },
+    "120": {
+     "edge_error_min": {
+      "n": 484,
+      "median": 0.11,
+      "p95": 0.9,
+      "max": 6.92
+     },
+     "reference_edges": 484,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0003
+     }
+    },
+    "360": {
+     "edge_error_min": {
+      "n": 484,
+      "median": 0.92,
+      "p95": 7.3,
+      "max": 69.25
+     },
+     "reference_edges": 484,
+     "missed_share": 0.0,
+     "extra_edges": 0,
+     "fraction_30d_abs_error": {
+      "n": 480,
+      "median": 0.0,
+      "p95": 0.0002,
+      "max": 0.003
+     }
+    }
+   }
+  }
+ },
+ "terrain": {
+  "polar:grid_120m_only": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.0821,
+    "p95": 0.3816,
+    "max": 1.7221
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 0.2964,
+    "p95": 1.5117,
+    "max": 3.8113
+   },
+   "sun": {
+    "instant_agreement_mean": 0.99569,
+    "instant_agreement_min": 0.91937,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0004,
+     "p95": 0.0157,
+     "max": 0.0806
+    },
+    "edge_shift_min": {
+     "n": 1424,
+     "median": 3.1,
+     "p95": 179.3,
+     "max": 691.0
+    },
+    "edges_without_partner": 26
+   },
+   "earth": {
+    "instant_agreement_mean": 0.99833,
+    "instant_agreement_min": 0.95121,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0,
+     "p95": 0.0034,
+     "max": 0.0488
+    },
+    "edge_shift_min": {
+     "n": 725,
+     "median": 7.1,
+     "p95": 109.0,
+     "max": 341.1
+    },
+    "edges_without_partner": 26
+   }
+  },
+  "polar:az_step_0_25": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.0083,
+    "p95": 0.0131,
+    "max": 0.0155
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 0.0732,
+    "p95": 0.1246,
+    "max": 0.2821
+   },
+   "sun": {
+    "instant_agreement_mean": 0.99973,
+    "instant_agreement_min": 0.99883,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0,
+     "p95": 0.0001,
+     "max": 0.0002
+    },
+    "edge_shift_min": {
+     "n": 1450,
+     "median": 1.5,
+     "p95": 19.6,
+     "max": 76.1
+    },
+    "edges_without_partner": 0
+   },
+   "earth": {
+    "instant_agreement_mean": 0.99983,
+    "instant_agreement_min": 0.99904,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0,
+     "p95": 0.0004,
+     "max": 0.0007
+    },
+    "edge_shift_min": {
+     "n": 751,
+     "median": 2.3,
+     "p95": 23.1,
+     "max": 146.8
+    },
+    "edges_without_partner": 0
+   }
+  },
+  "polar:observer_0m": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.2723,
+    "p95": 0.7247,
+    "max": 0.8869
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 0.6837,
+    "p95": 1.4319,
+    "max": 1.4357
+   },
+   "sun": {
+    "instant_agreement_mean": 0.99004,
+    "instant_agreement_min": 0.89518,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0013,
+     "p95": 0.0423,
+     "max": 0.1048
+    },
+    "edge_shift_min": {
+     "n": 1333,
+     "median": 6.6,
+     "p95": 353.1,
+     "max": 718.1
+    },
+    "edges_without_partner": 117
+   },
+   "earth": {
+    "instant_agreement_mean": 0.99404,
+    "instant_agreement_min": 0.89055,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0002,
+     "p95": 0.0391,
+     "max": 0.1094
+    },
+    "edge_shift_min": {
+     "n": 668,
+     "median": 12.9,
+     "p95": 224.0,
+     "max": 683.0
+    },
+    "edges_without_partner": 83
+   }
+  },
+  "polar:observer_10m": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.362,
+    "p95": 1.4403,
+    "max": 2.0867
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 1.2421,
+    "p95": 3.2691,
+    "max": 5.5168
+   },
+   "sun": {
+    "instant_agreement_mean": 0.98608,
+    "instant_agreement_min": 0.89132,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.004,
+     "p95": 0.0412,
+     "max": 0.1087
+    },
+    "edge_shift_min": {
+     "n": 1313,
+     "median": 24.3,
+     "p95": 474.2,
+     "max": 713.7
+    },
+    "edges_without_partner": 137
+   },
+   "earth": {
+    "instant_agreement_mean": 0.99182,
+    "instant_agreement_min": 0.87731,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0007,
+     "p95": 0.0414,
+     "max": 0.1227
+    },
+    "edge_shift_min": {
+     "n": 671,
+     "median": 49.5,
+     "p95": 297.5,
+     "max": 671.5
+    },
+    "edges_without_partner": 80
+   }
+  },
+  "polar:site_moved_80m_az0": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.2004,
+    "p95": 1.3777,
+    "max": 2.9815
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 0.6623,
+    "p95": 3.4679,
+    "max": 8.9127
+   },
+   "sun": {
+    "instant_agreement_mean": 0.9874,
+    "instant_agreement_min": 0.80736,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0028,
+     "p95": 0.0375,
+     "max": 0.1894
+    },
+    "edge_shift_min": {
+     "n": 1320,
+     "median": 27.6,
+     "p95": 447.0,
+     "max": 717.2
+    },
+    "edges_without_partner": 130
+   },
+   "earth": {
+    "instant_agreement_mean": 0.98474,
+    "instant_agreement_min": 0.56462,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0006,
+     "p95": 0.0488,
+     "max": 0.4354
+    },
+    "edge_shift_min": {
+     "n": 670,
+     "median": 55.1,
+     "p95": 568.3,
+     "max": 672.8
+    },
+    "edges_without_partner": 81
+   }
+  },
+  "polar:site_moved_80m_az90": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.1728,
+    "p95": 1.4648,
+    "max": 2.3611
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 0.5162,
+    "p95": 3.4395,
+    "max": 6.6343
+   },
+   "sun": {
+    "instant_agreement_mean": 0.98726,
+    "instant_agreement_min": 0.8353,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0022,
+     "p95": 0.0342,
+     "max": 0.0857
+    },
+    "edge_shift_min": {
+     "n": 1317,
+     "median": 32.9,
+     "p95": 294.1,
+     "max": 718.7
+    },
+    "edges_without_partner": 133
+   },
+   "earth": {
+    "instant_agreement_mean": 0.99563,
+    "instant_agreement_min": 0.95689,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0003,
+     "p95": 0.0233,
+     "max": 0.0431
+    },
+    "edge_shift_min": {
+     "n": 730,
+     "median": 62.8,
+     "p95": 587.5,
+     "max": 709.3
+    },
+    "edges_without_partner": 21
+   }
+  },
+  "polar:site_moved_80m_az180": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.2261,
+    "p95": 1.173,
+    "max": 2.1207
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 0.6553,
+    "p95": 2.6137,
+    "max": 4.1311
+   },
+   "sun": {
+    "instant_agreement_mean": 0.98594,
+    "instant_agreement_min": 0.83767,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0025,
+     "p95": 0.0519,
+     "max": 0.1214
+    },
+    "edge_shift_min": {
+     "n": 1290,
+     "median": 28.9,
+     "p95": 432.4,
+     "max": 716.8
+    },
+    "edges_without_partner": 160
+   },
+   "earth": {
+    "instant_agreement_mean": 0.99303,
+    "instant_agreement_min": 0.88103,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0004,
+     "p95": 0.0332,
+     "max": 0.119
+    },
+    "edge_shift_min": {
+     "n": 669,
+     "median": 39.5,
+     "p95": 483.9,
+     "max": 717.8
+    },
+    "edges_without_partner": 82
+   }
+  },
+  "polar:site_moved_80m_az270": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.1734,
+    "p95": 1.494,
+    "max": 3.6748
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 0.561,
+    "p95": 3.7498,
+    "max": 9.2841
+   },
+   "sun": {
+    "instant_agreement_mean": 0.98713,
+    "instant_agreement_min": 0.80049,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0021,
+     "p95": 0.0386,
+     "max": 0.1979
+    },
+    "edge_shift_min": {
+     "n": 1320,
+     "median": 30.0,
+     "p95": 315.6,
+     "max": 718.0
+    },
+    "edges_without_partner": 130
+   },
+   "earth": {
+    "instant_agreement_mean": 0.99011,
+    "instant_agreement_min": 0.76535,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0005,
+     "p95": 0.017,
+     "max": 0.2346
+    },
+    "edge_shift_min": {
+     "n": 695,
+     "median": 74.8,
+     "p95": 334.5,
+     "max": 602.2
+    },
+    "edges_without_partner": 56
+   }
+  },
+  "polar:grid_global_16ppd_only": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 1.2119,
+    "p95": 5.948,
+    "max": 7.5109
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 2.8834,
+    "p95": 11.6117,
+    "max": 26.8018
+   },
+   "sun": {
+    "instant_agreement_mean": 0.94981,
+    "instant_agreement_min": 0.70912,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0317,
+     "p95": 0.1443,
+     "max": 0.2909
+    },
+    "edge_shift_min": {
+     "n": 934,
+     "median": 116.7,
+     "p95": 609.5,
+     "max": 713.2
+    },
+    "edges_without_partner": 516
+   },
+   "earth": {
+    "instant_agreement_mean": 0.9447,
+    "instant_agreement_min": 0.54964,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0071,
+     "p95": 0.3269,
+     "max": 0.4504
+    },
+    "edge_shift_min": {
+     "n": 468,
+     "median": 181.4,
+     "p95": 591.6,
+     "max": 715.6
+    },
+    "edges_without_partner": 283
+   }
+  },
+  "polar:max_400km_with_global": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.0,
+    "p95": 0.0,
+    "max": 0.053
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 0.0,
+    "p95": 0.0,
+    "max": 0.6176
+   },
+   "sun": {
+    "instant_agreement_mean": 0.99996,
+    "instant_agreement_min": 0.99794,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0,
+     "p95": 0.0,
+     "max": 0.0021
+    },
+    "edge_shift_min": {
+     "n": 1448,
+     "median": 0.0,
+     "p95": 0.0,
+     "max": 376.3
+    },
+    "edges_without_partner": 2
+   },
+   "earth": {
+    "instant_agreement_mean": 1.0,
+    "instant_agreement_min": 1.0,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0,
+     "p95": 0.0,
+     "max": 0.0
+    },
+    "edge_shift_min": {
+     "n": 751,
+     "median": 0.0,
+     "p95": 0.0,
+     "max": 0.0
+    },
+    "edges_without_partner": 0
+   }
+  },
+  "polar:max_100km": {
+   "points": 50,
+   "horizon_diff_rms_deg": {
+    "n": 50,
+    "median": 0.0,
+    "p95": 0.4836,
+    "max": 0.7263
+   },
+   "horizon_diff_max_deg": {
+    "n": 50,
+    "median": 0.0,
+    "p95": 2.1279,
+    "max": 2.5062
+   },
+   "sun": {
+    "instant_agreement_mean": 0.99655,
+    "instant_agreement_min": 0.93775,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0,
+     "p95": 0.0235,
+     "max": 0.0623
+    },
+    "edge_shift_min": {
+     "n": 1391,
+     "median": 0.0,
+     "p95": 0.0,
+     "max": 689.9
+    },
+    "edges_without_partner": 59
+   },
+   "earth": {
+    "instant_agreement_mean": 0.99869,
+    "instant_agreement_min": 0.93656,
+    "fraction_abs_diff": {
+     "n": 50,
+     "median": 0.0,
+     "p95": 0.0,
+     "max": 0.0634
+    },
+    "edge_shift_min": {
+     "n": 724,
+     "median": 0.0,
+     "p95": 0.0,
+     "max": 130.8
+    },
+    "edges_without_partner": 27
+   }
+  },
+  "non-polar:global_16ppd_terrain": {
+   "points": 7,
+   "horizon_diff_rms_deg": {
+    "n": 7,
+    "median": 1.3759,
+    "p95": 6.3375,
+    "max": 6.5625
+   },
+   "horizon_diff_max_deg": {
+    "n": 7,
+    "median": 3.0213,
+    "p95": 12.225,
+    "max": 12.4303
+   },
+   "sun": {
+    "instant_agreement_mean": 0.98778,
+    "instant_agreement_min": 0.97761,
+    "fraction_abs_diff": {
+     "n": 7,
+     "median": 0.0147,
+     "p95": 0.0215,
+     "max": 0.0224
+    },
+    "edge_shift_min": {
+     "n": 156,
+     "median": 139.1,
+     "p95": 615.1,
+     "max": 633.9
+    },
+    "edges_without_partner": 12
+   },
+   "earth": {
+    "instant_agreement_mean": 1.0,
+    "instant_agreement_min": 1.0,
+    "fraction_abs_diff": {
+     "n": 7,
+     "median": 0.0,
+     "p95": 0.0,
+     "max": 0.0
+    },
+    "edge_shift_min": {
+     "n": 0,
+     "median": null,
+     "p95": null,
+     "max": null
+    },
+    "edges_without_partner": 0
+   }
+  }
+ },
+ "terrain_per_point": {
+  "shackleton-ridge": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.8013,
+     "horizon_diff_max_deg": 2.7837,
+     "sun": {
+      "instant_agreement": 0.91937,
+      "fraction_diff": -0.0806,
+      "edge_shift_p95_min": 242.5
+     },
+     "earth": {
+      "instant_agreement": 0.99673,
+      "fraction_diff": -0.0033,
+      "edge_shift_p95_min": 92.2
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.0129,
+     "horizon_diff_max_deg": 0.0898,
+     "sun": {
+      "instant_agreement": 0.99904,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 20.9
+     },
+     "earth": {
+      "instant_agreement": 0.99975,
+      "fraction_diff": -0.0001,
+      "edge_shift_p95_min": 13.1
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.7085,
+     "horizon_diff_max_deg": 1.4309,
+     "sun": {
+      "instant_agreement": 0.89518,
+      "fraction_diff": -0.1048,
+      "edge_shift_p95_min": 26.9
+     },
+     "earth": {
+      "instant_agreement": 0.94375,
+      "fraction_diff": -0.0562,
+      "edge_shift_p95_min": null
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 0.7709,
+     "horizon_diff_max_deg": 2.7742,
+     "sun": {
+      "instant_agreement": 0.92751,
+      "fraction_diff": 0.0725,
+      "edge_shift_p95_min": 86.0
+     },
+     "earth": {
+      "instant_agreement": 0.99272,
+      "fraction_diff": 0.0073,
+      "edge_shift_p95_min": 166.6
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 2.9815,
+     "horizon_diff_max_deg": 8.9127,
+     "sun": {
+      "instant_agreement": 0.80736,
+      "fraction_diff": -0.1894,
+      "edge_shift_p95_min": 290.9
+     },
+     "earth": {
+      "instant_agreement": 0.56462,
+      "fraction_diff": -0.4354,
+      "edge_shift_p95_min": null
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 1.0405,
+     "horizon_diff_max_deg": 2.8231,
+     "sun": {
+      "instant_agreement": 0.8353,
+      "fraction_diff": -0.0633,
+      "edge_shift_p95_min": 101.1
+     },
+     "earth": {
+      "instant_agreement": 0.95689,
+      "fraction_diff": -0.0431,
+      "edge_shift_p95_min": 702.1
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 1.2471,
+     "horizon_diff_max_deg": 3.2024,
+     "sun": {
+      "instant_agreement": 0.83767,
+      "fraction_diff": -0.1214,
+      "edge_shift_p95_min": 126.4
+     },
+     "earth": {
+      "instant_agreement": 0.99721,
+      "fraction_diff": -0.002,
+      "edge_shift_p95_min": 90.8
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 3.6748,
+     "horizon_diff_max_deg": 9.2841,
+     "sun": {
+      "instant_agreement": 0.80049,
+      "fraction_diff": -0.1979,
+      "edge_shift_p95_min": 320.4
+     },
+     "earth": {
+      "instant_agreement": 0.8978,
+      "fraction_diff": -0.1022,
+      "edge_shift_p95_min": null
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 3.7853,
+     "horizon_diff_max_deg": 9.9569,
+     "sun": {
+      "instant_agreement": 0.70912,
+      "fraction_diff": -0.2909,
+      "edge_shift_p95_min": 233.6
+     },
+     "earth": {
+      "instant_agreement": 0.71879,
+      "fraction_diff": -0.2812,
+      "edge_shift_p95_min": null
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.2404,
+     "horizon_diff_max_deg": 0.9974,
+     "sun": {
+      "instant_agreement": 0.98306,
+      "fraction_diff": 0.0169,
+      "edge_shift_p95_min": 14.4
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    }
+   }
+  },
+  "malapert-massif": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.1142,
+     "horizon_diff_max_deg": 0.4723,
+     "sun": {
+      "instant_agreement": 0.99504,
+      "fraction_diff": 0.0007,
+      "edge_shift_p95_min": 177.1
+     },
+     "earth": {
+      "instant_agreement": 0.99041,
+      "fraction_diff": -0.0096,
+      "edge_shift_p95_min": 233.3
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.011,
+     "horizon_diff_max_deg": 0.1152,
+     "sun": {
+      "instant_agreement": 0.99924,
+      "fraction_diff": 0.0001,
+      "edge_shift_p95_min": 25.6
+     },
+     "earth": {
+      "instant_agreement": 0.99999,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 0.3
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.6949,
+     "horizon_diff_max_deg": 1.4091,
+     "sun": {
+      "instant_agreement": 0.96738,
+      "fraction_diff": -0.0326,
+      "edge_shift_p95_min": 522.3
+     },
+     "earth": {
+      "instant_agreement": 0.93041,
+      "fraction_diff": -0.0696,
+      "edge_shift_p95_min": null
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 1.3626,
+     "horizon_diff_max_deg": 2.7561,
+     "sun": {
+      "instant_agreement": 0.89132,
+      "fraction_diff": 0.1087,
+      "edge_shift_p95_min": 187.9
+     },
+     "earth": {
+      "instant_agreement": 0.87731,
+      "fraction_diff": 0.1227,
+      "edge_shift_p95_min": null
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 0.8837,
+     "horizon_diff_max_deg": 1.7992,
+     "sun": {
+      "instant_agreement": 0.92611,
+      "fraction_diff": 0.0487,
+      "edge_shift_p95_min": 327.5
+     },
+     "earth": {
+      "instant_agreement": 0.92462,
+      "fraction_diff": 0.0754,
+      "edge_shift_p95_min": null
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 0.2738,
+     "horizon_diff_max_deg": 0.7972,
+     "sun": {
+      "instant_agreement": 0.97029,
+      "fraction_diff": 0.0292,
+      "edge_shift_p95_min": 611.5
+     },
+     "earth": {
+      "instant_agreement": 0.9903,
+      "fraction_diff": 0.0097,
+      "edge_shift_p95_min": 263.9
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 1.0824,
+     "horizon_diff_max_deg": 2.287,
+     "sun": {
+      "instant_agreement": 0.95264,
+      "fraction_diff": -0.042,
+      "edge_shift_p95_min": 220.7
+     },
+     "earth": {
+      "instant_agreement": 0.88103,
+      "fraction_diff": -0.119,
+      "edge_shift_p95_min": null
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 0.1585,
+     "horizon_diff_max_deg": 0.5589,
+     "sun": {
+      "instant_agreement": 0.9867,
+      "fraction_diff": -0.0082,
+      "edge_shift_p95_min": 183.5
+     },
+     "earth": {
+      "instant_agreement": 0.99296,
+      "fraction_diff": -0.007,
+      "edge_shift_p95_min": 158.4
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 1.5738,
+     "horizon_diff_max_deg": 4.531,
+     "sun": {
+      "instant_agreement": 0.83654,
+      "fraction_diff": -0.1101,
+      "edge_shift_p95_min": 397.6
+     },
+     "earth": {
+      "instant_agreement": 0.94165,
+      "fraction_diff": 0.0584,
+      "edge_shift_p95_min": null
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.053,
+     "horizon_diff_max_deg": 0.6176,
+     "sun": {
+      "instant_agreement": 0.99794,
+      "fraction_diff": -0.0021,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.6006,
+     "horizon_diff_max_deg": 2.0388,
+     "sun": {
+      "instant_agreement": 0.93775,
+      "fraction_diff": 0.0623,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    }
+   }
+  },
+  "haworth": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.3475,
+     "horizon_diff_max_deg": 1.0622,
+     "sun": {
+      "instant_agreement": 0.99892,
+      "fraction_diff": -0.0011,
+      "edge_shift_p95_min": 36.8
+     },
+     "earth": {
+      "instant_agreement": 0.99891,
+      "fraction_diff": -0.0011,
+      "edge_shift_p95_min": 26.7
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.0108,
+     "horizon_diff_max_deg": 0.1083,
+     "sun": {
+      "instant_agreement": 0.99972,
+      "fraction_diff": -0.0001,
+      "edge_shift_p95_min": 8.2
+     },
+     "earth": {
+      "instant_agreement": 0.99989,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 8.1
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.7142,
+     "horizon_diff_max_deg": 1.4301,
+     "sun": {
+      "instant_agreement": 0.99838,
+      "fraction_diff": -0.0016,
+      "edge_shift_p95_min": 48.6
+     },
+     "earth": {
+      "instant_agreement": 0.99893,
+      "fraction_diff": -0.0011,
+      "edge_shift_p95_min": 23.7
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 1.0173,
+     "horizon_diff_max_deg": 2.6305,
+     "sun": {
+      "instant_agreement": 0.98791,
+      "fraction_diff": 0.0121,
+      "edge_shift_p95_min": 190.4
+     },
+     "earth": {
+      "instant_agreement": 0.99575,
+      "fraction_diff": 0.0043,
+      "edge_shift_p95_min": 93.1
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 1.4684,
+     "horizon_diff_max_deg": 3.2442,
+     "sun": {
+      "instant_agreement": 0.99484,
+      "fraction_diff": -0.0051,
+      "edge_shift_p95_min": 134.4
+     },
+     "earth": {
+      "instant_agreement": 0.99208,
+      "fraction_diff": -0.0079,
+      "edge_shift_p95_min": 179.4
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 0.2228,
+     "horizon_diff_max_deg": 0.6165,
+     "sun": {
+      "instant_agreement": 0.99604,
+      "fraction_diff": 0.0023,
+      "edge_shift_p95_min": 121.4
+     },
+     "earth": {
+      "instant_agreement": 0.99156,
+      "fraction_diff": 0.0084,
+      "edge_shift_p95_min": 202.6
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 0.5887,
+     "horizon_diff_max_deg": 1.554,
+     "sun": {
+      "instant_agreement": 0.99717,
+      "fraction_diff": 0.0015,
+      "edge_shift_p95_min": 76.8
+     },
+     "earth": {
+      "instant_agreement": 0.99475,
+      "fraction_diff": 0.0052,
+      "edge_shift_p95_min": 118.7
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 0.6567,
+     "horizon_diff_max_deg": 1.6865,
+     "sun": {
+      "instant_agreement": 0.99535,
+      "fraction_diff": -0.0031,
+      "edge_shift_p95_min": 141.0
+     },
+     "earth": {
+      "instant_agreement": 0.99032,
+      "fraction_diff": -0.0097,
+      "edge_shift_p95_min": 226.2
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 1.4658,
+     "horizon_diff_max_deg": 2.7922,
+     "sun": {
+      "instant_agreement": 0.90707,
+      "fraction_diff": -0.0902,
+      "edge_shift_p95_min": 479.8
+     },
+     "earth": {
+      "instant_agreement": 0.95405,
+      "fraction_diff": -0.0459,
+      "edge_shift_p95_min": 714.9
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.3144,
+     "horizon_diff_max_deg": 1.8182,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    }
+   }
+  },
+  "mons-mouton": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.3214,
+     "horizon_diff_max_deg": 0.8588,
+     "sun": {
+      "instant_agreement": 0.99408,
+      "fraction_diff": 0.0059,
+      "edge_shift_p95_min": 233.4
+     },
+     "earth": {
+      "instant_agreement": 0.99794,
+      "fraction_diff": 0.0021,
+      "edge_shift_p95_min": 50.0
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.0038,
+     "horizon_diff_max_deg": 0.0383,
+     "sun": {
+      "instant_agreement": 0.99975,
+      "fraction_diff": 0.0001,
+      "edge_shift_p95_min": 22.9
+     },
+     "earth": {
+      "instant_agreement": 0.99985,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 8.4
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.3424,
+     "horizon_diff_max_deg": 0.7037,
+     "sun": {
+      "instant_agreement": 0.99184,
+      "fraction_diff": -0.0082,
+      "edge_shift_p95_min": 364.2
+     },
+     "earth": {
+      "instant_agreement": 0.99887,
+      "fraction_diff": -0.0011,
+      "edge_shift_p95_min": 26.5
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 0.5941,
+     "horizon_diff_max_deg": 1.2696,
+     "sun": {
+      "instant_agreement": 0.98126,
+      "fraction_diff": 0.0187,
+      "edge_shift_p95_min": 581.9
+     },
+     "earth": {
+      "instant_agreement": 0.99546,
+      "fraction_diff": 0.0045,
+      "edge_shift_p95_min": 106.1
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 0.2403,
+     "horizon_diff_max_deg": 0.659,
+     "sun": {
+      "instant_agreement": 0.98095,
+      "fraction_diff": -0.0189,
+      "edge_shift_p95_min": 401.9
+     },
+     "earth": {
+      "instant_agreement": 0.99631,
+      "fraction_diff": -0.0037,
+      "edge_shift_p95_min": 89.4
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 0.1779,
+     "horizon_diff_max_deg": 0.4784,
+     "sun": {
+      "instant_agreement": 0.98311,
+      "fraction_diff": 0.0152,
+      "edge_shift_p95_min": 450.1
+     },
+     "earth": {
+      "instant_agreement": 0.99094,
+      "fraction_diff": 0.0091,
+      "edge_shift_p95_min": 250.0
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 0.9595,
+     "horizon_diff_max_deg": 2.1943,
+     "sun": {
+      "instant_agreement": 0.97869,
+      "fraction_diff": -0.0077,
+      "edge_shift_p95_min": 283.9
+     },
+     "earth": {
+      "instant_agreement": 0.99781,
+      "fraction_diff": 0.0022,
+      "edge_shift_p95_min": 53.8
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 0.3413,
+     "horizon_diff_max_deg": 1.2513,
+     "sun": {
+      "instant_agreement": 0.97315,
+      "fraction_diff": -0.0269,
+      "edge_shift_p95_min": 559.9
+     },
+     "earth": {
+      "instant_agreement": 0.98985,
+      "fraction_diff": -0.0101,
+      "edge_shift_p95_min": 263.7
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 1.7723,
+     "horizon_diff_max_deg": 3.7502,
+     "sun": {
+      "instant_agreement": 0.94665,
+      "fraction_diff": 0.0509,
+      "edge_shift_p95_min": 673.2
+     },
+     "earth": {
+      "instant_agreement": 0.97067,
+      "fraction_diff": 0.0293,
+      "edge_shift_p95_min": 626.5
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    }
+   }
+  },
+  "nobile-rim-2": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.2269,
+     "horizon_diff_max_deg": 0.7763,
+     "sun": {
+      "instant_agreement": 0.99266,
+      "fraction_diff": 0.0073,
+      "edge_shift_p95_min": 496.2
+     },
+     "earth": {
+      "instant_agreement": 0.99841,
+      "fraction_diff": 0.0016,
+      "edge_shift_p95_min": 58.2
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.0109,
+     "horizon_diff_max_deg": 0.1206,
+     "sun": {
+      "instant_agreement": 0.99986,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 7.9
+     },
+     "earth": {
+      "instant_agreement": 0.99989,
+      "fraction_diff": -0.0001,
+      "edge_shift_p95_min": 8.0
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.701,
+     "horizon_diff_max_deg": 1.4314,
+     "sun": {
+      "instant_agreement": 0.96234,
+      "fraction_diff": -0.0377,
+      "edge_shift_p95_min": 684.7
+     },
+     "earth": {
+      "instant_agreement": 0.99665,
+      "fraction_diff": -0.0034,
+      "edge_shift_p95_min": 76.1
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 0.6842,
+     "horizon_diff_max_deg": 1.9807,
+     "sun": {
+      "instant_agreement": 0.97946,
+      "fraction_diff": 0.0205,
+      "edge_shift_p95_min": 601.1
+     },
+     "earth": {
+      "instant_agreement": 0.98688,
+      "fraction_diff": 0.0131,
+      "edge_shift_p95_min": 300.3
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 0.5091,
+     "horizon_diff_max_deg": 1.4457,
+     "sun": {
+      "instant_agreement": 0.98419,
+      "fraction_diff": 0.0157,
+      "edge_shift_p95_min": 396.2
+     },
+     "earth": {
+      "instant_agreement": 0.9883,
+      "fraction_diff": -0.0117,
+      "edge_shift_p95_min": 285.3
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 0.4625,
+     "horizon_diff_max_deg": 1.2158,
+     "sun": {
+      "instant_agreement": 0.98383,
+      "fraction_diff": 0.0161,
+      "edge_shift_p95_min": 472.8
+     },
+     "earth": {
+      "instant_agreement": 0.98803,
+      "fraction_diff": 0.012,
+      "edge_shift_p95_min": 282.0
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 0.6859,
+     "horizon_diff_max_deg": 1.62,
+     "sun": {
+      "instant_agreement": 0.97373,
+      "fraction_diff": -0.0263,
+      "edge_shift_p95_min": 544.3
+     },
+     "earth": {
+      "instant_agreement": 0.99121,
+      "fraction_diff": 0.0088,
+      "edge_shift_p95_min": 199.7
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 0.4605,
+     "horizon_diff_max_deg": 1.0942,
+     "sun": {
+      "instant_agreement": 0.97159,
+      "fraction_diff": -0.0284,
+      "edge_shift_p95_min": 444.7
+     },
+     "earth": {
+      "instant_agreement": 0.98656,
+      "fraction_diff": -0.0134,
+      "edge_shift_p95_min": 309.2
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 1.8772,
+     "horizon_diff_max_deg": 4.8334,
+     "sun": {
+      "instant_agreement": 0.94574,
+      "fraction_diff": -0.0543,
+      "edge_shift_p95_min": 701.7
+     },
+     "earth": {
+      "instant_agreement": 0.94509,
+      "fraction_diff": -0.0549,
+      "edge_shift_p95_min": 667.4
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    }
+   }
+  },
+  "de-gerlache-rim-2": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.1708,
+     "horizon_diff_max_deg": 0.7139,
+     "sun": {
+      "instant_agreement": 0.99978,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 10.9
+     },
+     "earth": {
+      "instant_agreement": 0.99998,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 0.7
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.0105,
+     "horizon_diff_max_deg": 0.1228,
+     "sun": {
+      "instant_agreement": 0.99929,
+      "fraction_diff": -0.0001,
+      "edge_shift_p95_min": 34.5
+     },
+     "earth": {
+      "instant_agreement": 0.99942,
+      "fraction_diff": -0.0001,
+      "edge_shift_p95_min": 39.1
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.6323,
+     "horizon_diff_max_deg": 1.4313,
+     "sun": {
+      "instant_agreement": 0.99307,
+      "fraction_diff": -0.0069,
+      "edge_shift_p95_min": 430.0
+     },
+     "earth": {
+      "instant_agreement": 0.9903,
+      "fraction_diff": -0.0097,
+      "edge_shift_p95_min": 607.4
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 1.8672,
+     "horizon_diff_max_deg": 5.5168,
+     "sun": {
+      "instant_agreement": 0.96322,
+      "fraction_diff": 0.0368,
+      "edge_shift_p95_min": 44.0
+     },
+     "earth": {
+      "instant_agreement": 0.99968,
+      "fraction_diff": 0.0003,
+      "edge_shift_p95_min": 7.3
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 1.2667,
+     "horizon_diff_max_deg": 3.651,
+     "sun": {
+      "instant_agreement": 0.97425,
+      "fraction_diff": 0.0257,
+      "edge_shift_p95_min": 175.2
+     },
+     "earth": {
+      "instant_agreement": 0.99901,
+      "fraction_diff": 0.001,
+      "edge_shift_p95_min": 25.0
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 1.8119,
+     "horizon_diff_max_deg": 6.6343,
+     "sun": {
+      "instant_agreement": 0.96042,
+      "fraction_diff": 0.0379,
+      "edge_shift_p95_min": 51.9
+     },
+     "earth": {
+      "instant_agreement": 0.99938,
+      "fraction_diff": -0.0006,
+      "edge_shift_p95_min": 21.6
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 0.3723,
+     "horizon_diff_max_deg": 0.975,
+     "sun": {
+      "instant_agreement": 0.99314,
+      "fraction_diff": -0.0069,
+      "edge_shift_p95_min": 221.6
+     },
+     "earth": {
+      "instant_agreement": 0.9984,
+      "fraction_diff": -0.0016,
+      "edge_shift_p95_min": 24.8
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 1.6223,
+     "horizon_diff_max_deg": 5.0343,
+     "sun": {
+      "instant_agreement": 0.97475,
+      "fraction_diff": -0.0235,
+      "edge_shift_p95_min": 35.3
+     },
+     "earth": {
+      "instant_agreement": 0.76535,
+      "fraction_diff": -0.2346,
+      "edge_shift_p95_min": null
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 4.8297,
+     "horizon_diff_max_deg": 10.6846,
+     "sun": {
+      "instant_agreement": 0.91855,
+      "fraction_diff": 0.0815,
+      "edge_shift_p95_min": 305.8
+     },
+     "earth": {
+      "instant_agreement": 0.99717,
+      "fraction_diff": 0.0028,
+      "edge_shift_p95_min": 90.1
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.3941,
+     "horizon_diff_max_deg": 2.2007,
+     "sun": {
+      "instant_agreement": 0.97107,
+      "fraction_diff": 0.0289,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    }
+   }
+  },
+  "amundsen-rim": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.0097,
+     "horizon_diff_max_deg": 0.062,
+     "sun": {
+      "instant_agreement": 0.99988,
+      "fraction_diff": 0.0001,
+      "edge_shift_p95_min": 6.0
+     },
+     "earth": {
+      "instant_agreement": 0.99991,
+      "fraction_diff": 0.0001,
+      "edge_shift_p95_min": 2.6
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.0102,
+     "horizon_diff_max_deg": 0.108,
+     "sun": {
+      "instant_agreement": 0.99966,
+      "fraction_diff": -0.0001,
+      "edge_shift_p95_min": 21.2
+     },
+     "earth": {
+      "instant_agreement": 0.99971,
+      "fraction_diff": 0.0001,
+      "edge_shift_p95_min": 16.2
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.0117,
+     "horizon_diff_max_deg": 0.0224,
+     "sun": {
+      "instant_agreement": 0.99975,
+      "fraction_diff": -0.0003,
+      "edge_shift_p95_min": 14.4
+     },
+     "earth": {
+      "instant_agreement": 0.99979,
+      "fraction_diff": -0.0002,
+      "edge_shift_p95_min": 4.7
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 0.0469,
+     "horizon_diff_max_deg": 0.0897,
+     "sun": {
+      "instant_agreement": 0.99892,
+      "fraction_diff": 0.0011,
+      "edge_shift_p95_min": 66.3
+     },
+     "earth": {
+      "instant_agreement": 0.99917,
+      "fraction_diff": 0.0008,
+      "edge_shift_p95_min": 18.7
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 0.0333,
+     "horizon_diff_max_deg": 0.1567,
+     "sun": {
+      "instant_agreement": 0.99921,
+      "fraction_diff": -0.0004,
+      "edge_shift_p95_min": 40.3
+     },
+     "earth": {
+      "instant_agreement": 0.99909,
+      "fraction_diff": -0.0008,
+      "edge_shift_p95_min": 28.3
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 0.0473,
+     "horizon_diff_max_deg": 0.1518,
+     "sun": {
+      "instant_agreement": 0.99913,
+      "fraction_diff": -0.0004,
+      "edge_shift_p95_min": 43.5
+     },
+     "earth": {
+      "instant_agreement": 0.99967,
+      "fraction_diff": 0.0003,
+      "edge_shift_p95_min": 12.1
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 0.0443,
+     "horizon_diff_max_deg": 0.1956,
+     "sun": {
+      "instant_agreement": 0.99942,
+      "fraction_diff": 0.0001,
+      "edge_shift_p95_min": 29.4
+     },
+     "earth": {
+      "instant_agreement": 0.99936,
+      "fraction_diff": 0.0005,
+      "edge_shift_p95_min": 20.3
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 0.0407,
+     "horizon_diff_max_deg": 0.1229,
+     "sun": {
+      "instant_agreement": 0.99915,
+      "fraction_diff": 0.0002,
+      "edge_shift_p95_min": 43.1
+     },
+     "earth": {
+      "instant_agreement": 0.99964,
+      "fraction_diff": -0.0004,
+      "edge_shift_p95_min": 15.0
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 0.9374,
+     "horizon_diff_max_deg": 2.684,
+     "sun": {
+      "instant_agreement": 0.96853,
+      "fraction_diff": -0.0315,
+      "edge_shift_p95_min": 639.8
+     },
+     "earth": {
+      "instant_agreement": 0.98389,
+      "fraction_diff": -0.0161,
+      "edge_shift_p95_min": 457.1
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    }
+   }
+  },
+  "cabeus-lcross": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.0092,
+     "horizon_diff_max_deg": 0.0382,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 0.99985,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 6.0
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.0101,
+     "horizon_diff_max_deg": 0.0683,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 0.99904,
+      "fraction_diff": -0.0007,
+      "edge_shift_p95_min": 48.8
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.0137,
+     "horizon_diff_max_deg": 0.0333,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 0.99977,
+      "fraction_diff": -0.0002,
+      "edge_shift_p95_min": 6.7
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 0.0503,
+     "horizon_diff_max_deg": 0.1334,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 0.9991,
+      "fraction_diff": 0.0009,
+      "edge_shift_p95_min": 26.5
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 0.0379,
+     "horizon_diff_max_deg": 0.1148,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 0.99911,
+      "fraction_diff": 0.0007,
+      "edge_shift_p95_min": 33.4
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 0.0368,
+     "horizon_diff_max_deg": 0.1099,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 0.99661,
+      "fraction_diff": -0.0034,
+      "edge_shift_p95_min": 106.3
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 0.0403,
+     "horizon_diff_max_deg": 0.1219,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 0.99939,
+      "fraction_diff": -0.0004,
+      "edge_shift_p95_min": 24.4
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 0.0391,
+     "horizon_diff_max_deg": 0.1141,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 0.99668,
+      "fraction_diff": 0.0033,
+      "edge_shift_p95_min": 96.3
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 0.2506,
+     "horizon_diff_max_deg": 0.8344,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 0.98558,
+      "fraction_diff": 0.0144,
+      "edge_shift_p95_min": 470.7
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    }
+   }
+  },
+  "south-pole-reference": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.0882,
+     "horizon_diff_max_deg": 0.3876,
+     "sun": {
+      "instant_agreement": 0.99977,
+      "fraction_diff": 0.0002,
+      "edge_shift_p95_min": 8.7
+     },
+     "earth": {
+      "instant_agreement": 0.99998,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.8
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.0122,
+     "horizon_diff_max_deg": 0.1538,
+     "sun": {
+      "instant_agreement": 0.99902,
+      "fraction_diff": 0.0001,
+      "edge_shift_p95_min": 18.4
+     },
+     "earth": {
+      "instant_agreement": 0.99974,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 12.9
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.2789,
+     "horizon_diff_max_deg": 1.0052,
+     "sun": {
+      "instant_agreement": 0.99654,
+      "fraction_diff": -0.0035,
+      "edge_shift_p95_min": 236.1
+     },
+     "earth": {
+      "instant_agreement": 0.99996,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 1.0
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 0.2751,
+     "horizon_diff_max_deg": 0.6086,
+     "sun": {
+      "instant_agreement": 0.99754,
+      "fraction_diff": 0.0025,
+      "edge_shift_p95_min": 85.5
+     },
+     "earth": {
+      "instant_agreement": 0.99982,
+      "fraction_diff": 0.0002,
+      "edge_shift_p95_min": 4.0
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 0.1424,
+     "horizon_diff_max_deg": 0.6851,
+     "sun": {
+      "instant_agreement": 0.99711,
+      "fraction_diff": -0.0029,
+      "edge_shift_p95_min": 52.3
+     },
+     "earth": {
+      "instant_agreement": 0.99939,
+      "fraction_diff": -0.0006,
+      "edge_shift_p95_min": 16.4
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 0.3221,
+     "horizon_diff_max_deg": 0.6976,
+     "sun": {
+      "instant_agreement": 0.97555,
+      "fraction_diff": 0.0047,
+      "edge_shift_p95_min": 274.8
+     },
+     "earth": {
+      "instant_agreement": 0.99684,
+      "fraction_diff": -0.0011,
+      "edge_shift_p95_min": 104.3
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 0.128,
+     "horizon_diff_max_deg": 0.6298,
+     "sun": {
+      "instant_agreement": 0.99492,
+      "fraction_diff": 0.0039,
+      "edge_shift_p95_min": 205.5
+     },
+     "earth": {
+      "instant_agreement": 0.99939,
+      "fraction_diff": 0.0006,
+      "edge_shift_p95_min": 14.8
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 0.331,
+     "horizon_diff_max_deg": 0.8067,
+     "sun": {
+      "instant_agreement": 0.97769,
+      "fraction_diff": -0.0023,
+      "edge_shift_p95_min": 239.0
+     },
+     "earth": {
+      "instant_agreement": 0.99643,
+      "fraction_diff": 0.0027,
+      "edge_shift_p95_min": 157.9
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 7.5109,
+     "horizon_diff_max_deg": 26.8018,
+     "sun": {
+      "instant_agreement": 0.90459,
+      "fraction_diff": -0.0741,
+      "edge_shift_p95_min": 492.8
+     },
+     "earth": {
+      "instant_agreement": 0.81634,
+      "fraction_diff": -0.1789,
+      "edge_shift_p95_min": 76.3
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.5151,
+     "horizon_diff_max_deg": 2.2762,
+     "sun": {
+      "instant_agreement": 0.95331,
+      "fraction_diff": 0.0467,
+      "edge_shift_p95_min": 355.8
+     },
+     "earth": {
+      "instant_agreement": 0.93656,
+      "fraction_diff": 0.0634,
+      "edge_shift_p95_min": null
+     }
+    }
+   }
+  },
+  "im-2": {
+   "kind": "polar",
+   "variants": {
+    "grid_120m_only": {
+     "horizon_diff_rms_deg": 0.0269,
+     "horizon_diff_max_deg": 0.1049,
+     "sun": {
+      "instant_agreement": 0.99948,
+      "fraction_diff": 0.0005,
+      "edge_shift_p95_min": 39.5
+     },
+     "earth": {
+      "instant_agreement": 0.99987,
+      "fraction_diff": 0.0001,
+      "edge_shift_p95_min": 5.9
+     }
+    },
+    "az_step_0_25": {
+     "horizon_diff_rms_deg": 0.0065,
+     "horizon_diff_max_deg": 0.0419,
+     "sun": {
+      "instant_agreement": 0.99985,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 11.5
+     },
+     "earth": {
+      "instant_agreement": 0.99948,
+      "fraction_diff": -0.0003,
+      "edge_shift_p95_min": 28.5
+     }
+    },
+    "observer_0m": {
+     "horizon_diff_rms_deg": 0.135,
+     "horizon_diff_max_deg": 0.3236,
+     "sun": {
+      "instant_agreement": 0.99642,
+      "fraction_diff": -0.0036,
+      "edge_shift_p95_min": 288.5
+     },
+     "earth": {
+      "instant_agreement": 0.99938,
+      "fraction_diff": -0.0006,
+      "edge_shift_p95_min": 13.8
+     }
+    },
+    "observer_10m": {
+     "horizon_diff_rms_deg": 0.3569,
+     "horizon_diff_max_deg": 0.815,
+     "sun": {
+      "instant_agreement": 0.99233,
+      "fraction_diff": 0.0077,
+      "edge_shift_p95_min": 558.0
+     },
+     "earth": {
+      "instant_agreement": 0.99747,
+      "fraction_diff": 0.0025,
+      "edge_shift_p95_min": 55.5
+     }
+    },
+    "site_moved_80m_az0": {
+     "horizon_diff_rms_deg": 0.1003,
+     "horizon_diff_max_deg": 0.2575,
+     "sun": {
+      "instant_agreement": 0.99827,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 125.6
+     },
+     "earth": {
+      "instant_agreement": 0.99867,
+      "fraction_diff": -0.0013,
+      "edge_shift_p95_min": 38.4
+     }
+    },
+    "site_moved_80m_az90": {
+     "horizon_diff_rms_deg": 0.1329,
+     "horizon_diff_max_deg": 0.336,
+     "sun": {
+      "instant_agreement": 0.99663,
+      "fraction_diff": -0.0032,
+      "edge_shift_p95_min": 252.0
+     },
+     "earth": {
+      "instant_agreement": 0.99713,
+      "fraction_diff": -0.0029,
+      "edge_shift_p95_min": 74.0
+     }
+    },
+    "site_moved_80m_az180": {
+     "horizon_diff_rms_deg": 0.0611,
+     "horizon_diff_max_deg": 0.2109,
+     "sun": {
+      "instant_agreement": 0.99779,
+      "fraction_diff": 0.0017,
+      "edge_shift_p95_min": 162.3
+     },
+     "earth": {
+      "instant_agreement": 0.99844,
+      "fraction_diff": 0.0016,
+      "edge_shift_p95_min": 46.0
+     }
+    },
+    "site_moved_80m_az270": {
+     "horizon_diff_rms_deg": 0.0773,
+     "horizon_diff_max_deg": 0.4038,
+     "sun": {
+      "instant_agreement": 0.99937,
+      "fraction_diff": -0.0,
+      "edge_shift_p95_min": 25.4
+     },
+     "earth": {
+      "instant_agreement": 0.99838,
+      "fraction_diff": 0.0016,
+      "edge_shift_p95_min": 71.9
+     }
+    },
+    "grid_global_16ppd_only": {
+     "horizon_diff_rms_deg": 1.0193,
+     "horizon_diff_max_deg": 2.7676,
+     "sun": {
+      "instant_agreement": 0.98301,
+      "fraction_diff": 0.0096,
+      "edge_shift_p95_min": 618.7
+     },
+     "earth": {
+      "instant_agreement": 0.90685,
+      "fraction_diff": -0.0932,
+      "edge_shift_p95_min": null
+     }
+    },
+    "max_400km_with_global": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    },
+    "max_100km": {
+     "horizon_diff_rms_deg": 0.0,
+     "horizon_diff_max_deg": 0.0,
+     "sun": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": 0.0
+     }
+    }
+   }
+  },
+  "chandrayaan-3": {
+   "kind": "non-polar",
+   "variants": {
+    "global_16ppd_terrain": {
+     "horizon_diff_rms_deg": 1.2534,
+     "horizon_diff_max_deg": 2.2166,
+     "sun": {
+      "instant_agreement": 0.98534,
+      "fraction_diff": -0.0147,
+      "edge_shift_p95_min": 541.3
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     }
+    }
+   }
+  },
+  "apollo-11": {
+   "kind": "non-polar",
+   "variants": {
+    "global_16ppd_terrain": {
+     "horizon_diff_rms_deg": 0.6095,
+     "horizon_diff_max_deg": 0.9231,
+     "sun": {
+      "instant_agreement": 0.99598,
+      "fraction_diff": -0.0008,
+      "edge_shift_p95_min": 106.3
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     }
+    }
+   }
+  },
+  "apollo-15": {
+   "kind": "non-polar",
+   "variants": {
+    "global_16ppd_terrain": {
+     "horizon_diff_rms_deg": 5.8125,
+     "horizon_diff_max_deg": 12.4303,
+     "sun": {
+      "instant_agreement": 0.97761,
+      "fraction_diff": -0.0224,
+      "edge_shift_p95_min": 1.6
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     }
+    }
+   }
+  },
+  "apollo-17": {
+   "kind": "non-polar",
+   "variants": {
+    "global_16ppd_terrain": {
+     "horizon_diff_rms_deg": 6.5625,
+     "horizon_diff_max_deg": 11.7458,
+     "sun": {
+      "instant_agreement": 0.98114,
+      "fraction_diff": -0.0189,
+      "edge_shift_p95_min": 492.1
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     }
+    }
+   }
+  },
+  "slim": {
+   "kind": "non-polar",
+   "variants": {
+    "global_16ppd_terrain": {
+     "horizon_diff_rms_deg": 5.1157,
+     "horizon_diff_max_deg": 7.4792,
+     "sun": {
+      "instant_agreement": 0.9807,
+      "fraction_diff": -0.0193,
+      "edge_shift_p95_min": 633.2
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     }
+    }
+   }
+  },
+  "change-4": {
+   "kind": "non-polar",
+   "variants": {
+    "global_16ppd_terrain": {
+     "horizon_diff_rms_deg": 1.3759,
+     "horizon_diff_max_deg": 2.8528,
+     "sun": {
+      "instant_agreement": 0.99471,
+      "fraction_diff": -0.0049,
+      "edge_shift_p95_min": 231.8
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     }
+    }
+   }
+  },
+  "change-6": {
+   "kind": "non-polar",
+   "variants": {
+    "global_16ppd_terrain": {
+     "horizon_diff_rms_deg": 0.8663,
+     "horizon_diff_max_deg": 3.0213,
+     "sun": {
+      "instant_agreement": 0.99896,
+      "fraction_diff": -0.0002,
+      "edge_shift_p95_min": 31.0
+     },
+     "earth": {
+      "instant_agreement": 1.0,
+      "fraction_diff": 0.0,
+      "edge_shift_p95_min": null
+     }
+    }
+   }
+  }
+ },
+ "pgda": {
+  "points": 300,
+  "sun_centre": {
+   "abs_error": {
+    "n": 300,
+    "median": 0.0107,
+    "p95": 0.0272,
+    "max": 0.2814
+   },
+   "mean_signed_error": -0.0112,
+   "within_0_05": 0.99,
+   "within_0_10": 0.9933,
+   "class_edges": [
+    0.3,
+    0.7
+   ],
+   "confusion_rows_pgda_cols_ours": [
+    [
+     141,
+     3,
+     0
+    ],
+    [
+     10,
+     146,
+     0
+    ],
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "class_agreement": 0.9567,
+   "cohen_kappa": 0.913,
+   "pgda_class_counts": [
+    144,
+    156,
+    0
+   ]
+  },
+  "sun_any_part": {
+   "abs_error": {
+    "n": 300,
+    "median": 0.002,
+    "p95": 0.0216,
+    "max": 0.2573
+   },
+   "mean_signed_error": 0.0014,
+   "within_0_05": 0.9867,
+   "within_0_10": 0.9967,
+   "class_edges": [
+    0.3,
+    0.7
+   ],
+   "confusion_rows_pgda_cols_ours": [
+    [
+     141,
+     3,
+     0
+    ],
+    [
+     2,
+     154,
+     0
+    ],
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "class_agreement": 0.9833,
+   "cohen_kappa": 0.967,
+   "pgda_class_counts": [
+    144,
+    156,
+    0
+   ]
+  },
+  "earth_centre": {
+   "abs_error": {
+    "n": 300,
+    "median": 0.0444,
+    "p95": 0.0924,
+    "max": 0.1266
+   },
+   "mean_signed_error": -0.0354,
+   "within_0_05": 0.7067,
+   "within_0_10": 0.9733,
+   "class_edges": [
+    0.1,
+    0.5
+   ],
+   "confusion_rows_pgda_cols_ours": [
+    [
+     119,
+     0,
+     0
+    ],
+    [
+     16,
+     93,
+     0
+    ],
+    [
+     0,
+     16,
+     56
+    ]
+   ],
+   "class_agreement": 0.8933,
+   "cohen_kappa": 0.835,
+   "pgda_class_counts": [
+    119,
+    109,
+    72
+   ]
+  },
+  "earth_any_part": {
+   "abs_error": {
+    "n": 300,
+    "median": 0.0011,
+    "p95": 0.0278,
+    "max": 0.1017
+   },
+   "mean_signed_error": 0.0044,
+   "within_0_05": 0.9767,
+   "within_0_10": 0.9967,
+   "class_edges": [
+    0.1,
+    0.5
+   ],
+   "confusion_rows_pgda_cols_ours": [
+    [
+     117,
+     2,
+     0
+    ],
+    [
+     0,
+     109,
+     0
+    ],
+    [
+     0,
+     0,
+     72
+    ]
+   ],
+   "class_agreement": 0.9933,
+   "cohen_kappa": 0.99,
+   "pgda_class_counts": [
+    119,
+    109,
+    72
+   ]
+  }
+ },
+ "calibration": {
+  "sun": {
+   "raw_mae": 0.0132,
+   "raw_any_part_mae": 0.0063,
+   "calibrated_mae": 0.0079,
+   "improvement_vs_any_part_pct": -25.1
+  },
+  "earth": {
+   "raw_mae": 0.0362,
+   "raw_any_part_mae": 0.0061,
+   "calibrated_mae": 0.0103,
+   "improvement_vs_any_part_pct": -69.9
+  }
+ },
+ "seconds": 379.3
+}

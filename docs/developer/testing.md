@@ -10,7 +10,7 @@ Everyone writes at least one test for the code they add. Calculations are also c
 
 ## API tests (pytest)
 
-In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15, with the data downloaded, 83 tests pass. `test_assistant.py` tests the chat endpoint with a scripted model, so it needs no key and no network.
+In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15, with the data downloaded, 97 tests pass. `test_assistant.py` tests the chat endpoint with a scripted model, so it needs no key and no network.
 
 | File | Tests | Needs data files |
 | --- | --- | --- |
@@ -22,6 +22,8 @@ In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15,
 | `test_lola_global.py` | On the real `LDEM_16`: the label values; it agrees with `LDEM_80S_80M` where both cover and not when mirrored; the Apollo 11 site gets a horizon that is not flat | LOLA global grid and 80 m grid |
 | `test_horizons.py` | Every saved JPL Horizons case is within 0.05 degrees | Kernels |
 | `test_apollo_sun.py` | Our Sun elevation at 16 Apollo moonwalk times (1969 to 1972) is within 0.05 degrees of the saved JPL Horizons values | Kernels |
+| `test_time_scale.py` | Unix times become the right UTC instant on both sides of the 1972 and 2016 leap seconds, against Skyfield's own datetime conversion | Kernels |
+| `test_error_budget.py` | Helpers of the error study (`app/engines/error_budget.py`): splitting Unix time into day and seconds gives the right UTC instant, and the whole-seconds form is 27 s early; angular separation; time equivalent of a position error; edges of a sine and their pairing; classes, confusion matrix and kappa; the global-grid pixel layout and longitude wrap | No |
 | `test_api.py` | Through the FastAPI test client with a synthetic grid: `/health`, `/sites`, `/analyze` for curated and custom sites, with and without the series, its error codes and the four-scenario limit, `/sky` and `/scene`, `/terrain` and its errors, `/validation`; from the point under the Earth, the site-to-Earth-centre distance in `/sky` is the centre-to-centre distance in `/scene` minus the Moon's 1737.4 km radius, one radius more from the opposite point, and the surface distance is 6378.137 km less | Kernels |
 | `test_accuracy.py` | `/accuracy` and `/missions` read the saved files; `/missions/departures` subtracts each mission's travel time from the arrival (Apollo 11: 4 days 6 h 45 min 40 s), skips missions with no landing time, sorts shortest first, and rejects a missing, zone-less or out-of-range arrival; the calibration file's shape | Kernels |
 

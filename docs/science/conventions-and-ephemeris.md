@@ -97,5 +97,5 @@ The point on the Moon directly under the Sun is the latitude and longitude, in t
 ## What limits accuracy
 
 - The orientation kernel's name states its coverage, 1900 to 2050. The API accepts dates from 1900-01-02 to 2050-12-30, one day inside it, and refuses others with `out_of_ephemeris_range`.
-- We use DE421; JPL Horizons uses a newer ephemeris. Over the 16 saved cases the largest difference is 0.0123 degrees, below our 0.05 degree tolerance ([validation.md](validation.md)).
+- We use DE421; JPL Horizons uses a newer ephemeris. Over the 16 saved cases the largest difference is 0.0001 degrees, and over 420 wider cases from 1900 to 2050 at most 0.00008 degrees ([research/error-study.md](../../research/error-study.md)), below our 0.05 degree tolerance ([validation.md](validation.md)).
 - Positions are for the centre of each body. Disc size is handled in the visibility step.

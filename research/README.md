@@ -15,6 +15,7 @@ The source material the team collected, and a record of how each source is used 
 | [second-scrape/](second-scrape/) | A second, independent copy of the guides, the Beirut page and our challenge page, used to cross-check the first | Same pages, read 2026-11-14 |
 | [data-source-notes.md](data-source-notes.md) | Notes from checking the data sources: the JPL Horizons call that was tested, the LOLA files, the illumination maps | NASA pages, read 2026-11-14 |
 | [space-apps-resources.md](space-apps-resources.md) | Notes from writing the assistant's knowledge files: the challenge resources, the general Space Apps resources, the Beirut page and mission pages, and what could not be read | spaceappschallenge.org, NASA, CSA and ISRO pages, read 2026-11-15 |
+| [error-study.md](error-study.md) | Error budget of the app's answers and the proposed KPIs, with the scripts and data behind every number | JPL Horizons API, IERS, NASA NSSDCA fact sheets, LOLA grids, NASA Goddard PGDA maps; read and run 2026-11-15 |
 
 The pages were saved because the Space Apps site builds its content in the browser and may change or close after the event.
 
