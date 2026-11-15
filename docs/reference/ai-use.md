@@ -33,6 +33,7 @@ Positions, horizons, visibility and metrics are deterministic calculations from 
 | 2026-11-15 | Leap-second fix in `Ephemeris._times`, its test, and the matching corrections in `docs/VALIDATION.md` and the science documents | Claude | Confirmed the 27 s offset against Skyfield's datetime conversion, wrote the fix and test, recomputed the JPL Horizons table | The team lead |
 | 2026-11-15 | Error study (`apps/api/scripts/error_study.py`, `fetch_horizons_wide.py`, `compare_pgda_grids.py`, `app/engines/error_budget.py`, its tests, `research/error-study.md`) | Claude | Wrote the scripts and tests, ran them, and wrote the note from their saved output; every number in the note comes from the JSON files the scripts wrote | The team lead, to review |
 | 2026-11-15 | Fixes from the testers' results: the landed view's real skyline (`apps/web/src/features/landing/lib/skyline.ts`, ADR-016) and the team's names in the footer | Claude | Wrote the code, tests and docs from the testers' notes and screenshots | The team lead |
+| 2026-11-15 | Assistant answer style in `apps/api/app/services/assistant_prompt.md` (direct first sentence, length and words fitted to the person) | Claude | Rewrote the style rules from the team lead's request | The team lead |
 
 How the output was checked:
 
