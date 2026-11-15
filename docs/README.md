@@ -32,7 +32,7 @@ These documents describe what is built and the design we are building towards. [
 | [decisions/](decisions/) | [Decision records](decisions/README.md) |
 | [developer/](developer/) | [getting-started](developer/getting-started.md), [conventions](developer/conventions.md), [testing](developer/testing.md), [deployment](developer/deployment.md) |
 | [reference/](reference/) | [glossary](reference/glossary.md), [references](reference/references.md), [ai-use](reference/ai-use.md) |
-| [hackathon/](hackathon/) | [rules-and-submission](hackathon/rules-and-submission.md), [local-schedule-and-deliverables](hackathon/local-schedule-and-deliverables.md), [judging-criteria](hackathon/judging-criteria.md) |
+| [hackathon/](hackathon/) | [rules-and-submission](hackathon/rules-and-submission.md), [local-schedule-and-deliverables](hackathon/local-schedule-and-deliverables.md), [judging-criteria](hackathon/judging-criteria.md), [impact-and-opportunity](hackathon/impact-and-opportunity.md), [approach-challenges-and-limits](hackathon/approach-challenges-and-limits.md) |
 
 ## Source-of-truth policy
 

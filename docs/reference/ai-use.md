@@ -37,6 +37,7 @@ Positions, horizons, visibility and metrics are deterministic calculations from 
 | 2026-11-15 | Documentation sweep after the testers' results (`docs/backend`, `docs/frontend`, `docs/science`, `docs/data`, `docs/reference` and the assistant's knowledge files) | Claude | Compared the documents with the code and corrected the statements that no longer matched | The team lead, to review |
 | 2026-11-15 | The Apollo Journal note on the Accuracy page, the smaller shadow map on weaker devices (`apps/web/src/scene/renderer.ts`) and the matching updates in `docs/VALIDATION.md` | Claude | Wrote the code, tests and text from the team lead's requests and the testers' notes; checked the figures against `GET /accuracy` and the deployed app | The team lead |
 | 2026-11-15 | About page "Future scope" section (`apps/web/src/features/about/components/about-section.tsx`) | Claude | Wrote the section's text from the team's two ideas (watching the site during the flight; best spot in an area by quadtree and sliding window) | The team lead |
+| 2026-11-15 | `docs/hackathon/impact-and-opportunity.md` and `docs/hackathon/approach-challenges-and-limits.md` | Claude | Wrote both from the repository's documents, decision records, validation report and git history, for the Slack requirements' impact and judging-video items | The team lead |
 
 How the output was checked:
 
