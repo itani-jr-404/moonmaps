@@ -1,0 +1,200 @@
+# Resources and citations
+
+Team Lunar Titans, Moon Maps, NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". Last updated: 2026-11-15.
+
+Everything Moon Maps uses or cites: data, papers, tools, libraries, models, images and design references. The same list is kept in [docs/reference/references.md](docs/reference/references.md); file names, owners and the required credit line for each dataset and asset are in [docs/data/sources.md](docs/data/sources.md). How AI was used is recorded in [docs/reference/ai-use.md](docs/reference/ai-use.md).
+
+## The challenge
+
+1. NASA Space Apps Challenge 2026, "Lunar Landing Site Navigator", challenge page and resources. https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/ ; Resources tab: https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/?tab=resources (read again 2026-11-15; page last published 2026-11-13).
+
+## NASA Space Apps pages
+
+Used for the assistant's knowledge files `challenge.md` and `space-apps.md`. Notes in [research/space-apps-resources.md](research/space-apps-resources.md).
+
+1a. NASA Space Apps, Resources. https://www.spaceappschallenge.org/resources/ (read 2026-11-15).
+1b. NASA Space Apps, Participant FAQs. https://www.spaceappschallenge.org/resources/participant-faqs/ (read 2026-11-15).
+1c. NASA Space Apps, Space Apps Connect Guide. https://www.spaceappschallenge.org/resources/space-app-connect-guide/ (read 2026-11-15). The forum: https://github.com/nasa/spaceapps
+1d. NASA Space Apps, Project Submission Guide. https://www.spaceappschallenge.org/resources/project-submission-guide/ (read 2026-11-15).
+1e. NASA Space Apps, Judging & Awards Guide. https://www.spaceappschallenge.org/resources/judging-awards-guide/ (read 2026-11-15).
+1f. NASA Space Apps, Team Formation Guide. https://www.spaceappschallenge.org/resources/team-formation-guide/ (read 2026-11-15).
+1g. NASA Space Apps, 2026 NASA Space Apps Challenge. https://www.spaceappschallenge.org/2026/ (read 2026-11-15).
+1h. NASA Space Apps, 2026 Challenges. https://www.spaceappschallenge.org/2026/challenges/ (read 2026-11-14).
+1i. NASA Space Apps, 2026 Space Agency Partners. https://www.spaceappschallenge.org/2026/space-agency-partners/ (read 2026-11-15).
+1j. NASA Space Apps, Beirut 2026 local event page (content by the Local Lead). https://www.spaceappschallenge.org/2026/local-events/beirut/ (read 2026-11-15; page last published 2026-11-06).
+
+## NASA data and resources
+
+2. NASA Jet Propulsion Laboratory, Horizons System. https://ssd.jpl.nasa.gov/horizons/ ; API documentation: https://ssd-api.jpl.nasa.gov/doc/horizons.html ; API endpoint used by `apps/api/scripts/fetch_horizons.py`: https://ssd.jpl.nasa.gov/api/horizons.api (values fetched 2026-11-14).
+3. NASA JPL, Navigation and Ancillary Information Facility (NAIF), generic kernels: DE421 ephemeris (`de421.bsp`), lunar frame kernel (`moon_080317.tf`), planetary constants (`pck00008.tpc`) and lunar orientation (`moon_pa_de421_1900-2050.bpc`). https://naif.jpl.nasa.gov/pub/naif/generic_kernels/ (downloaded 2026-11-14; file addresses in [data/sources.md](docs/data/sources.md)).
+4. NASA Lunar Reconnaissance Orbiter, Lunar Orbiter Laser Altimeter (LOLA) gridded elevation, south pole. Browse: https://imbrium.mit.edu/BROWSE/LOLA_GDR/POLAR/SOUTH_POLE ; files: https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/ (`LDEM_80S_80M`, `LDEM_75S_120M`, downloaded 2026-11-14).
+5. LOLA PDS label of the 80 m south polar grid. https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/LDEM_80S_80M.LBL (read 2026-11-14). The `LDEM_75S_120M.LBL` label is at the same address pattern.
+6. LOLA catalogue, polar stereographic map projection description, DSMAP_POLAR.CAT. https://imbrium.mit.edu/CATALOG/DSMAP_POLAR.CAT (read 2026-11-14).
+6a. NASA Lunar Reconnaissance Orbiter, LOLA gridded elevation, global, simple cylindrical: `LDEM_16` (16 pixels per degree). Files: https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/ (listing read and `LDEM_16` downloaded 2026-11-15); label https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/LDEM_16.LBL (read 2026-11-15). The labels of `LDEM_4`, `LDEM_64` and `LDEM_128` in the same folder were read the same day for [ADR-015](docs/decisions/ADR-015-global-terrain-grid.md).
+6b. LOLA catalogue, simple cylindrical map projection description, DSMAP.CAT. https://imbrium.mit.edu/CATALOG/DSMAP.CAT (read 2026-11-15). The pixel formulas of the global grid reader.
+7. NASA Goddard, Planetary Geodesy Data Archive, lunar polar illumination maps. https://pgda.gsfc.nasa.gov/products/69
+8. NASA Goddard, Planetary Geodesy Data Archive, high-resolution LOLA models of south pole sites. https://pgda.gsfc.nasa.gov/products/78
+9. NASA's Scientific Visualization Studio, CGI Moon Kit (ID 4720). https://svs.gsfc.nasa.gov/4720 (read 2026-11-14). Files used: `lroc_color_2k.jpg`, `ldem_3_8bit.jpg`. Usage terms: https://svs.gsfc.nasa.gov/help/ (read 2026-11-14).
+10. NASA, Blue Marble. https://visibleearth.nasa.gov/collection/1484/blue-marble
+11. NASA 3D Resources. https://science.nasa.gov/3d-resources/ ; models used: https://science.nasa.gov/3d-resources/apollo-lunar-module/ , https://science.nasa.gov/3d-resources/z2-spacesuit/ , https://science.nasa.gov/3d-resources/astronaut/ ; GitHub mirror: https://github.com/nasa/NASA-3D-Resources (all read 2026-11-14). Details in [research/web-assets.md](research/web-assets.md).
+12. NASA Images and Media Usage Guidelines. https://www.nasa.gov/nasa-brand-center/images-and-media/ (read 2026-11-14).
+13. Arizona State University and NASA LRO, Quickmap. https://quickmap.lroc.asu.edu/
+14. NASA, Moon Trek. https://trek.nasa.gov/moon/ (linked from the assistant's Resources tab, with entry 2)
+14b. NASA NSSDCA, Sun Fact Sheet, Dr. David R. Williams, last updated 9 May 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html (read 2026-11-14). The Sun's radius in the comparison with NASA's maps.
+14c. NASA NSSDCA spacecraft pages for Apollo 11, Apollo 15 and Apollo 17 (launch and landing times). https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-096A (read 2026-11-14).
+14d. Brian W. Lawrence, "Sun Angles", Apollo Lunar Surface Journal, last revised 8 February 1999. https://www.apollojournals.org/alsj/sunangles.html (read 2026-11-14).
+14e. LOLA polar illumination and Earth-visibility maps (PGDA product 69): `AVGVISIB_75S_120M_201608` and `AVGVISIB_75S_120M_201608_EARTH`. https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/ (downloaded 2026-11-14).
+14f. NASA NSSDCA, Earth Fact Sheet, Dr. David R. Williams, last updated 15 November 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html (read 2026-11-15). The Earth's equatorial radius, 6378.137 km (polar radius 6356.752 km), used for the distance from a site to the Earth's surface in `GET /sky`.
+14g. NASA JPL, Horizons System manual, section on time scales ("prior to 1962, UT means UT1. After 1962, UT means UTC"). https://ssd.jpl.nasa.gov/horizons/manual.html (read 2026-11-15). Used by the error study ([research/error-study.md](research/error-study.md)) and `apps/api/scripts/fetch_horizons_wide.py`, which fetched 420 more reference positions on 2026-11-15.
+14h. International Earth Rotation and Reference Systems Service (IERS), Bulletin C leap second table, `Leap_Second.dat`. https://hpiers.obspm.fr/eoppc/bul/bulc/Leap_Second.dat (read 2026-11-15). TAI - UTC was 10 s from 1 January 1972 and 37 s from 1 January 2017; used by the error study to explain the 27 s time offset.
+14i. LOLA global grid label `LDEM_16.LBL` (simple cylindrical, 16 pixels a degree, 1895.21 m a pixel). https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/LDEM_16.LBL (read 2026-11-15). Read by the error study's `CylindricalGrid` in `apps/api/app/engines/error_budget.py`.
+14a. NASA NSSDCA, Moon Fact Sheet, Dr. David R. Williams, last updated 11 January 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html (read 2026-11-14). Used for the distance and radius checks in [VALIDATION.md](docs/VALIDATION.md).
+
+## Site coordinates
+
+Every page used for a coordinate or a landing date, with its owner and the date it was read, is listed in [research/site-coordinates.md](research/site-coordinates.md). The main ones:
+
+15. LROC (Arizona State University / NASA GSFC) image pages: https://lroc.im-ldi.com/images/1247 , /1294 , /1408 , /1314 , /938 , /1358 , /1087 , /1374 (read 2026-11-14).
+16. USGS Astrogeology, Lunar LRO NAC Haworth Photoclinometry DEM 1m. https://astrogeology.usgs.gov/search/map/lunar_lro_nac_haworth_photoclinometry_dem_1m (read 2026-11-14).
+17. IAU WGPSN / USGS, Gazetteer of Planetary Nomenclature, Mons Mouton. https://planetarynames.wr.usgs.gov/Feature/16070 (read 2026-11-14).
+18. Peña-Asensio, Neira-Acosta, Sánchez-Lozano, "Evaluating potential landing sites for the Artemis III mission using a multi-criteria decision making approach", arXiv:2406.19863 v2. https://arxiv.org/abs/2406.19863 (read 2026-11-14).
+19. Marshall et al., "Locating the LCROSS Impact Craters", arXiv:1103.1687. https://arxiv.org/abs/1103.1687 (read 2026-11-14).
+20. NASA Space Science Data Coordinated Archive, Apollo 11, 15 and 17 pages and "Apollo Landing Site Coordinates". https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html (read 2026-11-14).
+
+## Space agency partner resources
+
+21. Canadian Space Agency, Moon Exploration. https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/ (read 2026-11-15).
+21a. Canadian Space Agency, "The Artemis campaign: humanity's return to the Moon". https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/artemis-missions.asp (read 2026-11-15).
+21b. Canadian Space Agency, "Canada's role in Moon exploration". https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/canada-role.asp (read 2026-11-15).
+
+## Missions
+
+Used for the assistant's knowledge file `missions.md`.
+
+21c. NASA, "Moon to Mars: NASA's Artemis Program". https://www.nasa.gov/humans-in-space/artemis/ (read 2026-11-15).
+21d. NASA, "NASA Provides Update on Artemis III Moon Landing Regions", release 24-136, 28 October 2024. https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/ (read 2026-11-15).
+21e. NASA, Commercial Lunar Payload Services. https://www.nasa.gov/commercial-lunar-payload-services/ (read 2026-11-15).
+21f. NASA, "NASA Receives Some Data Before Intuitive Machines Ends Lunar Mission", 7 March 2025. https://www.nasa.gov/news-release/nasa-receives-some-data-before-intuitive-machines-ends-lunar-mission/ (read 2026-11-15).
+21g. NASA Science, Lunar Reconnaissance Orbiter (LRO). https://science.nasa.gov/mission/lro/ (read 2026-11-15).
+21h. NASA Science, LCROSS. https://science.nasa.gov/mission/lcross/ (read 2026-11-15).
+21i. Indian Space Research Organisation, Chandrayaan-3 and Chandrayaan-3 Details. https://www.isro.gov.in/Chandrayaan3.html , https://www.isro.gov.in/Chandrayaan3_Details.html (read 2026-11-15).
+21k. NASA NSSDCA spacecraft pages for the Apollo 12, 14 and 16 command modules and lunar modules (launch and landing times in `apps/api/app/data/missions.json`). https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099C , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-008A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-031A (read 2026-11-15). The Apollo 11, 15 and 17 pages are those cited in [VALIDATION.md](docs/VALIDATION.md#3-past-missions).
+21l. JAXA, "JAXA Confirms Smart Lander for Investigating Moon (SLIM) Landed on Moon", press release, 20 January 2024 (landing at 0:20 am JST on 20 January 2024). https://global.jaxa.jp/press/2024/01/20240120-1_e.html (read 2026-11-15). JAXA, SLIM project page (launch at 8:42:11 a.m. JST on 7 September 2023, 23:42:11 UTC on 6 September). https://global.jaxa.jp/projects/sas/slim/ (read 2026-11-15).
+21j. LROC (Arizona State University / NASA GSFC), "Chandrayaan-3 Landing Site" and "IM-2 Athena Seen Obliquely", already listed under 15. https://lroc.im-ldi.com/images/1314 , https://lroc.im-ldi.com/images/1408 (read again 2026-11-15).
+
+## Papers
+
+22a. Hoerl, A. E., Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. Technometrics 12(1), 55-67. doi:10.1080/00401706.1970.10488634. The method of `apps/api/scripts/train_calibration.py` (ADR-014).
+22b. Cohen, J. (1960). A coefficient of agreement for nominal scales. Educational and Psychological Measurement 20(1), 37-46. doi:10.1177/001316446002000104. Cohen's kappa in the error study's class agreement with NASA's maps.
+22. Mazarico, E., Neumann, G. A., Smith, D. E., Zuber, M. T., Torrence, M. H. (2011). Illumination conditions of the lunar polar regions using LOLA topography. Icarus 211, 1066-1081. doi:10.1016/j.icarus.2010.10.030
+
+## Software
+
+Versions are the ones installed from the lock files (`apps/api/uv.lock`, `pnpm-lock.yaml`) on 2026-11-14. Licences are as declared in each package's own metadata (its `package.json` or Python package metadata) on that date; the npm entries for `gsap` and `@gltf-transform/cli` were also checked with `npm view <package> license`.
+
+### API (Python 3.12)
+
+| Library | Version | Licence | Used for | Link |
+| --- | --- | --- | --- | --- |
+| FastAPI | 0.162.7 | MIT | The API | https://fastapi.tiangolo.com/ |
+| Starlette (through FastAPI) | 1.10.0 | BSD-3-Clause | Web framework under FastAPI | https://www.starlette.io/ |
+| uvicorn | 0.54.0 | BSD-3-Clause | Running the API | https://www.uvicorn.org/ |
+| Pydantic | 2.14.3 | MIT | Request and response models | https://docs.pydantic.dev/ |
+| pydantic-settings | 2.16.3 | MIT | Configuration from the environment | https://docs.pydantic.dev/latest/concepts/pydantic_settings/ |
+| Skyfield | 1.55 | MIT | Positions of the Sun and the Earth | https://rhodesmill.org/skyfield/ ; "Planetary reference frames": https://rhodesmill.org/skyfield/planetary.html |
+| jplephem (through Skyfield) | 2.24 | MIT | Reading JPL kernels | https://github.com/brandon-rhodes/python-jplephem |
+| numpy | 2.5.4 | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | Array calculations, reading elevation grids | https://numpy.org/ |
+| pytest (development) | 9.2.0 | MIT | Tests | https://docs.pytest.org/ |
+| httpx | 0.28.1 | BSD-3-Clause | Calls to the assistant's model providers, and the test client | https://www.python-httpx.org/ |
+| ruff (development) | 0.17.5 | MIT | Lint and format | https://docs.astral.sh/ruff/ |
+| uv | 0.13.8 on the development laptop; 0.9 in the Docker image | To confirm | Python environments and packages | https://docs.astral.sh/uv/ |
+
+### Web app
+
+| Library | Version | Licence | Used for | Link |
+| --- | --- | --- | --- | --- |
+| Next.js | 16.4.6 | MIT | The web app | https://nextjs.org/ |
+| React, React DOM | 19.3.1 | MIT | The interface | https://react.dev/ |
+| TypeScript | 5.9.3 | Apache-2.0 | Types | https://www.typescriptlang.org/ |
+| Tailwind CSS, @tailwindcss/postcss | 4.3.5 | MIT | Styling and design tokens | https://tailwindcss.com/ |
+| three.js | 0.187.0 | MIT | 3D scenes, used directly; its Meshopt decoder loads the compressed model | https://threejs.org/ |
+| @types/three | 0.187.0 | MIT | Types for three.js | https://www.npmjs.com/package/@types/three |
+| GSAP | 3.15.1 | GSAP Standard "no charge" licence, https://gsap.com/standard-license | Scroll-linked animation | https://gsap.com/ |
+| Lenis | 1.3.27 | MIT | Smooth scrolling | https://lenis.darkroom.engineering/ |
+| TanStack Query | 5.107.1 | MIT | Fetching and caching API data | https://tanstack.com/query |
+| openapi-fetch | 0.17.0 | MIT | Typed API client | https://openapi-ts.dev/openapi-fetch/ |
+| zustand | 5.1.0 | MIT | The scenario store | https://zustand.docs.pmnd.rs/ |
+| zod | 4.6.7 | MIT | Checking input | https://zod.dev/ |
+| clsx | 2.1.1 | MIT | Class names | https://github.com/lukeed/clsx |
+| tailwind-merge | 3.7.0 | MIT | Merging Tailwind classes | https://github.com/dcastil/tailwind-merge |
+| Vitest (development) | 5.1.0 | MIT | Tests | https://vitest.dev/ |
+| Playwright, @playwright/test (development) | 1.65.1 | Apache-2.0 | End-to-end browser tests | https://playwright.dev/ |
+| @vitejs/plugin-react (development) | 6.3.0 | MIT | React in Vitest | https://github.com/vitejs/vite-plugin-react |
+| Testing Library for React (development) | 16.3.3 | MIT | Component tests | https://testing-library.com/ |
+| jsdom (development) | 31.0.1 | MIT | Browser environment for tests | https://github.com/jsdom/jsdom |
+| ESLint (development) | 9.39.5 | MIT | Lint | https://eslint.org/ |
+| eslint-config-next (development) | 16.4.6 | MIT | Next.js lint rules | https://nextjs.org/docs/app/api-reference/config/eslint |
+
+### Contract and repository tooling
+
+| Library | Version | Licence | Used for | Link |
+| --- | --- | --- | --- | --- |
+| openapi-typescript | 7.13.0 | MIT | Generating `api.d.ts` from `openapi.json` | https://openapi-ts.dev/ |
+| Prettier | 3.10.1 | MIT | Formatting | https://prettier.io/ |
+| prettier-plugin-tailwindcss | 0.8.1 | MIT | Sorting Tailwind classes | https://github.com/tailwindlabs/prettier-plugin-tailwindcss |
+| husky | 9.1.7 | MIT | Git pre-commit hook | https://typicode.github.io/husky/ |
+| lint-staged | 17.6.0 | MIT | Checking staged files | https://github.com/lint-staged/lint-staged |
+| pnpm | 11.3.0 (pinned in `package.json`) | To confirm | Installing web packages | https://pnpm.io/ |
+| glTF-Transform CLI | 4.5.1, run once by hand, not a dependency | MIT | Compressing `Z2Spacesuit.glb` | https://gltf-transform.dev/ |
+| GitHub Actions (`actions/checkout`, `actions/setup-node`, `actions/setup-python`) | v4, v4, v5 | To confirm | Running the checks on every pull request | https://docs.github.com/actions |
+
+### Fonts
+
+Loaded with `next/font/google` in `apps/web/src/app/layout.tsx`.
+
+| Font | Used for | Licence | Link |
+| --- | --- | --- | --- |
+| Exo 2 | Display text | To confirm | https://fonts.google.com/specimen/Exo+2 |
+| Jost | Body text | To confirm | https://fonts.google.com/specimen/Jost |
+| JetBrains Mono | Numbers and labels | To confirm | https://fonts.google.com/specimen/JetBrains+Mono |
+
+Not used: React Three Fiber, drei, shadcn/ui, Chart.js, React Bits. See [ADR-010](docs/decisions/ADR-010-threejs-directly.md) and [ADR-012](docs/decisions/ADR-012-visual-styling.md).
+
+## AI model providers for the assistant
+
+Free tiers, model ids, base URLs and limits, read 2026-11-15 from each provider's own pages. Details: [backend/assistant.md](docs/backend/assistant.md#model) and `apps/api/app/services/providers.py`.
+
+| Provider | Pages read |
+| --- | --- |
+| NVIDIA API catalog | https://build.nvidia.com/faq , https://integrate.api.nvidia.com/v1/models , https://docs.api.nvidia.com/nim/docs/faq |
+| Groq | https://console.groq.com/docs/rate-limits , https://console.groq.com/docs/tool-use , https://console.groq.com/docs/your-data |
+| Google Gemini API | https://ai.google.dev/gemini-api/docs/openai , https://ai.google.dev/gemini-api/docs/pricing |
+| Cloudflare Workers AI | https://developers.cloudflare.com/workers-ai/configuration/open-ai-compatibility/ , https://developers.cloudflare.com/workers-ai/platform/pricing/ , https://developers.cloudflare.com/workers-ai/platform/privacy/ |
+| SambaNova Cloud | https://docs.sambanova.ai/docs/en/models/rate-limits.md , https://docs.sambanova.ai/docs/en/features/function-calling.md |
+| OpenRouter | https://openrouter.ai/api/v1/models , https://openrouter.ai/docs/api/reference/limits , https://openrouter.ai/docs/guides/routing/model-fallbacks , https://openrouter.ai/docs/api/reference/overview |
+| Cohere | https://docs.cohere.com/docs/compatibility-api , https://docs.cohere.com/docs/rate-limits |
+| Checked and not used (no free API use) | https://inference-docs.cerebras.ai/support/rate-limits.md , https://docs.mistral.ai/admin/billing-usage/usage-limits.md , https://docs.together.ai/docs/billing-credits.md , https://huggingface.co/docs/inference-providers/pricing.md |
+
+## Design references
+
+- Wikipedia, "Lambert's cosine law". https://en.wikipedia.org/wiki/Lambert%27s_cosine_law (read 2026-11-15). The shading of the elevation map on the site page (`apps/web/src/features/sites/lib/relief.ts`): brightness is the cosine of the angle between the ground's normal and the light.
+- Wikipedia, "Terrain cartography", section "Shaded relief". https://en.wikipedia.org/wiki/Terrain_cartography (read 2026-11-15). The convention of a light from the north-west on maps with north up; the article cites Eduard Imhof, *Cartographic relief presentation* (2007), ISBN 978-1-58948-026-1.
+
+- Prompt Motion, a library of motion design examples with source code. Used as a reference for the landing page scenes and the demo video. https://www.promptsmotion.com
+
+## Images and textures
+
+Listed with their owners and credit lines in [data/sources.md](docs/data/sources.md). Add any new image here and there.
+
+## The team's first prototype
+
+The team's first prototype (`lunar.html`, shared in the team's Slack channel on 14 November 2026) was replaced by this app. Its author listed these sources for it. The current app does not use them unless they also appear above.
+
+- NASA JPL Horizons, https://ssd.jpl.nasa.gov/horizons/ , queried through its API, https://ssd.jpl.nasa.gov/api/horizons.api .
+- NASA Scientific Visualization Studio, CGI Moon Kit, https://svs.gsfc.nasa.gov/4720 : `lroc_color_2k.jpg`, `ldem_3_8bit.jpg`, `ldem_4_uint.tif`.
+- NASA 3D Resources, https://github.com/nasa/NASA-3D-Resources : the Z2 spacesuit and Apollo Lunar Module models.
+- Astronaut model (Google Poly, CC-BY), https://modelviewer.dev/shared-assets/models/Astronaut.glb , as a fallback model.
+- Jean Meeus, *Astronomical Algorithms*, 2nd edition, 1998: formulas for the Sun and Moon positions. To confirm: listed from memory, not opened during the work.
+- Archinal, B. A., et al., 2011, report of the IAU Working Group on Cartographic Coordinates and Rotational Elements 2009, https://doi.org/10.1007/s10569-010-9320-4 : the Moon's rotation model. To confirm: listed from memory, not opened during the work.
+- Software: three.js, GSAP, D3 and Lenis from cdnjs and jsDelivr, and Google Fonts.
+
