@@ -1,6 +1,6 @@
 # Features
 
-Last updated: 2026-11-14.
+Last updated: 2026-11-15.
 
 The status column is the record of what is built. Update it in the pull request that changes it.
 
@@ -19,7 +19,7 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | 9 | Site view in 3D | Building: surface view and planner diorama with decorative ground; real terrain planned | `GET /sky` (built), `GET /terrain` (not built) |
 | 10 | Solar System view | Planned | Planet positions in `GET /scene` (not built) |
 | 11 | Landing page | Building: hero, why and about sections on the one page | None |
-| 12 | Assistant | Planned | `POST /assistant/chat` (not built) |
+| 12 | Assistant | Built: chat panel on every screen; needs at least one model provider key on the API | `POST /assistant/chat` (built) |
 | 13 | Planner and Explorer modes | Planned | None |
 | 14 | Data export | Planned | `POST /analyze` (built) |
 | 15 | Checks against past landings (judges' feedback) | Started: 16 Apollo moonwalk times, LCROSS and SLIM in [VALIDATION.md](../VALIDATION.md); Chandrayaan-3 and robotic south pole landers planned | `GET /sky`, `POST /analyze` (built) |

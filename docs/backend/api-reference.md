@@ -1,6 +1,6 @@
 # API reference
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
 The contract is `packages/contracts/openapi.json`, exported from the API's Pydantic models in `apps/api/app/schemas/`. This document follows that file. If the two disagree, the generated file is right and this document must be fixed.
 
@@ -19,9 +19,9 @@ Base URL: set per environment, see [developer/deployment.md](../developer/deploy
 | GET | `/scene` | The Moon's sub-solar and sub-Earth points at one moment | Built (no planets) |
 | GET | `/validation` | Our angles next to saved JPL Horizons values | Built |
 | GET | `/terrain` | A height tile around a site for a 3D site view | Planned, not built |
-| POST | `/assistant/chat` | One assistant answer | Planned, not built |
+| POST | `/assistant/chat` | One assistant answer | Built; off when no model key is set |
 
-There is no rate limiting yet.
+Only `/assistant/chat` is rate limited (per client address, in memory).
 
 ## Examples
 
@@ -273,9 +273,48 @@ Query: `lat`, `lon`, `size_km` (5 to 80, default 40), `n` (65 to 513, default 25
 
 The 3D ground in the web app today is decorative and does not use this endpoint.
 
-### POST /assistant/chat
+## POST /assistant/chat
 
-Request: `messages` (role and content) and a `context` with the scenarios on screen and the current time. Response: `reply`, `sources` and `tools_used`. Limits: 20 messages per request, 2,000 characters per message, rate limited per client. See [assistant.md](assistant.md).
+One answer from the assistant. The browser keeps the conversation and sends it each time; the server stores nothing. Design and guardrails: [assistant.md](assistant.md).
+
+Request (illustrative):
+
+```json
+{
+  "messages": [{ "role": "user", "content": "Is this spot good right now?" }],
+  "context": { "site_id": "shackleton-ridge", "t": "2026-11-15T09:00:00Z" }
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `messages` | 1 to 20 messages. `role` is `user` or `assistant` only; `content` is 1 to 2,000 characters. The last message must be the user's |
+| `context` | Optional. What is on screen: `site_id`, or `lat` and `lon` for a custom spot, and `t`, the moment chosen in the planner |
+
+Response (illustrative):
+
+```json
+{
+  "reply": "At that moment the Sun is above the terrain horizon here, but the Earth is not ...",
+  "sources": [
+    { "kind": "knowledge", "id": "app-help", "title": "How to use Moon Maps" },
+    { "kind": "tool", "id": "analyze_site", "title": "Moon Maps API: visibility analysis" }
+  ],
+  "tools_used": ["analyze_site"],
+  "app_link": { "site_id": "shackleton-ridge", "lat": -89.684, "lon": -163.261, "t": "2026-11-15T09:00:00Z" },
+  "model": "nvidia/nemotron-3-ultra-550b-a55b:free"
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `reply` | Plain text. Links to hosts not named in the knowledge base are replaced with "(link removed)" |
+| `sources` | Knowledge files the answer names, then the tools that returned a result |
+| `tools_used` | Tool names, without repeats |
+| `app_link` | The last place and moment a tool computed, for the "Show in the planner" button; `null` when no tool ran for one place |
+| `model` | The model that wrote the answer, as the provider reports it |
+
+Limits: 6 requests a minute and 60 a day per client address by default (`MM_ASSISTANT_PER_MINUTE`, `MM_ASSISTANT_PER_DAY`). Errors: `assistant_unavailable` (503) when no key is set or the model cannot be reached, `rate_limited` (429) for our limit or the provider's, `invalid_input` (422) for the limits above.
 
 ## Errors
 
@@ -293,6 +332,6 @@ Codes in use:
 | `unknown_site` | 404 | No curated site has that id |
 | `range_too_long` | 422 | More than 10,000 samples in a scenario |
 | `out_of_ephemeris_range` | 422 | A date is outside 1900-01-02 to 2050-12-30 |
+| `rate_limited` | 429 | Too many assistant requests from one client, or the model provider's own limit |
+| `assistant_unavailable` | 503 | The assistant has no model key, or the model cannot be reached |
 | `internal` | 500 | Anything else; the message is generic and the error is logged with the request id |
-
-Codes planned with the endpoints that are not built: `assistant_unavailable` (503) and `rate_limited` (429).

@@ -6,14 +6,9 @@ import { errorMessage } from '@/lib/api/client';
 import { useSites, useSky } from '@/lib/api/hooks';
 import { useReducedMotion } from '@/lib/motion/reduced-motion';
 import { useScenarioStore } from '@/lib/state/scenario-store';
-import { ErrorState, LoadingState } from '@/components/ui/states';
+import { EmptyState, ErrorState, LoadingState } from '@/components/ui/states';
+import { horizonText } from '../lib/horizon-text';
 import { createDioramaScene, type DioramaScene } from '../lib/diorama-scene';
-
-function horizonText(source: string): string {
-  return source.startsWith('lola')
-    ? 'Horizon from NASA LOLA terrain (80 m grid)'
-    : 'Smooth Moon: no terrain data at this latitude';
-}
 
 /** "See the spot in 3D": the ground around the place with beams toward the Sun and the Earth from /sky. */
 export function SiteDiorama() {
@@ -118,6 +113,11 @@ export function SiteDiorama() {
             message={errorMessage(sites.error)}
             onRetry={() => void sites.refetch()}
           />
+        ) : sites.data && place.kind === 'site' && !site ? (
+          <EmptyState>
+            This link names a place Moon Maps does not know. Pick a place in
+            step 1.
+          </EmptyState>
         ) : data ? (
           <p>
             {horizonText(data.horizon_source)}

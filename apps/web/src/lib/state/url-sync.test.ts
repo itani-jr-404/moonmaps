@@ -27,3 +27,22 @@ describe('scenario url', () => {
     });
   });
 });
+
+describe('useScenarioUrlSync', () => {
+  it('writes the first real change of a fresh visit to the address', async () => {
+    const { renderHook, act } = await import('@testing-library/react');
+    const { useScenarioUrlSync } = await import('./url-sync');
+    const { useScenarioStore } = await import('./scenario-store');
+    window.history.replaceState(null, '', '/');
+    const hook = renderHook(() => useScenarioUrlSync());
+    const start = useScenarioStore.getState().timeMs;
+
+    act(() => useScenarioStore.getState().setTime(start));
+    expect(window.location.search).toBe('');
+
+    act(() => useScenarioStore.getState().setTime(start + 3_600_000));
+    expect(window.location.search).toContain('site=shackleton-ridge');
+    expect(window.location.search).toContain('t=');
+    hook.unmount();
+  });
+});

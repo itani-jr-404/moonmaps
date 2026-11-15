@@ -1,6 +1,6 @@
 # Testing
 
-Status: Built. Last updated: 2026-11-14.
+Status: Built. Last updated: 2026-11-15.
 
 What we test, where, and what must pass before a change is merged. The reasoning behind the science checks is in [science/validation.md](../science/validation.md).
 
@@ -10,7 +10,7 @@ Everyone writes at least one test for the code they add. Calculations are also c
 
 ## API tests (pytest)
 
-In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-14, with the data downloaded, 37 tests pass.
+In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15, with the data downloaded, 59 tests pass. `test_assistant.py` tests the chat endpoint with a scripted model, so it needs no key and no network.
 
 | File | Tests | Needs data files |
 | --- | --- | --- |
@@ -27,7 +27,7 @@ In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-14,
 
 ## End-to-end tests (Playwright)
 
-In `apps/web/e2e/`. They open the production build in a real browser with the real API running on its NASA data, capture each API response the page receives, and check that the screen shows exactly that answer: the planner, the 30-day calendar, the best times, the live readout, the globe's aim card and the landed view. They also cover the error state, a phone-size screen, reduced motion and the navigation. Any uncaught page error fails a test.
+In `apps/web/e2e/`. They open the production build in a real browser with the real API running on its NASA data, capture each API response the page receives, and check that the screen shows exactly that answer: the planner, the 30-day calendar, the best times, the live readout, the globe's aim card and the landed view. They also cover the error state, a phone-size screen, reduced motion, the navigation, and the assistant panel (`assistant.spec.ts`, with `/assistant/chat` mocked so no model key is needed). Any uncaught page error fails a test.
 
 Run from `apps/web`: `pnpm build && pnpm test:e2e`. Playwright starts the API and the web server itself (`playwright.config.ts`); the API needs `scripts/download_data.py` first. Locally the tests use the installed Chrome; CI installs Playwright's Chromium.
 

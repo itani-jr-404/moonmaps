@@ -7,7 +7,9 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "pnpm --filter web dev",
+    "dev": "pnpm run --reporter-hide-prefix=false \"/^dev:(api|web)$/\"",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "node scripts/dev-api.mjs",
     "build": "pnpm --filter web build",
     "lint": "pnpm --filter web lint",
     "typecheck": "pnpm --filter web typecheck",

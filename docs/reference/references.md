@@ -1,12 +1,27 @@
 # References
 
-Last updated: 2026-11-14.
+Last updated: 2026-11-15.
 
 Everything the project uses or cites: data, tools, code and reading. Add a line here in the same pull request that adds a dependency, a dataset or an asset. The submission form asks for this list.
 
 ## The challenge
 
-1. NASA Space Apps Challenge 2026, "Lunar Landing Site Navigator", challenge page and resources. https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/
+1. NASA Space Apps Challenge 2026, "Lunar Landing Site Navigator", challenge page and resources. https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/ ; Resources tab: https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/?tab=resources (read again 2026-11-15; page last published 2026-11-13).
+
+## NASA Space Apps pages
+
+Used for the assistant's knowledge files `challenge.md` and `space-apps.md`. Notes in [research/space-apps-resources.md](../../research/space-apps-resources.md).
+
+1a. NASA Space Apps, Resources. https://www.spaceappschallenge.org/resources/ (read 2026-11-15).
+1b. NASA Space Apps, Participant FAQs. https://www.spaceappschallenge.org/resources/participant-faqs/ (read 2026-11-15).
+1c. NASA Space Apps, Space Apps Connect Guide. https://www.spaceappschallenge.org/resources/space-app-connect-guide/ (read 2026-11-15). The forum: https://github.com/nasa/spaceapps
+1d. NASA Space Apps, Project Submission Guide. https://www.spaceappschallenge.org/resources/project-submission-guide/ (read 2026-11-15).
+1e. NASA Space Apps, Judging & Awards Guide. https://www.spaceappschallenge.org/resources/judging-awards-guide/ (read 2026-11-15).
+1f. NASA Space Apps, Team Formation Guide. https://www.spaceappschallenge.org/resources/team-formation-guide/ (read 2026-11-15).
+1g. NASA Space Apps, 2026 NASA Space Apps Challenge. https://www.spaceappschallenge.org/2026/ (read 2026-11-15).
+1h. NASA Space Apps, 2026 Challenges. https://www.spaceappschallenge.org/2026/challenges/ (read 2026-11-14).
+1i. NASA Space Apps, 2026 Space Agency Partners. https://www.spaceappschallenge.org/2026/space-agency-partners/ (read 2026-11-15).
+1j. NASA Space Apps, Beirut 2026 local event page (content by the Local Lead). https://www.spaceappschallenge.org/2026/local-events/beirut/ (read 2026-11-15; page last published 2026-11-06).
 
 ## NASA data and resources
 
@@ -42,7 +57,22 @@ Every page used for a coordinate or a landing date, with its owner and the date 
 
 ## Space agency partner resources
 
-21. Canadian Space Agency, Moon Exploration. https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/
+21. Canadian Space Agency, Moon Exploration. https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/ (read 2026-11-15).
+21a. Canadian Space Agency, "The Artemis campaign: humanity's return to the Moon". https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/artemis-missions.asp (read 2026-11-15).
+21b. Canadian Space Agency, "Canada's role in Moon exploration". https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/canada-role.asp (read 2026-11-15).
+
+## Missions
+
+Used for the assistant's knowledge file `missions.md`.
+
+21c. NASA, "Moon to Mars: NASA's Artemis Program". https://www.nasa.gov/humans-in-space/artemis/ (read 2026-11-15).
+21d. NASA, "NASA Provides Update on Artemis III Moon Landing Regions", release 24-136, 28 October 2024. https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/ (read 2026-11-15).
+21e. NASA, Commercial Lunar Payload Services. https://www.nasa.gov/commercial-lunar-payload-services/ (read 2026-11-15).
+21f. NASA, "NASA Receives Some Data Before Intuitive Machines Ends Lunar Mission", 7 March 2025. https://www.nasa.gov/news-release/nasa-receives-some-data-before-intuitive-machines-ends-lunar-mission/ (read 2026-11-15).
+21g. NASA Science, Lunar Reconnaissance Orbiter (LRO). https://science.nasa.gov/mission/lro/ (read 2026-11-15).
+21h. NASA Science, LCROSS. https://science.nasa.gov/mission/lcross/ (read 2026-11-15).
+21i. Indian Space Research Organisation, Chandrayaan-3 and Chandrayaan-3 Details. https://www.isro.gov.in/Chandrayaan3.html , https://www.isro.gov.in/Chandrayaan3_Details.html (read 2026-11-15).
+21j. LROC (Arizona State University / NASA GSFC), "Chandrayaan-3 Landing Site" and "IM-2 Athena Seen Obliquely", already listed under 15. https://lroc.im-ldi.com/images/1314 , https://lroc.im-ldi.com/images/1408 (read again 2026-11-15).
 
 ## Papers
 
@@ -65,7 +95,7 @@ Versions are the ones installed from the lock files (`apps/api/uv.lock`, `pnpm-l
 | jplephem (through Skyfield) | 2.24 | MIT | Reading JPL kernels | https://github.com/brandon-rhodes/python-jplephem |
 | numpy | 2.5.4 | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | Array calculations, reading elevation grids | https://numpy.org/ |
 | pytest (development) | 9.2.0 | MIT | Tests | https://docs.pytest.org/ |
-| httpx (development) | 0.28.1 | BSD-3-Clause | The test client | https://www.python-httpx.org/ |
+| httpx | 0.28.1 | BSD-3-Clause | Calls to the assistant's model providers, and the test client | https://www.python-httpx.org/ |
 | ruff (development) | 0.17.5 | MIT | Lint and format | https://docs.astral.sh/ruff/ |
 | uv | 0.13.8 on the development laptop; 0.9 in the Docker image | To confirm | Python environments and packages | https://docs.astral.sh/uv/ |
 
@@ -119,6 +149,21 @@ Loaded with `next/font/google` in `apps/web/src/app/layout.tsx`.
 | JetBrains Mono | Numbers and labels | To confirm | https://fonts.google.com/specimen/JetBrains+Mono |
 
 Not used: React Three Fiber, drei, shadcn/ui, Chart.js, React Bits. See [ADR-010](../decisions/ADR-010-threejs-directly.md) and [ADR-012](../decisions/ADR-012-visual-styling.md).
+
+## AI model providers for the assistant
+
+Free tiers, model ids, base URLs and limits, read 2026-11-15 from each provider's own pages. Details: [backend/assistant.md](../backend/assistant.md#model) and `apps/api/app/services/providers.py`.
+
+| Provider | Pages read |
+| --- | --- |
+| NVIDIA API catalog | https://build.nvidia.com/faq , https://integrate.api.nvidia.com/v1/models , https://docs.api.nvidia.com/nim/docs/faq |
+| Groq | https://console.groq.com/docs/rate-limits , https://console.groq.com/docs/tool-use , https://console.groq.com/docs/your-data |
+| Google Gemini API | https://ai.google.dev/gemini-api/docs/openai , https://ai.google.dev/gemini-api/docs/pricing |
+| Cloudflare Workers AI | https://developers.cloudflare.com/workers-ai/configuration/open-ai-compatibility/ , https://developers.cloudflare.com/workers-ai/platform/pricing/ , https://developers.cloudflare.com/workers-ai/platform/privacy/ |
+| SambaNova Cloud | https://docs.sambanova.ai/docs/en/models/rate-limits.md , https://docs.sambanova.ai/docs/en/features/function-calling.md |
+| OpenRouter | https://openrouter.ai/api/v1/models , https://openrouter.ai/docs/api/reference/limits , https://openrouter.ai/docs/guides/routing/model-fallbacks , https://openrouter.ai/docs/api/reference/overview |
+| Cohere | https://docs.cohere.com/docs/compatibility-api , https://docs.cohere.com/docs/rate-limits |
+| Checked and not used (no free API use) | https://inference-docs.cerebras.ai/support/rate-limits.md , https://docs.mistral.ai/admin/billing-usage/usage-limits.md , https://docs.together.ai/docs/billing-credits.md , https://huggingface.co/docs/inference-providers/pricing.md |
 
 ## Design references
 

@@ -12,7 +12,8 @@ from fastapi.middleware.gzip import GZipMiddleware
 
 from app.core.config import VERSION, Settings, get_settings
 from app.core.errors import install_error_handlers
-from app.routers import analysis, sites, system
+from app.core.rate_limit import RateLimiter
+from app.routers import analysis, assistant, sites, system
 from app.services.container import Services, build_services
 
 log = logging.getLogger("moon_maps")
@@ -25,6 +26,9 @@ def create_app(settings: Settings | None = None, services: Services | None = Non
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.services = services or build_services(settings)
+        app.state.chat_limiter = RateLimiter(
+            settings.assistant_per_minute, settings.assistant_per_day
+        )
         yield
 
     app = FastAPI(
@@ -62,7 +66,7 @@ def create_app(settings: Settings | None = None, services: Services | None = Non
         return response
 
     install_error_handlers(app)
-    for module in (system, sites, analysis):
+    for module in (system, sites, analysis, assistant):
         app.include_router(module.router)
     return app
 

@@ -1,6 +1,6 @@
 # Routes and state
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
 How the web app is laid out, where state lives, and how data is fetched. Layering rules are in [architecture/application-layers.md](../architecture/application-layers.md). The web app is being written, so this page describes the structure, not every detail.
 
@@ -18,7 +18,9 @@ One page, `/` (`src/app/page.tsx`). Its sections, in order:
 
 Navigation, the footer, the custom cursor and reveal effects are in `site-chrome`. A skip link jumps to the planner.
 
-Planned, not built: an accuracy page for `GET /validation`, a comparison view, a horizon panorama and the assistant panel.
+The assistant (`assistant`) floats over every section: a launcher at the bottom right, opening a chat panel. Its conversation lives in an in-memory zustand store (`features/assistant/hooks/use-chat-store.ts`), never in storage. See [backend/assistant.md](../backend/assistant.md#in-the-interface).
+
+Planned, not built: an accuracy page for `GET /validation`, a comparison view and a horizon panorama.
 
 ## State
 
@@ -49,6 +51,7 @@ Hooks in `src/lib/api/hooks.ts`, built on TanStack Query and the typed client in
 | `useAnalyze(scenarios)` | `POST /analyze` | Keyed by the scenarios; the planner sends two (the verdict span and the 30-day calendar), without series |
 | `useSky(point, t)` | `GET /sky` | Kept for a minute |
 | `useScene(t)` | `GET /scene` | Available; not used by a section yet |
+| `useAssistantChat()` | `POST /assistant/chat` | A mutation; nothing is cached |
 | `useValidation()` | `GET /validation` | Available; not used by a section yet |
 
 `fetchSkyRounded` in `src/lib/api/fetch-sky.ts` serves the globe while aiming: it rounds the point to 0.1 degree and the time to 10 minutes and caches answers in memory ([ADR-011](../decisions/ADR-011-sky-endpoint.md)).

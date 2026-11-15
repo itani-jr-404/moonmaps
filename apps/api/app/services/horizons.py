@@ -69,13 +69,17 @@ class HorizonService:
                 )
         result = self._build(lat, lon)
         if path is not None:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            np.savez(
-                path,
-                profile_deg=result.profile_deg,
-                source=result.source,
-                site_height_m=np.nan if result.site_height_m is None else result.site_height_m,
-            )
+            try:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                np.savez(
+                    path,
+                    profile_deg=result.profile_deg,
+                    source=result.source,
+                    site_height_m=np.nan if result.site_height_m is None else result.site_height_m,
+                )
+            except OSError as exc:
+                # Some hosts have a read-only file system; the memory cache still works.
+                log.warning("could not write the horizon cache %s: %s", path.name, exc)
         return result
 
     def _build(self, lat: float, lon: float) -> SiteHorizon:

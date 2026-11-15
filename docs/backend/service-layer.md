@@ -1,12 +1,12 @@
 # Service layer
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
 How the API in `apps/api` is organised inside. The layering rules are in [architecture/application-layers.md](../architecture/application-layers.md). The endpoints are in [api-reference.md](api-reference.md).
 
 ## Start-up
 
-`app/main.py` has `create_app(settings, services)`. It adds gzip compression for responses over 1 KB, CORS (methods `GET` and `POST`, header `Content-Type`, origins from configuration), a middleware that logs one line per request and sets `x-request-id`, the error handlers, and the three routers. At start-up, the lifespan hook calls `build_services(settings)` in `app/services/container.py` once and stores the result on `app.state.services`.
+`app/main.py` has `create_app(settings, services)`. It adds gzip compression for responses over 1 KB, CORS (methods `GET` and `POST`, header `Content-Type`, origins from configuration), a middleware that logs one line per request and sets `x-request-id`, the error handlers, and the four routers. It also creates the assistant's rate limiter (`app/core/rate_limit.py`) on `app.state.chat_limiter`. At start-up, the lifespan hook calls `build_services(settings)` in `app/services/container.py` once and stores the result on `app.state.services`.
 
 `build_services` loads the JPL kernels, memory-maps the elevation grids that are present (`LDEM_80S_80M`, then `LDEM_75S_120M`; a missing grid is logged as a warning and skipped), reads `sites.json`, and builds every service. Routers receive the `Services` object through the `Deps` dependency in `app/routers/deps.py`.
 
@@ -39,6 +39,7 @@ The request and response models are in `app/schemas`: `common.py` (site, site re
 | `AnalysisService` | `services/analysis.py` | `run(scenarios)`, `run_one(scenario)` | Runs one scenario end to end; see below |
 | `SkyService` | `services/sky.py` | `at(lat, lon, t)`, `scene(t)` | The Sun and the Earth at one point and moment with clearance; the sub-solar and sub-Earth points |
 | `ValidationService` | `services/validation.py` | `report()` | Recomputes our angles for the saved JPL Horizons cases and compares them; the report is built once and kept |
+| `AssistantService` | `services/assistant.py` | `chat(request)` | One assistant answer: system prompt, tool loop over the services above, guardrails. Uses `KnowledgeBase` (`services/knowledge.py`) and an `LLMClient` (`services/llm.py`); see [assistant.md](assistant.md) |
 
 `AnalysisService.run_one` in steps:
 
@@ -107,7 +108,7 @@ Services raise `AppError`. `install_error_handlers` turns it into `{ "error": { 
 
 ## Configuration
 
-`app/core/config.py` reads environment variables with the prefix `MM_` once at start, and also reads a `.env` file in the working directory if present (`apps/api/.env` when the API is started from `apps/api`). Services receive the values; engines never read them.
+`app/core/config.py` reads environment variables with the prefix `MM_` once at start, and also reads the `.env` files at the repository root and in `apps/api`, if present (the second wins). Services receive the values; engines never read them.
 
 | Setting | Variable | Default |
 | --- | --- | --- |
@@ -117,6 +118,11 @@ Services raise `AppError`. `install_error_handlers` turns it into `{ "error": { 
 | `log_level` | `MM_LOG_LEVEL` | `INFO` |
 | `observer_height_m` | `MM_OBSERVER_HEIGHT_M` | 2.0 |
 | `horizon_max_km` | `MM_HORIZON_MAX_KM` | 200.0 |
+| `nvidia_api_key`, `groq_api_key`, `gemini_api_key`, `cloudflare_api_token`, `cloudflare_account_id`, `sambanova_api_key`, `openrouter_api_key`, `cohere_api_key` | `MM_` plus the name in capitals | none; each key set adds a provider to the assistant's chain ([assistant.md](assistant.md#model)) |
+| `openrouter_models` | `MM_OPENROUTER_MODELS` | three free OpenRouter models (a JSON list) |
+| `llm_api_key`, `llm_base_url`, `llm_models` | `MM_LLM_API_KEY`, `MM_LLM_BASE_URL`, `MM_LLM_MODELS` | none; any other OpenAI-compatible endpoint, tried last |
+| `llm_timeout_s` | `MM_LLM_TIMEOUT_S` | 60.0 |
+| `assistant_per_minute`, `assistant_per_day` | `MM_ASSISTANT_PER_MINUTE`, `MM_ASSISTANT_PER_DAY` | 6, 60 |
 
 ## Logging
 

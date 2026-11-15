@@ -37,6 +37,49 @@
         "title": "AnalyzeResponse",
         "type": "object"
       },
+      "AppLink": {
+        "additionalProperties": false,
+        "description": "A place and moment the assistant computed, for the \"Show in the planner\" button.",
+        "properties": {
+          "lat": {
+            "description": "Latitude in degrees, south negative",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "description": "East longitude, -180 to 180",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lon",
+            "type": "number"
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Id"
+          },
+          "t": {
+            "format": "date-time",
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lat",
+          "lon",
+          "t"
+        ],
+        "title": "AppLink",
+        "type": "object"
+      },
       "AtStart": {
         "additionalProperties": false,
         "description": "Visibility at the first sample, the moment the scenario asks about.",
@@ -122,6 +165,205 @@
           "visible"
         ],
         "title": "BodyInSky",
+        "type": "object"
+      },
+      "ChatContext": {
+        "additionalProperties": false,
+        "description": "What the user is looking at in the app, so the assistant can explain it.",
+        "properties": {
+          "lat": {
+            "anyOf": [
+              {
+                "description": "Latitude in degrees, south negative",
+                "maximum": 90.0,
+                "minimum": -90.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custom spot on screen, with lon",
+            "title": "Lat"
+          },
+          "lon": {
+            "anyOf": [
+              {
+                "description": "East longitude in degrees, -180 to 360",
+                "maximum": 360.0,
+                "minimum": -180.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lon"
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Curated site on screen",
+            "title": "Site Id"
+          },
+          "t": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Moment chosen in the planner",
+            "title": "T"
+          }
+        },
+        "title": "ChatContext",
+        "type": "object"
+      },
+      "ChatMessage": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "ChatMessage",
+        "type": "object"
+      },
+      "ChatRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChatContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Messages",
+            "type": "array"
+          }
+        },
+        "required": [
+          "messages"
+        ],
+        "title": "ChatRequest",
+        "type": "object"
+      },
+      "ChatResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "app_link": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AppLink"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Model that wrote the answer",
+            "title": "Model"
+          },
+          "reply": {
+            "description": "Plain text. The web app shows it as text, never as HTML",
+            "title": "Reply",
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/ChatSource"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "tools_used": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tools Used",
+            "type": "array"
+          }
+        },
+        "required": [
+          "reply",
+          "sources",
+          "tools_used"
+        ],
+        "title": "ChatResponse",
+        "type": "object"
+      },
+      "ChatSource": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Knowledge file name, or tool name",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "knowledge",
+              "tool"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "title"
+        ],
+        "title": "ChatSource",
         "type": "object"
       },
       "ErrorDetail": {
@@ -980,6 +1222,87 @@
         "summary": "Analyze",
         "tags": [
           "analysis"
+        ]
+      }
+    },
+    "/assistant/chat": {
+      "post": {
+        "operationId": "chat_assistant_chat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Chat",
+        "tags": [
+          "assistant"
         ]
       }
     },

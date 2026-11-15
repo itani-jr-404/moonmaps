@@ -10,6 +10,12 @@ export type SkyResponse = Schemas['SkyResponse'];
 export type SceneResponse = Schemas['SceneResponse'];
 export type ValidationReport = Schemas['ValidationReport'];
 export type ApiErrorBody = Schemas['ErrorResponse'];
+export type ChatMessage = Schemas['ChatMessage'];
+export type ChatContext = Schemas['ChatContext'];
+export type ChatRequest = Schemas['ChatRequest'];
+export type ChatResponse = Schemas['ChatResponse'];
+export type ChatSource = Schemas['ChatSource'];
+export type AppLink = Schemas['AppLink'];
 
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
@@ -21,6 +27,8 @@ export class ApiError extends Error {
   constructor(
     readonly code: string,
     message: string,
+    /** The HTTP status, when the API answered at all. */
+    readonly status?: number,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -39,6 +47,7 @@ export function unwrap<T>(result: {
     body?.error?.code ?? 'network',
     body?.error?.message ??
       `The Moon Maps API answered ${result.response.status}.`,
+    result.response.status,
   );
 }
 

@@ -46,12 +46,11 @@ export function useScenarioUrlSync(): void {
     const store = useScenarioStore.getState();
     if (place) store.setPlace(place);
     if (timeMs !== null) store.setTime(timeMs);
-    let first = !place && timeMs === null;
+    // A fresh visit keeps a clean address until the place or the time really changes.
+    const clean = !place && timeMs === null;
+    const startTime = useScenarioStore.getState().timeMs;
     return useScenarioStore.subscribe((s) => {
-      if (first && s.place === DEFAULT_PLACE) {
-        first = false;
-        return;
-      }
+      if (clean && s.place === DEFAULT_PLACE && s.timeMs === startTime) return;
       const url = `${window.location.pathname}?${scenarioQuery(s.place, s.timeMs)}${window.location.hash}`;
       window.history.replaceState(window.history.state, '', url);
     });
