@@ -59,7 +59,7 @@ Ali Al Itani, Leonardo Khayyat, Hussein Alassaad, Sam Abou Zeid, Khalil Dandashl
 
 ## Data and credits
 
-Positions come from NASA JPL ephemerides, checked against JPL Horizons. Terrain comes from the Lunar Orbiter Laser Altimeter on NASA's Lunar Reconnaissance Orbiter. Moon surface maps come from NASA's Scientific Visualization Studio (CGI Moon Kit), and 3D models from NASA 3D Resources. The full list, with links and credit lines, is in [docs/data/sources.md](docs/data/sources.md) and [docs/reference/references.md](docs/reference/references.md).
+Positions come from NASA JPL ephemerides, checked against JPL Horizons. Terrain comes from the Lunar Orbiter Laser Altimeter on NASA's Lunar Reconnaissance Orbiter. Moon surface maps come from NASA's Scientific Visualization Studio (CGI Moon Kit), and 3D models from NASA 3D Resources. The full list, with links and credit lines, is in [CITATIONS.md](CITATIONS.md), [docs/data/sources.md](docs/data/sources.md) and [docs/reference/references.md](docs/reference/references.md).
 
 NASA does not endorse this project.
 

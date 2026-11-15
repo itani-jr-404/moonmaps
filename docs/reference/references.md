@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-15.
 
-Everything the project uses or cites: data, tools, code and reading. Add a line here in the same pull request that adds a dependency, a dataset or an asset. The submission form asks for this list.
+Everything the project uses or cites: data, tools, code and reading. Add a line here in the same pull request that adds a dependency, a dataset or an asset. The submission form asks for this list. [CITATIONS.md](../../CITATIONS.md) at the repository root repeats it for judges; change both together.
 
 ## The challenge
 
