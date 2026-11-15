@@ -1,6 +1,6 @@
 # Moon Maps: validation report
 
-Team Lunar Titans, NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". Last updated: 14 November 2026.
+Team Lunar Titans, NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". Last updated: 15 November 2026.
 
 Moon Maps tells you whether a place and a date on the Moon are good for landing: whether the Sun is above the terrain horizon (power) and whether the Earth is above it (a direct radio link). This report shows how we checked that the app works and that its numbers are right. Every result was produced by running the code on 14 November 2026, and each one names the command, dataset or publication behind it. The 0.05 degree tolerance for the JPL Horizons comparisons was set in our design documents before any comparison ran, and the pass rule for NASA's maps was written into the script before its first run. Where a first comparison did not agree, the report says so. Section 10 lists what we have not yet checked.
 
@@ -10,7 +10,7 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 
 | Check | Pass rule | Result | Section |
 | --- | --- | --- | --- |
-| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 37 API tests (with the NASA data, none skipped), 32 web unit tests and 8 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
+| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 69 API tests (with the NASA data, none skipped), 32 web unit tests and 8 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
 | Sun and Earth positions against NASA JPL Horizons, 2026 | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference 0.0123 degrees | [2](#2-positions-against-nasa-jpl-horizons) |
 | Sun elevation at 16 Apollo moonwalk times (1969 to 1972) against JPL Horizons | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference under 0.005 degrees | [3](#3-past-missions) |
 | Long-term sunlight against NASA Goddard's polar illumination map | Mean absolute difference at most 0.10 and correlation at least 0.90 | **Pass.** Mean absolute difference 0.006, correlation 0.992, over 300 random points | [4](#4-sunlight-and-earth-visibility-against-nasas-polar-maps) |
@@ -27,7 +27,7 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 Commands, run from the repository root on 14 November 2026:
 
 ```bash
-cd apps/api && uv run pytest -v          # 37 passed
+cd apps/api && uv run pytest -v          # 69 passed
 pnpm test                                 # 32 passed (5 files)
 pnpm lint && pnpm typecheck               # no errors
 pnpm build                                # production build succeeds
@@ -41,7 +41,7 @@ cd apps/web && pnpm build && pnpm test:e2e   # 8 passed: real browser, real API
 
 Continuous integration on GitHub Actions (https://github.com/itani-jr-404/moonmaps/actions/workflows/ci.yml) runs all of these on every change. It downloads the JPL kernels and the 80 m LOLA grid first, so every API test runs there; the job fails if any test is skipped. A separate job builds the web app, starts the API, and runs the browser tests in Chromium.
 
-### API tests (pytest), 37 passed
+### API tests (pytest), 69 passed
 
 | File | What it proves |
 | --- | --- |
@@ -313,3 +313,30 @@ We received the judges' feedback and will act on it. Their main points, and what
 4. **Forecast where the Earth will be, like a weather forecast.** The positions of the Earth and the Moon change over time. For each landing site we will show a forecast of where the Earth and the Sun will be in its sky over the coming days, with their rise and set times. The planner's 30-day calendar already forecasts the good landing windows from the same calculation. Next: draw the Earth's and the Sun's paths above each site's terrain horizon.
 
 These are recorded as planned features in [features/README.md](features/README.md).
+
+## 12. Learning from past data
+
+The judges asked us to use previous landings and data to narrow the error range. This section describes what we learned from the saved comparisons and what it changed. Decision: [ADR-014](decisions/ADR-014-calibration.md). The numbers are served by the API's `GET /accuracy` ([backend/api-reference.md](backend/api-reference.md#get-accuracy)) and read from `apps/api/app/data/validation/calibration.json`, written on 15 November 2026 by `apps/api/scripts/train_calibration.py`.
+
+**Data.** The 300 random points of Section 4 (the 10 curated sites are left out so that the sample stays random). For each point we have our share of time with the Sun, and with the Earth, visible over 18.6 years by the app's centre-of-disc rule and by the any-part rule, and the value of NASA Goddard's PGDA map (Mazarico et al. 2011, doi:10.1016/j.icarus.2010.10.030).
+
+**Method.** For each body, a ridge regression (Hoerl and Kennard 1970, doi:10.1080/00401706.1970.10488634) predicts NASA's value from four features: our centre-of-disc share, our any-part share, the absolute latitude, and the centre-of-disc share times the absolute latitude. Features are standardised; the penalty, 1.0, was fixed before the run; predictions are clipped to 0 to 1. The error is measured with 10 repeats of 5-fold cross-validation with seed 20261115: every point is predicted by a model that did not see it. Command: `cd apps/api && uv run python scripts/train_calibration.py` (numpy only, under a second).
+
+**Result,** mean absolute error against NASA's map on held-out points (share of time, 0 to 1):
+
+| Body | App's rule (centre of disc) | Any part of the disc, no learning | Learned model | Change against the app's rule | Points within 0.05: app's rule, learned |
+| --- | --- | --- | --- | --- | --- |
+| Sun | 0.0132 | 0.0063 | 0.0079 | 39.6 % lower | 99.0 %, 99.0 % |
+| Earth | 0.0362 | 0.0061 | 0.0103 | 71.6 % lower | 70.7 %, 97.9 % |
+
+The spread of the learned error between repeats is below 0.0001. A check of other penalty values, saved in the same file, gives a lowest held-out error of 0.0075 for both bodies (penalty 0.01), still above the any-part rule.
+
+**What this means.** Learning from NASA's maps lowers the error of the app's rule by 40 % for sunlight and 72 % for Earth visibility. But counting any part of the disc, with no learning at all, lowers it more (to 0.006 for both). The learned model mostly rediscovers that physical rule, and its squared-error fit is pulled by a few points with large gaps, such as narrow ridges. We report the learned model as a measured result, not as a better method than the any-part rule.
+
+**Limits.**
+
+- The calibration applies only to long-term shares over the 18.6-year cycle, between 80.5 S and 89.5 S. It is not applied to the planner's 30-day results, which are a different quantity, and the app shows uncalibrated results everywhere. `app/services/accuracy.py` has a helper for long-term shares only.
+- 300 points and one reference product; NASA's maps are themselves a model built from LOLA terrain, not measurements on the ground.
+- The Apollo moonwalk Sun angles (Section 3) give nothing to learn: our values equal JPL Horizons to under 0.0005 degrees, as saved in `apollo_sun.json`.
+
+**Past landings and travel times.** `GET /missions` lists launch and landing times, each from its official page, and the travel time computed from them: Apollo 11, 12, 14, 15, 16 and 17 (NASA NSSDCA, 102.8 to 110.5 hours), SLIM (JAXA, 3,231.6 hours on a long low-energy route) and Chandrayaan-3 (ISRO launch time; no official landing time to the minute found, so its landing is left empty, to confirm). The data is in `apps/api/app/data/missions.json` and the sources in [reference/references.md](reference/references.md#missions).

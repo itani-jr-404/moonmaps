@@ -6,32 +6,52 @@ Moon Maps is one long page. For a place on the Moon and a moment in time, it say
 
 All Sun and Earth answers come from the Moon Maps API. In the 3D views only the Sun and Earth directions and the yes/no answers come from the API; the ground is drawn for looks.
 
-## The page, top to bottom
+## The pages
 
-| Order | Anchor | Section | What it is for |
-| --- | --- | --- | --- |
-| 1 | `#top` | Opening screen | Headline and the live south pole readout |
-| 2 | `#land` | Choose your landing | A 3D Moon to aim at and land on |
-| 3 | `#why` | Why the south pole | Three short facts |
-| 4 | `#navigator` | The planner | Pick a place and a date, get the answer, 30-day calendar, best times, 3D view |
-| 5 | `#about` | About | What the app does, how it works, its limits |
+Moon Maps has separate pages. The menu at the top links to them: Explore, Planner, Sites, Accuracy and About, plus the "Open the planner" button. On a phone, the menu button opens the same links (Home, Choose a landing, Planner, Sites, How sure are we, About). "Skip to main content" is the first link for keyboard users.
 
-## Header and menu
+| Page | Address | What it is for |
+| --- | --- | --- |
+| Home | `/` | Headline, the live south pole readout, why the south pole matters, and cards that open each page ("What you can do") |
+| Choose a landing | `/explore` | A 3D Moon to aim at and land on |
+| Planner | `/planner` | Pick a place and a date; the answer, the 30-day calendar, the best times and a 3D view |
+| Sites | `/sites` | Every curated landing site as a card, grouped by kind, with a "right now" line |
+| A site's page | `/sites/<id>`, or `/sites/spot?lat=..&lon=..` for any spot | Everything about one site, and a chat that knows that site |
+| Accuracy | `/accuracy` | How accurate the numbers are, and what the app learned from past data |
+| About | `/about` | What the app does, how it works, its limits |
 
-- The logo "Moon Maps" goes back to the top.
-- On wide screens (1100 px and up) the bar shows: "Why the pole", "Planner", "Landing", "About", and an "Open the planner" button.
-- On narrower screens a menu button ("Open menu") opens a full-screen menu: "Why the pole", "Planner", "Choose a landing", "About", "Open the planner". Escape or "Close menu" closes it.
-- The bar hides when you scroll down and returns when you scroll up. Keyboard users get a "Skip to the planner" link first.
-- The footer repeats the links, lists the NASA credits, and says "NASA does not endorse this project."
+## A site's page (`/sites/<id>`)
 
-## Opening screen (`#top`)
+Open it from a card on Sites, from "See everything about this spot" in the landing panel on Choose a landing, or by link.
+
+- Header: the name, the kind of site, coordinates, mission date, description and its source; "Open in planner" and "Copy link".
+- "Right now": whether the Sun and the Earth are in view, their elevation and azimuth, the terrain horizon in that direction, and the distance from the Earth to the Moon.
+- "Is it a good landing site, and for how long?": if good now, until when; if not, when it is next good and for how long; the next good windows.
+- "Can a lander stay, or must it leave?": next sunset or sunrise, next Earthset or Earthrise, the longest dark spell and the longest time without the Earth in view in the next 30 days.
+- "Sky forecast": the next 14 days, day by day, with hours of Sun, Earth and both; and a horizon panorama with the terrain skyline and the paths of the Sun and the Earth over the next 3 days.
+- "Getting there": how long past missions took from launch to landing, with sources, and the mission that landed at this site if any.
+- "How sure are we": a link to the Accuracy page.
+- An unknown site or bad coordinates show "We do not know this site" or "This spot is not on the Moon map".
+
+## The site assistant
+
+On a site's page, a chat opens on the right by itself after about a second (a bottom sheet on a phone): "Ask about <site>". It already has the next 30 days for that site, so it can answer at once. Four suggestion cards start a question ("When is it next good for landing?", "How long can a lander stay here?", "Where will the Earth be this week?", "How did past missions get here?"). Each answer has sources, "Copy", "Retry" and, when it names a place and time, "Show in the planner". Collapse, Close or Escape folds it into an "Ask about <site>" button. Each site has its own conversation, kept only in the open tab. The round assistant button at the bottom right is hidden on site pages so the two do not overlap.
+
+## Accuracy (`/accuracy`)
+
+- "Error rates": how close our Sun and Earth positions are to NASA JPL Horizons, how our Sun elevation at the 16 Apollo moonwalk times compares, and our long-term sunlight and Earth visibility against NASA's polar maps, before and after learning.
+- "Learning from past data": a small model (ridge regression) learned how our long-term values differ from NASA's maps at 300 points, tested on points it did not see. The page shows the error before and after, and its limits: counting any part of the Sun's or Earth's disc, with no learning, does even better, and the model is not applied to 30-day results.
+- "Past landings": a table of the Apollo moonwalk times with our value, JPL Horizons and the Apollo Lunar Surface Journal.
+- "Positions vs JPL Horizons": the number of cases, the largest difference and the pass rule.
+
+## Home (`/`)
 
 - On first load a short intro plays. The "Skip intro" button ends it.
 - Headline: "Pick the site. Pick the hour." Buttons: "Plan a landing" (to the planner) and "Choose a landing" (to the 3D Moon).
 - "Right now at the south pole" shows Sunlight ("Yes, the Sun is up" or "No, it is dark") and Earth ("In view" or "Hidden"). This is the API's answer for 89.9 S, 0 E, asked again every minute. "--" means it is loading; "Unavailable" means the API could not be reached.
 - "Your time" is your device's clock. The astronaut, Moon and Earth behind the text are decoration; clicking empty space spins the astronaut.
 
-## Choose your landing (`#land`)
+## Choose a landing (`/explore`)
 
 The south polar region faces you at the start. Small dots mark the curated sites.
 
@@ -47,11 +67,11 @@ The south polar region faces you at the start. Small dots mark the curated sites
    - "Skip to sunrise" (only when it is dark) jumps to just after the next sunrise within 35 days. If there is none: "The Sun does not rise here in the next 35 days."
    - "See the best dates" sends the spot and time to the planner and scrolls there ("Showing the best dates for this spot.").
 
-## Why the south pole (`#why`)
+## Why the south pole (on Home, `/#why`)
 
 Three cards: "There is ice", "The Sun stays low", "Earth comes and goes".
 
-## The planner (`#navigator`)
+## The planner (`/planner`)
 
 ### Step 1: "Where do you want to land?"
 
@@ -93,19 +113,19 @@ A block of ground around the place with the lander, a compass ring, and beams: a
 - "Horizon from NASA LOLA terrain (80 m grid)" or "(120 m grid)": real terrain was used, from the 80 m grid south of 80 S or the 120 m grid between 75 S and 80 S.
 - "Smooth Moon: no terrain data at this latitude": the place is north of 75 S, so the Moon is treated as a smooth ball. The ground is decorative, with heights exaggerated two times.
 
-## About (`#about`)
+## About (`/about`)
 
 Three columns: "What it does for you", "The simple idea behind it" and "Good to know". It says the app is a planning and learning tool, not flight software.
 
 ## Sharing a link
 
-The address keeps the planner's place and time:
+On the Planner page, the address keeps the place and time:
 
-- `?site=<id>` for a curated site, for example `/?site=malapert-massif&t=2027-03-01T12:00Z`.
-- `?lat=<lat>&lon=<lon>` for any point, for example `/?lat=-85.3&lon=30.2&t=2027-03-01T12:00Z`. South is negative, east is positive; longitude can be -180 to 360.
+- `?site=<id>` for a curated site, for example `/planner?site=malapert-massif&t=2027-03-01T12:00Z`.
+- `?lat=<lat>&lon=<lon>` for any point, for example `/planner?lat=-85.3&lon=30.2&t=2027-03-01T12:00Z`. South is negative, east is positive; longitude can be -180 to 360.
 - `?t=` is the moment in UTC (the trailing `Z`).
 
-Site ids of the Step 1 buttons: `shackleton-ridge`, `malapert-massif`, `haworth`, `mons-mouton`, `de-gerlache-rim-2`, `south-pole-reference`, `chandrayaan-3`, `apollo-11`. Any curated id works in a link, even one without a button. Add `#navigator` to open at the planner. Badly formed values are ignored; a well-formed but unknown site id gives an error, and the 3D view says "This link names a place Moon Maps does not know. Pick a place in step 1." On a fresh visit the address bar shows the parameters after the first change of place or time.
+Site ids of the Step 1 buttons: `shackleton-ridge`, `malapert-massif`, `haworth`, `mons-mouton`, `de-gerlache-rim-2`, `south-pole-reference`, `chandrayaan-3`, `apollo-11`. Any curated id works in a link, even one without a button. Planner links use the `/planner` address, for example `/planner?site=haworth&t=2026-11-20T12:00Z`. A site's own page is `/sites/<id>`. Badly formed values are ignored; a well-formed but unknown site id gives an error, and the 3D view says "This link names a place Moon Maps does not know. Pick a place in step 1." On a fresh visit the address bar shows the parameters after the first change of place or time.
 
 ## Loading, empty and error messages
 

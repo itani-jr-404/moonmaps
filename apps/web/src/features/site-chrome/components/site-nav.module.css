@@ -108,6 +108,13 @@
 .links a:hover::after {
   transform: scaleX(1);
 }
+/* The page you are on. */
+.links a[aria-current='page'] {
+  color: var(--color-ink);
+}
+.links a[aria-current='page']::after {
+  transform: scaleX(1);
+}
 
 .end {
   display: flex;
@@ -206,6 +213,9 @@
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--color-accent);
+}
+.menu li a[aria-current='page'] {
+  color: var(--color-accent-2);
 }
 .menu.open li a {
   transform: none;

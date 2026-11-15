@@ -44,7 +44,7 @@ export function LandingSection() {
         <p className="eyebrow" data-reveal>
           Choose your landing
         </p>
-        <h2 className="h2" id="land-h" data-lines>
+        <h1 className="h2" id="land-h" data-lines>
           <span className="line">
             <span className="li">Where will you</span>
           </span>
@@ -53,7 +53,7 @@ export function LandingSection() {
               <em>touch down?</em>
             </span>
           </span>
-        </h2>
+        </h1>
         <p className="lead" data-reveal>
           The south polar region is turned toward you. Point at any spot. A red
           arrow shows where you would land and tells you if it is a good landing

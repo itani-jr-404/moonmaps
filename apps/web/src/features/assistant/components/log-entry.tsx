@@ -4,17 +4,18 @@ import { Fragment, useMemo } from 'react';
 import type { AppLink } from '@/lib/api/client';
 import {
   fmtUtcClock,
+  uniqueSources,
   type AssistantTurn,
   type FollowUp,
   type UserTurn,
 } from '../lib/conversation';
 import { linkify } from '../lib/linkify';
-import { replyBlocks } from '../lib/reply-blocks';
+import { replyBlocks, type ReplyBlock } from '../lib/reply-blocks';
 import styles from './assistant.module.css';
 import { TargetCard } from './target-card';
 
 /** Plain text with safe links. Never HTML: every part is a React text node or an <a>. */
-function RichText({ text }: { text: string }) {
+export function RichText({ text }: { text: string }) {
   return (
     <>
       {linkify(text).map((part, i) =>
@@ -25,6 +26,37 @@ function RichText({ text }: { text: string }) {
           </a>
         ) : (
           <Fragment key={i}>{part.text}</Fragment>
+        ),
+      )}
+    </>
+  );
+}
+
+/** A reply's paragraphs and lists, each line through the safe linkify. */
+export function ReplyBody({ blocks }: { blocks: ReplyBlock[] }) {
+  return (
+    <>
+      {blocks.map((b, i) =>
+        b.kind === 'p' ? (
+          <p key={i}>
+            <RichText text={b.text} />
+          </p>
+        ) : b.kind === 'ul' ? (
+          <ul key={i}>
+            {b.items.map((item, j) => (
+              <li key={j}>
+                <RichText text={item} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ol key={i} start={b.start}>
+            {b.items.map((item, j) => (
+              <li key={j}>
+                <RichText text={item} />
+              </li>
+            ))}
+          </ol>
         ),
       )}
     </>
@@ -77,9 +109,7 @@ export function AnswerEntry({
   onLoadInPlanner: (link: AppLink) => void;
 }) {
   const blocks = useMemo(() => replyBlocks(turn.content), [turn.content]);
-  const sources = turn.sources.filter(
-    (s, i, all) => all.findIndex((o) => o.title === s.title) === i,
-  );
+  const sources = uniqueSources(turn.sources);
   return (
     <article className={styles.entry} data-testid="assistant-answer">
       <p className={styles.entryHead}>
@@ -88,29 +118,7 @@ export function AnswerEntry({
         <span>{fmtUtcClock(turn.at)}</span>
       </p>
       <div className={styles.answer}>
-        {blocks.map((b, i) =>
-          b.kind === 'p' ? (
-            <p key={i}>
-              <RichText text={b.text} />
-            </p>
-          ) : b.kind === 'ul' ? (
-            <ul key={i}>
-              {b.items.map((item, j) => (
-                <li key={j}>
-                  <RichText text={item} />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <ol key={i} start={b.start}>
-              {b.items.map((item, j) => (
-                <li key={j}>
-                  <RichText text={item} />
-                </li>
-              ))}
-            </ol>
-          ),
-        )}
+        <ReplyBody blocks={blocks} />
       </div>
 
       {sources.length > 0 ? (

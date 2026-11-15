@@ -1,20 +1,26 @@
 # Landing page
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
-The app is one page at `/`. Its opening sections introduce the problem and lead to the planner, which is where a visitor gets an answer. The section list and the code folders are in [routes-and-state.md](routes-and-state.md). The web app is being written, so this page states the rules rather than every detail.
+The home page is `/`. It introduces the problem and links to the other pages: the globe (`/explore`), the planner (`/planner`), the sites (`/sites`), the accuracy page (`/accuracy`) and about (`/about`). The route list and the code folders are in [routes-and-state.md](routes-and-state.md). The web app is being written, so this page states the rules rather than every detail.
 
-## Sections
+## Sections of the home page
 
 | Section | What happens |
 | --- | --- |
-| Hero | A preloader, then the Moon, the Earth's limb and the NASA Z2 astronaut behind the title. A live line gives the Sun and the Earth at the south pole now, from `GET /sky`. |
-| Choose a landing | A globe of the Moon with the curated sites. Aiming at a point asks the API whether the Sun and the Earth are visible there; choosing it opens a surface view of that point. |
+| Hero | A preloader, then the Moon, the Earth's limb and the NASA Z2 astronaut behind the title. A live line gives the Sun and the Earth at the south pole now, from `GET /sky`. "Plan a landing" opens `/planner`; "Choose a landing" opens `/explore`. |
 | Why | Why missions want the south pole, and why light and a line of sight to the Earth decide a landing. |
-| Planner | Pick a site and a moment. A verdict, a 30-day calendar, the best windows and a 3D diorama. |
-| About | What the app does and how. Data credits and the statement that NASA does not endorse the project are in the footer. |
+| What you can do | One card for each page: Choose a landing, Plan a landing, Browse the sites, How sure are we, About. |
 
-The hero scene is decoration; it does not show where the Sun or the Earth really is. Every number on the page comes from the API.
+The preloader plays only when a visit starts on `/`.
+
+## The globe page (`/explore`)
+
+A globe of the Moon with the curated sites. Aiming at a point asks the API whether the Sun and the Earth are visible there; choosing it opens a surface view of that point. When the landed spot is not good now, the panel says "Good again from (date), for (length)", from one `POST /analyze` over the next 30 days, or that it is not good at any time in those 30 days. "See everything about this spot" opens the site page: `/sites/(id)` near a curated site, else `/sites/spot?lat=&lon=`. "See the best dates" opens `/planner` on the spot.
+
+Data credits and the statement that NASA does not endorse the project are in the footer of every page.
+
+The hero scene is decoration; it does not show where the Sun or the Earth really is. Every number on the pages comes from the API.
 
 ## Motion
 

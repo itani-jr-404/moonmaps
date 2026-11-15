@@ -47,6 +47,8 @@ SITES = [
 def data_dir(tmp_path: Path) -> Path:
     (tmp_path / "kernels").symlink_to(KERNELS)
     (tmp_path / "validation").mkdir()
-    shutil.copy(DATA / "validation" / "horizons.json", tmp_path / "validation" / "horizons.json")
+    for name in ("horizons.json", "apollo_sun.json", "calibration.json"):
+        shutil.copy(DATA / "validation" / name, tmp_path / "validation" / name)
+    shutil.copy(DATA / "missions.json", tmp_path / "missions.json")
     (tmp_path / "sites.json").write_text(json.dumps(SITES))
     return tmp_path

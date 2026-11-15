@@ -1,6 +1,6 @@
 /** What a slash command does. */
 export type CommandAction =
-  { kind: 'section'; id: string } | { kind: 'resources' } | { kind: 'new' };
+  { kind: 'route'; href: string } | { kind: 'resources' } | { kind: 'new' };
 
 export type SlashCommand = {
   name: string;
@@ -8,27 +8,37 @@ export type SlashCommand = {
   action: CommandAction;
 };
 
-/** Shortcuts typed in the input. Section ids are the page sections' own. */
+/** Shortcuts typed in the input. Route commands open a page of the app ("/#why" is a section of the home page). */
 export const SLASH_COMMANDS: readonly SlashCommand[] = [
   {
     name: '/planner',
-    description: 'Go to the planner',
-    action: { kind: 'section', id: 'navigator' },
+    description: 'Open the planner',
+    action: { kind: 'route', href: '/planner' },
   },
   {
     name: '/landing',
-    description: 'Go to Choose a landing',
-    action: { kind: 'section', id: 'land' },
+    description: 'Open Choose a landing',
+    action: { kind: 'route', href: '/explore' },
+  },
+  {
+    name: '/sites',
+    description: 'Open the landing sites',
+    action: { kind: 'route', href: '/sites' },
+  },
+  {
+    name: '/accuracy',
+    description: 'Open How accurate it is',
+    action: { kind: 'route', href: '/accuracy' },
   },
   {
     name: '/why',
     description: 'Go to Why the pole',
-    action: { kind: 'section', id: 'why' },
+    action: { kind: 'route', href: '/#why' },
   },
   {
     name: '/about',
-    description: 'Go to About',
-    action: { kind: 'section', id: 'about' },
+    description: 'Open About',
+    action: { kind: 'route', href: '/about' },
   },
   {
     name: '/resources',

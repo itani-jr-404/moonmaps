@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/accuracy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Accuracy
+         * @description Error rates against NASA references, and what the app learned from past data.
+         */
+        get: operations["accuracy_accuracy_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/analyze": {
         parameters: {
             query?: never;
@@ -47,6 +67,26 @@ export interface paths {
         };
         /** Health */
         get: operations["health_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/missions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Missions
+         * @description Past landings with launch and landing times and the travel time between them.
+         */
+        get: operations["missions_missions_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -127,6 +167,18 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AccuracyReport */
+        AccuracyReport: {
+            calibration: components["schemas"]["CalibrationSummary"];
+            error_rate: components["schemas"]["ErrorRate"];
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            past_landings: components["schemas"]["PastLandingsAccuracy"];
+            positions: components["schemas"]["PositionsAccuracy"];
+        };
         /** AnalyzeRequest */
         AnalyzeRequest: {
             /** Scenarios */
@@ -205,6 +257,52 @@ export interface components {
             horizon_el: number;
             /** Visible */
             visible: boolean;
+        };
+        /** CalibrationBody */
+        CalibrationBody: {
+            /**
+             * Body
+             * @enum {string}
+             */
+            body: "sun" | "earth";
+            /**
+             * Calibrated Mae
+             * @description Mean absolute error after calibration, held out
+             */
+            calibrated_mae: number;
+            /**
+             * Calibrated Within 0 05
+             * @description Share within 0.05 after calibration
+             */
+            calibrated_within_0_05: number;
+            /**
+             * Improvement Pct
+             * @description Drop in mean absolute error, percent
+             */
+            improvement_pct: number;
+            /**
+             * Raw Mae
+             * @description Mean absolute error of the app's centre-of-disc share against NASA's map, on held-out folds
+             */
+            raw_mae: number;
+            /**
+             * Raw Within 0 05
+             * @description Share of points within 0.05 before calibration
+             */
+            raw_within_0_05: number;
+        };
+        /** CalibrationSummary */
+        CalibrationSummary: {
+            /** Bodies */
+            bodies: components["schemas"]["CalibrationBody"][];
+            /** Features */
+            features: string[];
+            /** Folds */
+            folds: number;
+            /** Method */
+            method: string;
+            /** Points */
+            points: number;
         };
         /**
          * ChatContext
@@ -285,6 +383,22 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** ErrorRate */
+        ErrorRate: {
+            /** Headline */
+            headline: string;
+            /** Items */
+            items: components["schemas"]["ErrorRateItem"][];
+        };
+        /** ErrorRateItem */
+        ErrorRateItem: {
+            /** Detail */
+            detail: string;
+            /** Label */
+            label: string;
+            /** Value */
+            value: string;
+        };
         /** ErrorResponse */
         ErrorResponse: {
             error: components["schemas"]["ErrorDetail"];
@@ -347,6 +461,101 @@ export interface components {
             sun_elevation_at_start: number;
             /** Sunlight Fraction */
             sunlight_fraction: number;
+        };
+        /** Mission */
+        Mission: {
+            /** Id */
+            id: string;
+            /**
+             * Landing
+             * @description Landing time, UTC
+             */
+            landing: string | null;
+            /**
+             * Launch
+             * Format: date-time
+             * @description Launch time, UTC
+             */
+            launch: string;
+            /** Name */
+            name: string;
+            /**
+             * Site Id
+             * @description Curated site id, when the site exists
+             */
+            site_id: string | null;
+            /** Source Url */
+            source_url: string;
+            /**
+             * Travel Hours
+             * @description Hours from launch to landing, computed from the two times
+             */
+            travel_hours: number | null;
+        };
+        /** MissionsResponse */
+        MissionsResponse: {
+            /** Missions */
+            missions: components["schemas"]["Mission"][];
+        };
+        /** PastLandingRow */
+        PastLandingRow: {
+            /**
+             * Horizons El Deg
+             * @description Sun elevation from JPL Horizons
+             */
+            horizons_el_deg: number;
+            /**
+             * Journal El Deg
+             * @description Sun elevation in the Apollo Lunar Surface Journal table
+             */
+            journal_el_deg: number | null;
+            /** Mission */
+            mission: string;
+            /**
+             * Ours El Deg
+             * @description Sun elevation from our engine, smooth Moon
+             */
+            ours_el_deg: number;
+            /**
+             * Site
+             * @description Curated site id, for example apollo-11
+             */
+            site: string;
+            /**
+             * T
+             * Format: date-time
+             * @description Moonwalk start or end time, UTC
+             */
+            t: string;
+        };
+        /** PastLandingsAccuracy */
+        PastLandingsAccuracy: {
+            /** Cases */
+            cases: number;
+            /** Max Diff Vs Horizons Deg */
+            max_diff_vs_horizons_deg: number;
+            /** Rows */
+            rows: components["schemas"]["PastLandingRow"][];
+        };
+        /** PositionsAccuracy */
+        PositionsAccuracy: {
+            /**
+             * Cases
+             * @description Number of saved JPL Horizons cases
+             */
+            cases: number;
+            /**
+             * Max Diff Deg
+             * @description Largest azimuth or elevation difference, degrees
+             */
+            max_diff_deg: number;
+            /**
+             * Reference
+             * @description Where the reference values came from
+             */
+            reference: string;
+            /** Tolerance Deg */
+            tolerance_deg: number;
         };
         /** Scenario */
         Scenario: {
@@ -607,6 +816,53 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    accuracy_accuracy_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccuracyReport"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     analyze_analyze_post: {
         parameters: {
             query?: never;
@@ -743,6 +999,53 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Health"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    missions_missions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MissionsResponse"];
                 };
             };
             /** @description Not Found */

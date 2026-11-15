@@ -1,13 +1,11 @@
+import Link from 'next/link';
+
 import { LogoMark } from '@/components/ui/icons';
+import { PAGES } from '@/lib/routes';
 import { FooterWatermark } from './footer-watermark';
 import styles from './site-footer.module.css';
 
-const EXPLORE = [
-  { href: '#why', label: 'Why the pole' },
-  { href: '#navigator', label: 'Planner' },
-  { href: '#land', label: 'Choose a landing' },
-  { href: '#about', label: 'About' },
-] as const;
+const EXPLORE = [{ href: '/', label: 'Home' }, ...PAGES] as const;
 
 /*
   Credit lines for the material the site uses. Each source is listed in
@@ -39,17 +37,13 @@ export function SiteFooter() {
       <div className="wrap">
         <div className={styles.grid}>
           <div>
-            <a
-              href="#top"
-              className={styles.logo}
-              aria-label="Moon Maps, back to top"
-            >
+            <Link href="/" className={styles.logo} aria-label="Moon Maps, home">
               <LogoMark size={34} />
               <span className={styles.logoText}>
                 <span>Moon</span>
                 <span>Maps</span>
               </span>
-            </a>
+            </Link>
             <p className={styles.blurb}>
               Every landing starts with light. A NASA Space Apps Challenge 2026
               entry for comparing Moon landing sites and dates.
@@ -60,7 +54,7 @@ export function SiteFooter() {
             <ul>
               {EXPLORE.map((l) => (
                 <li key={l.href}>
-                  <a href={l.href}>{l.label}</a>
+                  <Link href={l.href}>{l.label}</Link>
                 </li>
               ))}
             </ul>

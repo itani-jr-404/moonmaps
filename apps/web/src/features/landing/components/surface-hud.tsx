@@ -11,6 +11,7 @@ import { useReducedMotion } from '@/lib/motion/reduced-motion';
 import type { LandedState } from '../hooks/use-landing';
 import { isGood, verdictText, whyText } from '../lib/verdict';
 import styles from './landing.module.css';
+import { SpotOutlook } from './spot-outlook';
 
 interface SurfaceHudProps {
   landed: LandedState;
@@ -83,6 +84,7 @@ export function SurfaceHud({
             {verdictText(good)}
           </div>
           <p className={styles.hudWhy}>{whyText(landed.sun, landed.earth)}</p>
+          <SpotOutlook landed={landed} good={good} />
         </>
       ) : landed.status === 'checking' ? (
         <LoadingState label="Checking the sky here…" />

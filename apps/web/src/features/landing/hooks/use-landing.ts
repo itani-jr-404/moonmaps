@@ -1,6 +1,7 @@
 'use client';
 
 import gsap from 'gsap';
+import { useRouter } from 'next/navigation';
 import {
   useCallback,
   useEffect,
@@ -15,7 +16,7 @@ import { errorMessage, type Site, type SkyResponse } from '@/lib/api/client';
 import { fetchSkyRounded } from '@/lib/api/fetch-sky';
 import { compassWord } from '@/lib/format/format';
 import { prefersReducedMotion } from '@/lib/motion/reduced-motion';
-import { useSmoothScroll } from '@/lib/motion/smooth-scroll';
+import { plannerPath } from '@/lib/routes';
 import { useScenarioStore } from '@/lib/state/scenario-store';
 import { createRenderer, observeVisibility } from '@/scene/renderer';
 import { moonMaps } from '@/scene/textures';
@@ -137,7 +138,7 @@ export function useLanding(
   const [landed, setLanded] = useState<LandedState | null>(null);
   const [facing, setFacing] = useState('north');
   const [sunriseBusy, setSunriseBusy] = useState(false);
-  const { scrollTo } = useSmoothScroll();
+  const router = useRouter();
 
   useEffect(() => {
     const stageEl = stageRef.current;
@@ -620,15 +621,15 @@ export function useLanding(
   const showBestDates = useCallback(() => {
     if (!landed) return;
     const { setPlace, setTime } = useScenarioStore.getState();
-    setPlace(
-      landed.siteId
-        ? { kind: 'site', id: landed.siteId }
-        : { kind: 'point', lat: landed.lat, lon: landed.lon },
-    );
-    setTime(Date.now() + landed.offsetMs);
-    scrollTo(document.getElementById('navigator'));
+    const place = landed.siteId
+      ? ({ kind: 'site', id: landed.siteId } as const)
+      : ({ kind: 'point', lat: landed.lat, lon: landed.lon } as const);
+    const timeMs = Date.now() + landed.offsetMs;
+    setPlace(place);
+    setTime(timeMs);
+    router.push(plannerPath(place, timeMs));
     useToast.getState().show('Showing the best dates for this spot.');
-  }, [landed, scrollTo]);
+  }, [landed, router]);
 
   return {
     status,

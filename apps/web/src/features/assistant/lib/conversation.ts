@@ -76,6 +76,13 @@ export function plannerTarget(link: AppLink): {
   return { place, timeMs: Number.isFinite(t) ? t : null };
 }
 
+/** An answer's sources without repeats (two tools can share a title), in their first order. */
+export function uniqueSources(sources: readonly ChatSource[]): ChatSource[] {
+  return sources.filter(
+    (s, i, all) => all.findIndex((o) => o.title === s.title) === i,
+  );
+}
+
 export const UNAVAILABLE_MESSAGE =
   'The assistant is not available right now. The rest of Moon Maps still works.';
 

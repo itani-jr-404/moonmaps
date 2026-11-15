@@ -23,3 +23,13 @@ describe('format', () => {
     expect(compassWord(-90)).toBe('west');
   });
 });
+
+describe('site page formats', () => {
+  it('formats days, dates, distances and percentages', async () => {
+    const { fmtUtcDay, fmtDate, fmtKm, fmtPercent } = await import('./format');
+    expect(fmtUtcDay(Date.parse('2026-11-15T23:30:00Z'))).toBe('Sun 15 Nov');
+    expect(fmtDate(Date.parse('1969-07-20T20:17:40Z'))).toBe('20 July 1969');
+    expect(fmtKm(384399.6)).toBe('384,400 km');
+    expect(fmtPercent(0.416)).toBe('42%');
+  });
+});

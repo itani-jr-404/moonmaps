@@ -111,7 +111,7 @@ test('planner opened from a link shows exactly the API answer', async ({
 }) => {
   const errors = collectPageErrors(page);
   const analyze = page.waitForResponse(isAnalyzeFrom('2026-11-14T14:56:00Z'));
-  await page.goto('/?site=shackleton-ridge&t=2026-11-14T14:56Z');
+  await page.goto('/planner?site=shackleton-ridge&t=2026-11-14T14:56Z');
   const body = (await (await analyze).json()) as Analyze;
   await skipIntro(page);
   await page.locator('#navigator').scrollIntoViewIfNeeded();
@@ -125,7 +125,7 @@ test('choosing another site and a quick date updates the answer from the API', a
   page,
 }) => {
   const errors = collectPageErrors(page);
-  await page.goto('/?site=shackleton-ridge&t=2026-11-14T14:56Z');
+  await page.goto('/planner?site=shackleton-ridge&t=2026-11-14T14:56Z');
   await skipIntro(page);
   await page.locator('#navigator').scrollIntoViewIfNeeded();
   await expect(page.getByTestId('planner-answer')).toHaveAttribute(
@@ -164,7 +164,7 @@ test('the planner shows an error with a retry when the API cannot be reached', a
 }) => {
   const errors = collectPageErrors(page);
   await page.route('**/analyze', (route) => route.abort());
-  await page.goto('/?site=haworth&t=2026-11-20T00:00Z');
+  await page.goto('/planner?site=haworth&t=2026-11-20T00:00Z');
   await skipIntro(page);
   await page.waitForTimeout(500);
   await page.locator('#navigator').scrollIntoViewIfNeeded();

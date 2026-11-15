@@ -46,6 +46,8 @@ It must not:
    | `analyze_site` | `AnalysisService.run_one`, 1 to 365 days, no series | visibility at the start, percentages of time, next rise and set times, longest dark spell and gap without Earth, status, the first five windows with both |
    | `sky_at` | `SkyService.at` | azimuth, elevation, terrain horizon and visibility of the Sun and the Earth at one moment |
    | `moon_scene` | `SkyService.scene` | sub-solar and sub-Earth points, Earth to Moon distance |
+   | `accuracy_report` | `AccuracyService.report` | the error-rate headline and items, and the calibration summary (`GET /accuracy`) |
+   | `past_missions` | `AccuracyService.missions` | each past landing's launch and landing time (UTC), travel hours, site id and source page (`GET /missions`) |
 
 All of the knowledge base goes into the system prompt on every request (about 7,000 words on 2026-11-15). Retrieval is added only when it no longer fits; the change stays inside `KnowledgeBase.select`.
 
@@ -74,9 +76,11 @@ One answer uses one model request plus one for each round of tool calls, so up t
 
 1. The router checks the client's rate limit, then the request schema (roles, counts, lengths).
 2. The service cleans each message: Unicode normalisation, and removal of control, zero-width and text-direction characters.
-3. It builds the system prompt: the rules, the current UTC time, what is on screen (inside `<screen>`), the knowledge base (inside `<knowledge>`), and a random marker.
+3. It builds the system prompt: the rules, the current UTC time, what is on screen (inside `<screen>`), the site brief (inside `<site_brief>`, below), the knowledge base (inside `<knowledge>`), and a random marker.
 4. It calls the model with the tool list. If the model asks for tools, the service runs at most 4 calls, sends back each result inside `<tool_result>`, and calls the model again. After 3 rounds the model is called without tools and must answer.
 5. The reply is checked (below), its "Sources:" line is turned into the `sources` list, and the answer is returned with `tools_used` and `app_link`.
+
+**Site brief.** When the request's `context` names a curated site (`site_id`) or a spot (`lat` and `lon`), the service runs the same analysis as the `analyze_site` tool for 30 days from `context.t`, or from now when no moment is set, before it calls the model. The result goes into the prompt inside `<site_brief>`, escaped like the other fences, so the assistant can answer about that place without a tool call. The prompt tells the model to treat it as a tool result. An unknown site id gives no brief. The brief is not listed in `tools_used`; answers that use it end with "Sources: tools".
 
 If no key is set or the model cannot be reached, the endpoint returns `assistant_unavailable` and the rest of the app is unaffected.
 
@@ -88,7 +92,7 @@ Against prompt injection and misuse, in the order a request meets them:
 - **Size.** 20 messages, 2,000 characters each; 6 requests a minute and 60 a day per client address.
 - **Hidden text.** Zero-width and direction-override characters, often used to hide instructions, are removed.
 - **Rules first.** `assistant_prompt.md` puts the rules before any data and states that nothing later can change them. Documents, tool results and earlier messages are declared data. Earlier assistant messages come back from the browser and may have been altered, so they are not a source of facts.
-- **Fences.** Documents, the screen description and tool results are wrapped in tags. Any text inside them that looks like one of these tags is defused, so data cannot close its fence and pose as instructions.
+- **Fences.** Documents, the screen description, the site brief and tool results are wrapped in tags. Any text inside them that looks like one of these tags is defused, so data cannot close its fence and pose as instructions.
 - **Read-only tools.** The tools only read; their arguments go through the same validation as the public endpoints; an error is sent back to the model as data.
 - **Prompt leaks.** The system prompt holds a random marker. A reply that contains it, or the prompt's own headings, is replaced with a one-line refusal.
 - **Links.** A reply may only link to hosts named in the knowledge base, or to `nasa.gov` and `spaceappschallenge.org` and their subdomains. Other links become "(link removed)". Markdown images and HTML tags are removed. The panel shows the reply as text, never as HTML, and makes links clickable only for the same hosts.
@@ -112,9 +116,22 @@ Code: `apps/web/src/features/assistant/`. The panel follows the patterns of a co
 - **Header and tabs.** The title and an "AI" tag, the time in UTC, a link status ("LINK OK", or "NO LINK" after a 503 or network failure), a New chat button and Close. Tabs "Chat" and "Resources" (official links from the knowledge base, grouped).
 - **Context strip.** "ON SCREEN" with the planner's site or custom spot, its coordinates and the planner's time in UTC: what the request sends as `context`.
 - **Conversation.** A welcome block (headline, "Plan a landing" and "About the NASA challenge" cards, three suggested questions) that scrolls away. Questions in bubbles on the right; answers as plain text under a "MOON MAPS · HH:MM UTC" label; sources as numbered chips named by their full titles; a target card with the coordinates, the UTC time and "Load in planner" when a tool computed one place and time; quick-reply pills on the latest answer.
-- **Input.** A rounded box with a "›" prompt and a round Send button. Typing "/" opens shortcuts (/planner, /landing, /why, /about, /resources, /new). A thin bar fills after 1,500 characters and a counter shows after 1,800 of 2,000.
+- **Input.** A rounded box with a "›" prompt and a round Send button. Typing "/" opens shortcuts: /planner (the planner page), /landing (/explore), /sites, /accuracy, /why (the "Why the pole" section of the home page), /about, /resources and /new. Page shortcuts use the router; "Load in planner" opens /planner with the place and time in the address. The panel is on every page except the site pages, which have the site assistant below. A thin bar fills after 1,500 characters and a counter shows after 1,800 of 2,000.
 - **Waiting and errors.** An orbit spinner with "Working on it", then "Still working. Free AI models can be slow." after 15 seconds, and Stop. Network errors and server errors other than 503 are retried after 1, 2, 4 and 8 seconds ("Signal lost, retrying in N s"); then the question is marked "NOT SENT" with "Retry". A 429 puts the question back in the input; a 503 is not retried.
 - **Links.** Answers are shown as text, never as HTML. Links are clickable only for nasa.gov, spaceappschallenge.org and the exact hosts named in the knowledge files (`features/assistant/lib/linkify.ts`); a host added to a knowledge file must also be added there, or the link stays plain text.
 - **Accessibility.** `role="dialog"`, tabs with arrow keys, the shortcut list linked to the input with `aria-activedescendant`, focus into the panel and back to the launcher, a focus trap when it fills the phone screen, Escape closes it (or first closes the shortcut list), the log is a polite live region, and touch targets are 44 px.
 - **Scrolling.** The wheel and touch scroll only the part under the pointer: the conversation fades at its top and bottom edges, and over a part that cannot scroll (header, strip, input) the event is cancelled, so the page behind never moves (`hooks/use-contain-scroll.ts`).
 - **History.** The conversation lives in memory only. Each request sends the last 20 messages, each cut to 2,000 characters, starting with a question; messages marked "NOT SENT" are left out.
+
+### Site assistant
+
+Code: `apps/web/src/features/site-assistant/`. A second chat, about one site, on each site page (`/sites/[id]`, and `/sites/spot` for a custom spot). It uses the same endpoint and the same helpers as the panel above (history trimming, automatic retries, error messages, safe links, lists), with its own look.
+
+- **Place.** Docked on the right on a large screen (420 px wide, full height below the navigation bar), a bottom sheet below 768 px. It opens by itself 1 second after the page loads (at once with reduced motion) and folds into an "Ask about <site>" pill with the Collapse or Close button or Escape. On a page 1,180 px or wider, the page's content keeps clear of it.
+- **Header.** An orbit mark, "Ask about <site name>", the coordinates, and New chat, Collapse and Close.
+- **Empty chat.** "What would you like to know about <site>?" and four suggestion cards: "When is it next good for landing?", "How long can a lander stay here?", "Where will the Earth be this week?", "How did past missions get here?". A card sends a full question that names the site.
+- **Messages.** Questions in a rounded bubble on the right; answers as plain text with a small mark beside them, typed out quickly once they arrive (the API does not stream; at least 140 characters a second, at most 1.6 seconds per answer, shown at once with reduced motion). Under each answer: numbered sources, Copy, Retry on the latest answer (asks the same question again and replaces the answer) and "Show in the planner" when a tool computed one place and time.
+- **Input.** A large rounded box: Enter sends, Shift+Enter starts a new line, 2,000 characters at most. The round Send button becomes Stop while waiting. Below it: "AI can make mistakes. Numbers come from the Moon Maps API." While waiting, a pulsing mark and "Thinking…".
+- **Context.** Each request sends `context` with the site id (or the spot's latitude and longitude) and the page's time, so the server adds the site brief to the prompt.
+- **Conversations.** One per site, in memory only, separate from the panel's. A reload starts again.
+- **Accessibility.** `role="complementary"` named "Ask about <site>", a polite live region that reads each new answer once, focus to the input when the pill is used and back to the pill on Escape, and 44 px targets.

@@ -1,27 +1,16 @@
 'use client';
 
 import { clsx } from 'clsx';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { LogoMark } from '@/components/ui/icons';
 import { useReducedMotion } from '@/lib/motion/reduced-motion';
 import { useSmoothScroll } from '@/lib/motion/smooth-scroll';
+import { isActive, PAGES } from '@/lib/routes';
 import { useIntroStore } from '@/lib/state/intro-store';
 import { useMagnetic } from './magnetic';
 import styles from './site-nav.module.css';
-
-const LINKS = [
-  { href: '#why', label: 'Why the pole' },
-  { href: '#navigator', label: 'Planner' },
-  { href: '#land', label: 'Landing' },
-  { href: '#about', label: 'About' },
-] as const;
-
-const MENU_LINKS = [
-  { href: '#why', label: 'Why the pole' },
-  { href: '#navigator', label: 'Planner' },
-  { href: '#land', label: 'Choose a landing' },
-  { href: '#about', label: 'About' },
-] as const;
 
 /** Scroll distances from the prototype: solid background after 40px, hide only below 240px. */
 const SOLID_AFTER = 40;
@@ -32,6 +21,7 @@ const SCROLL_SLOP = 4;
 const CLOSE_THEN_SCROLL_MS = 120;
 
 export function SiteNav() {
+  const pathname = usePathname();
   const introDone = useIntroStore((s) => s.done);
   const reduced = useReducedMotion();
   const { scrollTo, lock } = useSmoothScroll();
@@ -107,13 +97,26 @@ export function SiteNav() {
       e.preventDefault();
       const wasOpen = openRef.current;
       if (wasOpen) setMenuOpen(false);
-      const go = () => scrollTo(target);
+      const go = () => {
+        scrollTo(target);
+        // The skip link's target takes focus too, so keyboard users land in the page.
+        if (target?.hasAttribute('tabindex'))
+          target.focus({ preventScroll: true });
+      };
       if (wasOpen) window.setTimeout(go, CLOSE_THEN_SCROLL_MS);
       else go();
     };
     document.addEventListener('click', onClick);
     return () => document.removeEventListener('click', onClick);
   }, [scrollTo]);
+
+  // The logo goes home; on the home page it scrolls back to the top instead.
+  const onLogo = (e: React.MouseEvent) => {
+    setMenuOpen(false);
+    if (pathname !== '/') return;
+    e.preventDefault();
+    scrollTo(null);
+  };
 
   const toggleMenu = () => {
     if (!menuOpen) setHidden(false);
@@ -132,10 +135,11 @@ export function SiteNav() {
         )}
       >
         <div className={styles.bar}>
-          <a
-            href="#top"
+          <Link
+            href="/"
             className={styles.logo}
-            aria-label="Moon Maps, back to top"
+            aria-label="Moon Maps, home"
+            onClick={onLogo}
           >
             <span className={styles.mark}>
               <LogoMark size={34} />
@@ -155,24 +159,31 @@ export function SiteNav() {
               <span>Moon</span>
               <span>Maps</span>
             </span>
-          </a>
+          </Link>
           <nav aria-label="Primary">
             <ul className={styles.links}>
-              {LINKS.map((l) => (
+              {PAGES.map((l) => (
                 <li key={l.href}>
-                  <a href={l.href}>{l.label}</a>
+                  <Link
+                    href={l.href}
+                    aria-current={
+                      isActive(pathname, l.href) ? 'page' : undefined
+                    }
+                  >
+                    {l.short}
+                  </Link>
                 </li>
               ))}
             </ul>
           </nav>
           <div className={styles.end}>
-            <a
+            <Link
               ref={magnetic}
-              href="#navigator"
+              href="/planner"
               className={clsx('btn btn-accent btn-sm', styles.cta)}
             >
               <span className="btn-label">Open the planner</span>
-            </a>
+            </Link>
             <button
               ref={burgerRef}
               type="button"
@@ -195,15 +206,37 @@ export function SiteNav() {
         aria-hidden={!menuOpen}
       >
         <ol>
-          {MENU_LINKS.map((l, i) => (
-            <li key={l.href} style={{ '--i': i } as CSSProperties}>
-              <a href={l.href}>{l.label}</a>
+          <li style={{ '--i': 0 } as CSSProperties}>
+            <Link
+              href="/"
+              aria-current={pathname === '/' ? 'page' : undefined}
+              tabIndex={menuOpen ? undefined : -1}
+              onClick={() => setMenuOpen(false)}
+            >
+              Home
+            </Link>
+          </li>
+          {PAGES.map((l, i) => (
+            <li key={l.href} style={{ '--i': i + 1 } as CSSProperties}>
+              <Link
+                href={l.href}
+                aria-current={isActive(pathname, l.href) ? 'page' : undefined}
+                tabIndex={menuOpen ? undefined : -1}
+                onClick={() => setMenuOpen(false)}
+              >
+                {l.label}
+              </Link>
             </li>
           ))}
         </ol>
-        <a href="#navigator" className={clsx('btn btn-accent', styles.menuCta)}>
+        <Link
+          href="/planner"
+          className={clsx('btn btn-accent', styles.menuCta)}
+          tabIndex={menuOpen ? undefined : -1}
+          onClick={() => setMenuOpen(false)}
+        >
           <span className="btn-label">Open the planner</span>
-        </a>
+        </Link>
       </div>
     </>
   );

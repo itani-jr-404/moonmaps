@@ -8,6 +8,7 @@ from fastapi import Request
 from app.core.config import Settings
 from app.engines.ephemeris import Ephemeris
 from app.engines.terrain import GridStack, PolarGrid, load_polar_grid
+from app.services.accuracy import AccuracyService
 from app.services.analysis import AnalysisService
 from app.services.assistant import AssistantService
 from app.services.horizons import HorizonService
@@ -31,6 +32,7 @@ class Services:
     analysis: AnalysisService
     sky: SkyService
     validation: ValidationService
+    accuracy: AccuracyService
     assistant: AssistantService
     grids: GridStack
 
@@ -67,14 +69,24 @@ def build_services(
     analysis = AnalysisService(ephemeris, sites, horizons)
     sky = SkyService(ephemeris, horizons)
     knowledge = KnowledgeBase(settings.knowledge_dir, sites)
+    validation = ValidationService(ephemeris, settings.data_dir / "validation" / "horizons.json")
+    accuracy = AccuracyService(
+        validation, settings.data_dir / "validation", settings.data_dir / "missions.json"
+    )
     return Services(
         sites=sites,
         horizons=horizons,
         analysis=analysis,
         sky=sky,
-        validation=ValidationService(ephemeris, settings.data_dir / "validation" / "horizons.json"),
+        validation=validation,
+        accuracy=accuracy,
         assistant=AssistantService(
-            llm if llm is not None else build_llm(settings), knowledge, sites, analysis, sky
+            llm if llm is not None else build_llm(settings),
+            knowledge,
+            sites,
+            analysis,
+            sky,
+            accuracy=accuracy,
         ),
         grids=grids,
     )

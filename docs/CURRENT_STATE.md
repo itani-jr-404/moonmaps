@@ -13,7 +13,7 @@ The API is built for the core calculation: sites, analysis of up to four scenari
 | Part | State |
 | --- | --- |
 | Repository and tooling | pnpm workspace (`apps/web`, `packages/contracts`), uv for the API, Prettier, ESLint, ruff, a husky pre-commit hook running lint-staged |
-| CI | GitHub Actions: documentation links always; the web job (contract check, lint, type check, unit tests, build), the API job (ruff, ruff format, contract check, NASA data download, pytest with no test skipped) and the end-to-end job (16 browser tests against the real API) when their folders change. See [developer/testing.md](developer/testing.md) |
+| CI | GitHub Actions: documentation links always; the web job (contract check, lint, type check, unit tests, build), the API job (ruff, ruff format, contract check, NASA data download, pytest with no test skipped) and the end-to-end job (20 browser tests against the real API) when their folders change. See [developer/testing.md](developer/testing.md) |
 | Contract | `packages/contracts/openapi.json` exported from the API, `api.d.ts` generated from it, and a check that both are up to date |
 | API: endpoints | `GET /health`, `GET /sites`, `POST /analyze`, `GET /sky`, `GET /scene` (sub-solar and sub-Earth points only), `GET /validation`, `POST /assistant/chat`. See [backend/api-reference.md](backend/api-reference.md) |
 | Assistant | `POST /assistant/chat` and a chat panel on every screen. A chain of free model providers ([ADR-013](decisions/ADR-013-assistant-model.md)); tested live with OpenRouter; knowledge base of the app guide, glossary, data notes, the challenge, Space Apps and missions; four read-only tools over the API; guardrails against prompt injection; rate limited per client. Off until at least one provider key is set. See [backend/assistant.md](backend/assistant.md) |
@@ -22,12 +22,14 @@ The API is built for the core calculation: sites, analysis of up to four scenari
 | API: terrain and horizon engine | Reads `LDEM_80S_80M` and `LDEM_75S_120M`; 360-value profiles to 200 km; smooth Moon for sites north of 75 S; cached in memory and on disk |
 | API: visibility, windows, metrics, status | Built, with the starting thresholds |
 | API: scripts | `download_data.py`, `precompute_horizons.py`, `fetch_horizons.py`, `export_openapi.py` |
-| API: tests | 59 tests pass (`uv run pytest -q`, 2026-11-15), including the JPL Horizons comparisons for 2026 and for the Apollo moonwalks |
-| Web: end-to-end tests | 16 Playwright tests pass: the screens show exactly what the API returns, and the assistant panel works with a mocked chat endpoint (2026-11-15) |
+| API: tests | 69 tests pass (`uv run pytest -q`, 2026-11-15), including the JPL Horizons comparisons for 2026 and for the Apollo moonwalks |
+| Web: end-to-end tests | 20 Playwright tests pass: the screens show exactly what the API returns, and the assistant panel works with a mocked chat endpoint (2026-11-15) |
 | Validation | Positions match JPL Horizons (32 cases, 1969 to 2026); long-term sunlight and Earth visibility match NASA Goddard's polar maps at 310 points (mean absolute difference 0.006). See [VALIDATION.md](VALIDATION.md). |
 | API: Dockerfile | `apps/api/Dockerfile`; downloads the data and builds the site horizons at image build time. Not yet run on a host |
 | Sites | 17 curated sites in `apps/api/app/data/sites.json`. See [data/sites.md](data/sites.md) |
-| Web: page and sections | One page (`/`) with a hero, "choose a landing" (globe and surface view), why, the planner (verdict, 30-day calendar, best windows, 3D diorama) and about. Being written |
+| Web: pages | Home (`/`), Choose a landing (`/explore`), Planner (`/planner`), Sites (`/sites`), a page per site (`/sites/<id>`, `/sites/spot?lat=&lon=`) with the outlook, a 14-day sky forecast, a horizon panorama, travel times and a site assistant, Accuracy (`/accuracy`) and About (`/about`). See [frontend/routes-and-state.md](frontend/routes-and-state.md) |
+| Learning from past data | A ridge regression learns how the app's long-term sunlight and Earth visibility differ from NASA's polar maps (300 points, cross-validated); `GET /accuracy` reports the error before and after, and the Apollo comparison. See [VALIDATION.md](VALIDATION.md) and [ADR-014](decisions/ADR-014-calibration.md) |
+| Past missions | `GET /missions`: launch and landing times with sources, used for travel times |
 | Web: data | TanStack Query hooks over a typed `openapi-fetch` client; a zustand scenario store kept in the URL (`?site=` or `?lat=&lon=`, and `?t=`) |
 | Web: 3D | three.js used directly ([ADR-010](decisions/ADR-010-threejs-directly.md)). The ground relief in the 3D views is decorative procedural noise, not LOLA terrain |
 | Web: assets | NASA textures and 3D models in `apps/web/public/`. See [data/sources.md](data/sources.md) |
@@ -39,8 +41,6 @@ The API is built for the core calculation: sites, analysis of up to four scenari
 | `GET /terrain` height tiles, and a 3D site view from real terrain | Planned |
 | Rate limiting for endpoints other than the assistant | Planned |
 | Side-by-side comparison of sites or dates in the web app | The API accepts four scenarios; the planner analyses one site at a time |
-| Horizon panorama | Planned |
-| Accuracy page in the web app | `GET /validation` exists; no page shows it |
 | Solar System scene and planet positions in `/scene` | Planned |
 | Fallback results when the API is down | Planned; today the app shows an error state |
 | Check of sunlight percentages against NASA's illumination maps | Planned |

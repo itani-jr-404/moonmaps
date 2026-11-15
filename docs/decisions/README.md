@@ -19,6 +19,7 @@ Each record states one decision, why it was made, and what follows from it. A re
 | [ADR-011](ADR-011-sky-endpoint.md) | A `/sky` endpoint for single moments; the web app never computes positions | Accepted |
 | [ADR-012](ADR-012-visual-styling.md) | Tailwind tokens plus CSS modules for complex effects; no shadcn/ui yet | Accepted |
 | [ADR-013](ADR-013-assistant-model.md) | The assistant chains free model providers (NVIDIA, Groq, Gemini, Cloudflare, SambaNova, OpenRouter, Cohere) behind an OpenAI-compatible client | Accepted |
+| [ADR-014](ADR-014-calibration.md) | A small ridge regression, trained on NASA's polar maps and tested by cross-validation, measures how much learning from past data reduces our long-term error; it is reported, not applied to 30-day results | Accepted |
 
 ## Template
 

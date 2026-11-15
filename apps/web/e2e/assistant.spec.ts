@@ -1,5 +1,5 @@
 import { expect, test, type Page, type Request } from '@playwright/test';
-import { collectPageErrors, skipIntro, waitForScrollToSettle } from './helpers';
+import { collectPageErrors, skipIntro } from './helpers';
 
 /*
   The assistant panel, with POST /assistant/chat mocked: answers depend on a language model and a
@@ -77,7 +77,7 @@ test('a floating pill asks a question; the answer has footnotes, a target card a
 }) => {
   const errors = collectPageErrors(page);
   const requests = await mockChat(page, () => OK);
-  await page.goto('/?site=mons-mouton&t=2026-11-20T00:00Z');
+  await page.goto('/planner?site=mons-mouton&t=2026-11-20T00:00Z');
   await skipIntro(page);
 
   const pill = page
@@ -214,7 +214,7 @@ test('slash commands jump to a section and start a new chat', async ({
   // A lone "/" lists every shortcut; the arrow keys move the highlight; Escape closes the menu only.
   await input(page).fill('/');
   const menu = panel(page).getByRole('listbox', { name: 'Shortcuts' });
-  await expect(menu.getByRole('option')).toHaveCount(6);
+  await expect(menu.getByRole('option')).toHaveCount(8);
   await expect(menu.getByRole('option', { name: /\/planner/ })).toHaveAttribute(
     'aria-selected',
     'true',
@@ -232,8 +232,9 @@ test('slash commands jump to a section and start a new chat', async ({
   await expect(menu.getByRole('option')).toHaveCount(1);
   await input(page).press('Enter');
   await expect(input(page)).toHaveValue('');
-  await waitForScrollToSettle(page);
-  await expect(page.locator('#navigator')).toBeInViewport();
+  // The planner is its own page now.
+  await expect(page).toHaveURL(/\/planner(\?|$)/);
+  await expect(panel(page)).toBeVisible();
 
   await input(page).fill('What does Earthrise mean?');
   await input(page).press('Enter');

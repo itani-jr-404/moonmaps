@@ -10,7 +10,7 @@ Everyone writes at least one test for the code they add. Calculations are also c
 
 ## API tests (pytest)
 
-In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15, with the data downloaded, 59 tests pass. `test_assistant.py` tests the chat endpoint with a scripted model, so it needs no key and no network.
+In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15, with the data downloaded, 69 tests pass. `test_assistant.py` tests the chat endpoint with a scripted model, so it needs no key and no network.
 
 | File | Tests | Needs data files |
 | --- | --- | --- |

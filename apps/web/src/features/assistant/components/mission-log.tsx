@@ -37,7 +37,8 @@ export function MissionLog({
   onRetry: () => void;
   onStop: () => void;
   onLoadInPlanner: (link: AppLink) => void;
-  onGoTo: (sectionId: string) => void;
+  /** Opens a page of the app, or a section of one ("/#why"). */
+  onGoTo: (href: string) => void;
 }) {
   const reduced = useReducedMotion();
   const listRef = useRef<HTMLDivElement>(null);
@@ -98,7 +99,7 @@ export function MissionLog({
           <button
             type="button"
             className={styles.card}
-            onClick={() => onGoTo('navigator')}
+            onClick={() => onGoTo('/planner')}
           >
             <span className="text-sm font-semibold">Plan a landing</span>
             <span className="text-xs text-faint">Open the planner</span>

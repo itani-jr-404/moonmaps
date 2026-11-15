@@ -18,6 +18,8 @@ Base URL: set per environment, see [developer/deployment.md](../developer/deploy
 | GET | `/sky` | The Sun and the Earth at one point and one moment, with terrain clearance | Built |
 | GET | `/scene` | The Moon's sub-solar and sub-Earth points at one moment | Built (no planets) |
 | GET | `/validation` | Our angles next to saved JPL Horizons values | Built |
+| GET | `/accuracy` | Error rates against NASA references and the calibration learned from past data | Built |
+| GET | `/missions` | Past landings with launch and landing times and the travel time | Built |
 | GET | `/terrain` | A height tile around a site for a 3D site view | Planned, not built |
 | POST | `/assistant/chat` | One assistant answer | Built; off when no model key is set |
 
@@ -262,6 +264,22 @@ Response (`ValidationReport`), real output shortened to one case:
 - `generated_at` is when the JPL Horizons values were fetched, not when the report was built.
 - `diff.az` is 0 for cases where Horizons gives an elevation above 85 degrees, because azimuth is ill-defined near the zenith.
 - The `horizons` values are read from `apps/api/app/data/validation/horizons.json`, not fetched live. See [science/validation.md](../science/validation.md).
+
+## GET /accuracy
+
+Returns `AccuracyReport`, built once at start-up from saved files; nothing is fetched at run time. Method and numbers: [VALIDATION.md](../VALIDATION.md#12-learning-from-past-data). Decision: [ADR-014](../decisions/ADR-014-calibration.md).
+
+| Field | Meaning |
+| --- | --- |
+| `generated_at` | The later of the JPL Horizons fetch time and the calibration's training time |
+| `positions` | `{ cases, max_diff_deg, tolerance_deg, reference }`: our Sun and Earth positions against JPL Horizons, the same comparison as `GET /validation` |
+| `past_landings` | `{ cases, max_diff_vs_horizons_deg, rows }`. Each row: `mission`, `site` (curated site id), `t` (UTC), `ours_el_deg`, `horizons_el_deg`, `journal_el_deg` (the Apollo Lunar Surface Journal table; `null` when missing). From `app/data/validation/apollo_sun.json` |
+| `calibration` | `{ points, folds, method, features, bodies }`. Each body (`sun`, `earth`): `raw_mae` (the app's centre-of-disc share against NASA's map), `calibrated_mae` (on held-out points), `raw_within_0_05`, `calibrated_within_0_05`, `improvement_pct`. From `app/data/validation/calibration.json` |
+| `error_rate` | `{ headline, items }`, each item `{ label, value, detail }`: plain-language text for the accuracy page. Every number in it comes from the fields above |
+
+## GET /missions
+
+Returns `MissionsResponse`: `missions`, a list of `{ id, name, site_id, launch, landing, travel_hours, source_url }`. Times are UTC. `site_id` is the curated site id, or `null` when the site is not in `sites.json`. `landing` is `null` when we have no official landing time to the minute; `travel_hours` is computed from `launch` and `landing` and is `null` with it. The data is in `apps/api/app/data/missions.json`, with a note quoting the source page for each mission. SLIM's long low-energy route makes its travel time much longer than Apollo's, so the two are not comparable.
 
 ## Planned, not built
 

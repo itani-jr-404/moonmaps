@@ -1,6 +1,37 @@
 {
   "components": {
     "schemas": {
+      "AccuracyReport": {
+        "additionalProperties": false,
+        "properties": {
+          "calibration": {
+            "$ref": "#/components/schemas/CalibrationSummary"
+          },
+          "error_rate": {
+            "$ref": "#/components/schemas/ErrorRate"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "past_landings": {
+            "$ref": "#/components/schemas/PastLandingsAccuracy"
+          },
+          "positions": {
+            "$ref": "#/components/schemas/PositionsAccuracy"
+          }
+        },
+        "required": [
+          "generated_at",
+          "positions",
+          "past_landings",
+          "calibration",
+          "error_rate"
+        ],
+        "title": "AccuracyReport",
+        "type": "object"
+      },
       "AnalyzeRequest": {
         "additionalProperties": false,
         "properties": {
@@ -165,6 +196,94 @@
           "visible"
         ],
         "title": "BodyInSky",
+        "type": "object"
+      },
+      "CalibrationBody": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "enum": [
+              "sun",
+              "earth"
+            ],
+            "title": "Body",
+            "type": "string"
+          },
+          "calibrated_mae": {
+            "description": "Mean absolute error after calibration, held out",
+            "title": "Calibrated Mae",
+            "type": "number"
+          },
+          "calibrated_within_0_05": {
+            "description": "Share within 0.05 after calibration",
+            "title": "Calibrated Within 0 05",
+            "type": "number"
+          },
+          "improvement_pct": {
+            "description": "Drop in mean absolute error, percent",
+            "title": "Improvement Pct",
+            "type": "number"
+          },
+          "raw_mae": {
+            "description": "Mean absolute error of the app's centre-of-disc share against NASA's map, on held-out folds",
+            "title": "Raw Mae",
+            "type": "number"
+          },
+          "raw_within_0_05": {
+            "description": "Share of points within 0.05 before calibration",
+            "title": "Raw Within 0 05",
+            "type": "number"
+          }
+        },
+        "required": [
+          "body",
+          "raw_mae",
+          "calibrated_mae",
+          "raw_within_0_05",
+          "calibrated_within_0_05",
+          "improvement_pct"
+        ],
+        "title": "CalibrationBody",
+        "type": "object"
+      },
+      "CalibrationSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "bodies": {
+            "items": {
+              "$ref": "#/components/schemas/CalibrationBody"
+            },
+            "title": "Bodies",
+            "type": "array"
+          },
+          "features": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Features",
+            "type": "array"
+          },
+          "folds": {
+            "title": "Folds",
+            "type": "integer"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "points",
+          "folds",
+          "method",
+          "features",
+          "bodies"
+        ],
+        "title": "CalibrationSummary",
         "type": "object"
       },
       "ChatContext": {
@@ -385,6 +504,52 @@
         "title": "ErrorDetail",
         "type": "object"
       },
+      "ErrorRate": {
+        "additionalProperties": false,
+        "properties": {
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorRateItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "headline",
+          "items"
+        ],
+        "title": "ErrorRate",
+        "type": "object"
+      },
+      "ErrorRateItem": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "detail"
+        ],
+        "title": "ErrorRateItem",
+        "type": "object"
+      },
       "ErrorResponse": {
         "additionalProperties": false,
         "properties": {
@@ -566,6 +731,205 @@
           "sun_elevation_at_start"
         ],
         "title": "Metrics",
+        "type": "object"
+      },
+      "Mission": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "landing": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Landing time, UTC",
+            "title": "Landing"
+          },
+          "launch": {
+            "description": "Launch time, UTC",
+            "format": "date-time",
+            "title": "Launch",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Curated site id, when the site exists",
+            "title": "Site Id"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "travel_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Hours from launch to landing, computed from the two times",
+            "title": "Travel Hours"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "site_id",
+          "launch",
+          "landing",
+          "travel_hours",
+          "source_url"
+        ],
+        "title": "Mission",
+        "type": "object"
+      },
+      "MissionsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "missions": {
+            "items": {
+              "$ref": "#/components/schemas/Mission"
+            },
+            "title": "Missions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "missions"
+        ],
+        "title": "MissionsResponse",
+        "type": "object"
+      },
+      "PastLandingRow": {
+        "additionalProperties": false,
+        "properties": {
+          "horizons_el_deg": {
+            "description": "Sun elevation from JPL Horizons",
+            "title": "Horizons El Deg",
+            "type": "number"
+          },
+          "journal_el_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sun elevation in the Apollo Lunar Surface Journal table",
+            "title": "Journal El Deg"
+          },
+          "mission": {
+            "title": "Mission",
+            "type": "string"
+          },
+          "ours_el_deg": {
+            "description": "Sun elevation from our engine, smooth Moon",
+            "title": "Ours El Deg",
+            "type": "number"
+          },
+          "site": {
+            "description": "Curated site id, for example apollo-11",
+            "title": "Site",
+            "type": "string"
+          },
+          "t": {
+            "description": "Moonwalk start or end time, UTC",
+            "format": "date-time",
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mission",
+          "site",
+          "t",
+          "ours_el_deg",
+          "horizons_el_deg",
+          "journal_el_deg"
+        ],
+        "title": "PastLandingRow",
+        "type": "object"
+      },
+      "PastLandingsAccuracy": {
+        "additionalProperties": false,
+        "properties": {
+          "cases": {
+            "title": "Cases",
+            "type": "integer"
+          },
+          "max_diff_vs_horizons_deg": {
+            "title": "Max Diff Vs Horizons Deg",
+            "type": "number"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/PastLandingRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cases",
+          "max_diff_vs_horizons_deg",
+          "rows"
+        ],
+        "title": "PastLandingsAccuracy",
+        "type": "object"
+      },
+      "PositionsAccuracy": {
+        "additionalProperties": false,
+        "properties": {
+          "cases": {
+            "description": "Number of saved JPL Horizons cases",
+            "title": "Cases",
+            "type": "integer"
+          },
+          "max_diff_deg": {
+            "description": "Largest azimuth or elevation difference, degrees",
+            "title": "Max Diff Deg",
+            "type": "number"
+          },
+          "reference": {
+            "description": "Where the reference values came from",
+            "title": "Reference",
+            "type": "string"
+          },
+          "tolerance_deg": {
+            "title": "Tolerance Deg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "cases",
+          "max_diff_deg",
+          "tolerance_deg",
+          "reference"
+        ],
+        "title": "PositionsAccuracy",
         "type": "object"
       },
       "Scenario": {
@@ -1164,6 +1528,58 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/accuracy": {
+      "get": {
+        "description": "Error rates against NASA references, and what the app learned from past data.",
+        "operationId": "accuracy_accuracy_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccuracyReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Accuracy",
+        "tags": [
+          "accuracy"
+        ]
+      }
+    },
     "/analyze": {
       "post": {
         "operationId": "analyze_analyze_post",
@@ -1354,6 +1770,58 @@
         "summary": "Health",
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/missions": {
+      "get": {
+        "description": "Past landings with launch and landing times and the travel time between them.",
+        "operationId": "missions_missions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissionsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Missions",
+        "tags": [
+          "accuracy"
         ]
       }
     },

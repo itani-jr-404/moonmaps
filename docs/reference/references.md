@@ -72,10 +72,13 @@ Used for the assistant's knowledge file `missions.md`.
 21g. NASA Science, Lunar Reconnaissance Orbiter (LRO). https://science.nasa.gov/mission/lro/ (read 2026-11-15).
 21h. NASA Science, LCROSS. https://science.nasa.gov/mission/lcross/ (read 2026-11-15).
 21i. Indian Space Research Organisation, Chandrayaan-3 and Chandrayaan-3 Details. https://www.isro.gov.in/Chandrayaan3.html , https://www.isro.gov.in/Chandrayaan3_Details.html (read 2026-11-15).
+21k. NASA NSSDCA spacecraft pages for the Apollo 12, 14 and 16 command modules and lunar modules (launch and landing times in `apps/api/app/data/missions.json`). https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099C , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-008A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-031A (read 2026-11-15). The Apollo 11, 15 and 17 pages are those cited in [VALIDATION.md](../VALIDATION.md#3-past-missions).
+21l. JAXA, "JAXA Confirms Smart Lander for Investigating Moon (SLIM) Landed on Moon", press release, 20 January 2024 (landing at 0:20 am JST on 20 January 2024). https://global.jaxa.jp/press/2024/01/20240120-1_e.html (read 2026-11-15). JAXA, SLIM project page (launch at 8:42:11 a.m. JST on 7 September 2023, 23:42:11 UTC on 6 September). https://global.jaxa.jp/projects/sas/slim/ (read 2026-11-15).
 21j. LROC (Arizona State University / NASA GSFC), "Chandrayaan-3 Landing Site" and "IM-2 Athena Seen Obliquely", already listed under 15. https://lroc.im-ldi.com/images/1314 , https://lroc.im-ldi.com/images/1408 (read again 2026-11-15).
 
 ## Papers
 
+22a. Hoerl, A. E., Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. Technometrics 12(1), 55-67. doi:10.1080/00401706.1970.10488634. The method of `apps/api/scripts/train_calibration.py` (ADR-014).
 22. Mazarico, E., Neumann, G. A., Smith, D. E., Zuber, M. T., Torrence, M. H. (2011). Illumination conditions of the lunar polar regions using LOLA topography. Icarus 211, 1066-1081. doi:10.1016/j.icarus.2010.10.030
 
 ## Software

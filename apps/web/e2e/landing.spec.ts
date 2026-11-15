@@ -37,7 +37,7 @@ test('aiming at the globe and landing show the API answer for that spot', async 
   page,
 }) => {
   const errors = collectPageErrors(page);
-  await page.goto('/');
+  await page.goto('/explore');
   await skipIntro(page);
   const stage = page.getByLabel(
     'Interactive 3D Moon. Hover to aim at a landing site, click to choose it.',
@@ -83,9 +83,16 @@ test('aiming at the globe and landing show the API answer for that spot', async 
     `Can see Earth: ${landSky.earth.visible ? 'Yes' : 'No'}`,
   );
 
-  // "See the best dates" hands the spot to the planner.
+  // The site page link points at this spot (a curated site or its coordinates).
+  await expect(hud.getByTestId('spot-page-link')).toHaveAttribute(
+    'href',
+    /^\/sites\/(spot\?lat=-?[\d.]+&lon=-?[\d.]+|[a-z0-9-]+)$/,
+  );
+
+  // "See the best dates" opens the planner page on the spot.
   const analyze = page.waitForResponse(isApi('/analyze', 'POST'));
   await hud.getByRole('button', { name: 'See the best dates' }).click();
+  await expect(page).toHaveURL(/\/planner\?(site=|lat=)/);
   await analyze;
   await expect(page.getByTestId('planner-answer')).toHaveAttribute(
     'data-verdict',

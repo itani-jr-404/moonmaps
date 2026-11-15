@@ -18,7 +18,7 @@ export function AboutSection() {
           <p className="eyebrow" data-reveal>
             About
           </p>
-          <h2 className="h2" id="about-h" data-lines>
+          <h1 className="h2" id="about-h" data-lines>
             <span className="line">
               <span className="li">Moon landings,</span>
             </span>
@@ -27,7 +27,7 @@ export function AboutSection() {
                 <em>made easy to plan.</em>
               </span>
             </span>
-          </h2>
+          </h1>
         </div>
         <div className={styles.grid}>
           <div className={styles.col} data-reveal>
