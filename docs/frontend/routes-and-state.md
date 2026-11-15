@@ -17,7 +17,7 @@ The app has one page per task (Next.js App Router, `src/app`). The navigation ba
 | `/sites/[id]` | `app/sites/[id]/page.tsx` | `sites` | Everything about one curated site (below). An unknown id shows a not-found state |
 | `/sites/spot?lat=&lon=` | `app/sites/spot/page.tsx` | `sites` | The same page for any point on the Moon. Longitudes from 180 to 360 are converted to -180 to 0; bad values show a not-found state |
 | `/accuracy` | `app/accuracy/page.tsx` | `accuracy` | Error rates and checks against past landings |
-| `/about` | `app/about/page.tsx` | `about` | What the app does and how, and its limits |
+| `/about` | `app/about/page.tsx` | `about` | What the app does and how, its limits, and a "Future scope" section on two planned ideas |
 
 `app/layout.tsx` holds what every page shares: the skip link (to `#main`), the navigation, the footer, the assistant, the toast, the custom cursor, the scroll reveals and `RouteEffects` (`site-chrome`). A page with no route shows `app/not-found.tsx`.
 
