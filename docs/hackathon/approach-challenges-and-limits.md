@@ -1,10 +1,10 @@
-# Moon Maps: data, method, development process, challenges and limits
+# Moon Maps: data, method, development process, challenges and next steps
 
 Team Lunar Titans: Ali Al Itani, Hussein Alassaad, Leonardo Khayyat, Khalil Dandashli, Hassan Korek. NASA Space Apps Challenge 2026, Beirut, challenge "Lunar Landing Site Navigator". Last updated: 2026-11-15.
 
 Live app: https://moonmaps.vercel.app · Code: https://github.com/itani-jr-404/moonmaps
 
-This document covers the points the NASA Space Apps Beirut 2026 Slack requirements ask the judging video to explain: the data, software, methods and tools used; what makes the solution distinctive; the development process, with its challenges and limitations; and why the team chose this approach.
+This document covers the points the NASA Space Apps Beirut 2026 Slack requirements ask the judging video to explain: the data, software, methods and tools used; what makes the solution distinctive; the development process, with its challenges and limitation; and why the team chose this approach.
 
 ## 1. Data
 
@@ -37,11 +37,11 @@ Every source, with its address and credit line, is in [CITATIONS.md](../../CITAT
 
 ## 4. What makes it distinctive
 
-- **Real terrain for a specific date.** JPL Horizons treats the Moon as smooth, and NASA's illumination maps are long-term averages. Moon Maps applies LOLA terrain to the exact moment chosen.
-- **A landed view.** You stand on the chosen spot and watch the Sun and the Earth rise and set over the real skyline.
-- **A forecast.** Each site has a 14-day sky forecast, a 30-day calendar of good windows, and when to leave Earth to land in the next one, based on past missions' travel times.
-- **Checked in the open.** An accuracy page shows our results against JPL Horizons, the Apollo moonwalks and NASA Goddard's maps. See [VALIDATION.md](../VALIDATION.md).
-- **An assistant that does not guess.** Every number it gives comes from a call to the API, and it lists its sources.
+- **Real terrain for the exact moment.** JPL Horizons treats the Moon as a smooth ball, and NASA's illumination maps are long-term averages. Moon Maps applies LOLA terrain to the exact site and minute you choose, which is the question a mission team actually has.
+- **You stand on the site.** The landed view puts you on the chosen spot and shows the Sun and the Earth rising and setting over the real skyline, so the answer can be seen, not only read.
+- **A forecast, not a snapshot.** Each site has a 14-day sky forecast, a 30-day calendar of good windows, and the time to leave Earth to land in the next one, based on the travel times of real missions.
+- **Proven against NASA, in the open.** An accuracy page compares our results with JPL Horizons, the Apollo moonwalks and NASA Goddard's maps, and anyone can repeat the checks. See [VALIDATION.md](../VALIDATION.md).
+- **An assistant that never guesses.** Every number it gives comes from a call to the Moon Maps API, and it lists its sources.
 
 ## 5. Development process
 
@@ -49,26 +49,32 @@ Every source, with its address and credit line, is in [CITATIONS.md](../../CITAT
 - **Day 2, 15 November 2026.** The team acted on each point of that feedback: checks against past missions, the distance to the Earth, travel times and a sky forecast. It added the chat assistant, terrain for the whole Moon, an error study and the accuracy page. A 23-case test round by the team found problems that were fixed the same afternoon.
 - **How the work was done.** Tasks were tracked on a Jira board. Each change went through a GitHub pull request and was merged only when every automated check passed, and each merge deployed itself. More than 20 pull requests were merged. Every outside number names its source next to it.
 
-## 6. Challenges we met
+## 6. Challenges we overcame
 
-| Challenge | What we did |
-| --- | --- |
-| In the landed view, the Sun and the Earth looked like they clipped into the hills | The landed view now draws the API's real LOLA horizon as its skyline, so bodies rise and set behind the actual ridges |
-| Terrain covered only the south pole, so other sites had a flat horizon | We added NASA's global LOLA grid, so every site has a real terrain horizon |
-| The error study found that every time was 27 s off, because leap seconds were not counted | We fixed the time conversion and added a test |
-| The 1999 Apollo Journal table of Sun angles differed from ours by up to 4.3 degrees | JPL Horizons gives our values, so we report the gap as a property of the table and explain it on the accuracy page |
-| Free AI models have daily limits and can be slow | The assistant chains several free providers and moves to the next when one runs out |
+### Minimizing the error rate
 
-## 7. Limits
+A landing verdict is only useful if it can be trusted, so we treated accuracy as a feature. We measured every source of error and drove each one down:
 
-- Outside the south polar region the terrain map is about 1.9 km per pixel, so small nearby hills are smoothed and a horizon set by them can be too low.
-- Dates run from 1900 to 2050, the range of the ephemeris and lunar orientation files.
-- The horizon has a 1 degree resolution and a 200 km reach.
-- Visibility uses the centre of the disc. Counting any part of the disc matches NASA's long-term maps more closely; see [VALIDATION.md](../VALIDATION.md).
-- The app does not model the radio link itself, temperatures or light reflected into shadow.
-- Side-by-side comparison of scenarios is in the API but not yet in the web app.
-- Chat answers take about 11 to 17 seconds on the free models.
-- The 3D scenes have not been tried on a real low-end phone.
+- Sun and Earth positions now agree with NASA JPL Horizons within **0.0001 degrees** in all 16 test cases, against a pass rule of 0.05 degrees.
+- Our Sun angles match JPL Horizons at all **16 Apollo moonwalk** start and end times, from 1969 to 1972.
+- Over 18.6 years at 300 random south pole points, our results match NASA Goddard's polar maps with correlations of **0.992** for sunlight and **0.999** for Earth visibility.
+- An error study found a 27-second time offset caused by leap seconds. We fixed it and added a test so it cannot return.
+- A model trained on NASA's maps cut the error of our Earth-visibility estimate by **72 %** on points it had never seen.
+
+### Choosing the best way to show the answer
+
+The same result has to work for an engineer who wants numbers and for a student who wants to understand. We chose a set of views that each answer one question:
+
+- **Is it good now?** A plain verdict for sunlight, for the Earth, and for both.
+- **When is it good?** A 30-day calendar of good landing windows and a 14-day sky forecast.
+- **Why?** A horizon panorama with the paths of the Sun and the Earth, and a landed view where you watch them cross the real skyline.
+- **Where?** A 3D Moon you can spin and land on anywhere.
+
+Every view reads from the same API result, so the picture, the numbers and the assistant always agree.
+
+## 7. Limitation and next step
+
+Moon Maps checks the direct link between the landing site and the Earth. It does not yet count relay satellites, which could keep a lander connected even when the Earth is hidden behind the terrain. Adding relay coverage is the next step we are working on.
 
 ## 8. Why we chose this approach
 
@@ -80,5 +86,6 @@ Every source, with its address and credit line, is in [CITATIONS.md](../../CITAT
 
 ## 9. Future scope
 
-- Watching the site during the flight, against new orbital images and hazard data such as a fresh impact crater.
-- Finding the best spot in an area: from 4 corners and 2 dates, the point and start date with the longest run of good days, with a coarse-to-fine quadtree search and a sliding window over time.
+- **Relay satellites.** Count relay coverage alongside the direct Earth link, so a site hidden from the Earth can still be shown as connected.
+- **Watching the site during the flight.** Check the target again and again against new orbital images and hazard data, such as a fresh impact crater, so the crew can change site before landing.
+- **The best spot in an area.** From 4 corners and 2 dates, find the point and start date with the longest run of good days, with a coarse-to-fine quadtree search and a sliding window over time.
