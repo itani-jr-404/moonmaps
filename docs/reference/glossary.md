@@ -1,8 +1,8 @@
 # Glossary
 
-Last updated: 2026-11-14.
+Last updated: 2026-11-15.
 
-Terms used in the app and in these documents, in plain words. The assistant's `glossary.md` is kept identical to this file.
+Terms used in the app and in these documents, in plain words. The assistant's `apps/api/app/data/knowledge/glossary.md` holds the terms a user meets in the app, taken from this file.
 
 ## Position and direction
 
@@ -22,7 +22,7 @@ Terms used in the app and in these documents, in plain words. The assistant's `g
 
 **Lunar day.** The time from one noon to the next at a place on the Moon, about 29.5 Earth days. Away from the poles that is roughly two weeks of daylight and two weeks of night.
 
-**UTC.** The world's reference time. All times in the app are in UTC.
+**UTC.** The world's reference time. The API and the `t=` value in a link use UTC; the page shows times in the visitor's own time zone.
 
 **Sunrise, sunset, Earthrise, Earthset.** The moments the Sun or the Earth crosses the terrain horizon as seen from the site. Over most of the Moon the Earth never rises or sets; it stays in about the same place. Near the poles and the edge of the near side it hovers at the horizon, and terrain and libration make it appear and disappear.
 
@@ -78,4 +78,4 @@ Terms used in the app and in these documents, in plain words. The assistant's `g
 
 **Sunlight fraction.** The share of the time range during which the Sun is visible from the site.
 
-**Fallback data.** A saved result shown when the live calculation cannot be reached.
+**Fallback data.** A saved result shown when the live calculation cannot be reached. Planned, not built.

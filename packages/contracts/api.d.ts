@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/assistant/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Chat */
+        post: operations["chat_assistant_chat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -121,6 +138,29 @@ export interface components {
             results: components["schemas"]["ScenarioResult"][];
         };
         /**
+         * AppLink
+         * @description A place and moment the assistant computed, for the "Show in the planner" button.
+         */
+        AppLink: {
+            /**
+             * Lat
+             * @description Latitude in degrees, south negative
+             */
+            lat: number;
+            /**
+             * Lon
+             * @description East longitude, -180 to 180
+             */
+            lon: number;
+            /** Site Id */
+            site_id?: string | null;
+            /**
+             * T
+             * Format: date-time
+             */
+            t: string;
+        };
+        /**
          * AtStart
          * @description Visibility at the first sample, the moment the scenario asks about.
          */
@@ -165,6 +205,78 @@ export interface components {
             horizon_el: number;
             /** Visible */
             visible: boolean;
+        };
+        /**
+         * ChatContext
+         * @description What the user is looking at in the app, so the assistant can explain it.
+         */
+        ChatContext: {
+            /**
+             * Lat
+             * @description Custom spot on screen, with lon
+             */
+            lat?: number | null;
+            /** Lon */
+            lon?: number | null;
+            /**
+             * Site Id
+             * @description Curated site on screen
+             */
+            site_id?: string | null;
+            /**
+             * T
+             * @description Moment chosen in the planner
+             */
+            t?: string | null;
+        };
+        /** ChatMessage */
+        ChatMessage: {
+            /** Content */
+            content: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "user" | "assistant";
+        };
+        /** ChatRequest */
+        ChatRequest: {
+            context?: components["schemas"]["ChatContext"] | null;
+            /** Messages */
+            messages: components["schemas"]["ChatMessage"][];
+        };
+        /** ChatResponse */
+        ChatResponse: {
+            app_link?: components["schemas"]["AppLink"] | null;
+            /**
+             * Model
+             * @description Model that wrote the answer
+             */
+            model?: string | null;
+            /**
+             * Reply
+             * @description Plain text. The web app shows it as text, never as HTML
+             */
+            reply: string;
+            /** Sources */
+            sources: components["schemas"]["ChatSource"][];
+            /** Tools Used */
+            tools_used: string[];
+        };
+        /** ChatSource */
+        ChatSource: {
+            /**
+             * Id
+             * @description Knowledge file name, or tool name
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "knowledge" | "tool";
+            /** Title */
+            title: string;
         };
         /** ErrorDetail */
         ErrorDetail: {
@@ -537,6 +649,75 @@ export interface operations {
             };
             /** @description Internal Server Error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    chat_assistant_chat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

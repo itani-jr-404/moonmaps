@@ -1,6 +1,6 @@
 # Repository structure
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
 One repository holds the web app, the API and the contract between them. The root is a pnpm workspace (`pnpm-workspace.yaml`: `apps/web`, `packages/contracts`); the API is a separate uv project.
 
@@ -33,9 +33,9 @@ moon-maps/
     api/                          FastAPI app
       app/
         main.py                   creates the app: middleware, error handlers, routers
-        routers/                  system.py, sites.py, analysis.py, deps.py
-        schemas/                  common.py, analyze.py, sky.py, system.py: the contract
-        services/                 sites, horizons, analysis, sky, validation, container
+        routers/                  system.py, sites.py, analysis.py, assistant.py, deps.py
+        schemas/                  common.py, analyze.py, sky.py, system.py, assistant.py: the contract
+        services/                 sites, horizons, analysis, sky, validation, assistant, knowledge, llm, container
         engines/                  ephemeris, terrain, horizon, visibility (no FastAPI imports)
         core/                     config, errors, cache
         data/
@@ -80,7 +80,9 @@ From `package.json`:
 
 | Script | Runs |
 | --- | --- |
-| `pnpm dev`, `pnpm build` | The web app's `next dev` and `next build` |
+| `pnpm dev` | The API (`scripts/dev-api.mjs`, which starts `uvicorn` on port 8000 or reuses a running Moon Maps API) and the web app (`next dev` on port 3000) together |
+| `pnpm dev:api`, `pnpm dev:web` | One of the two servers alone |
+| `pnpm build` | The web app's `next build` |
 | `pnpm lint`, `pnpm typecheck`, `pnpm test` | ESLint, `tsc --noEmit` and Vitest in `apps/web` |
 | `pnpm contracts:generate` | Exports `openapi.json` from the API, then regenerates `api.d.ts` |
 | `pnpm contracts:check` | Fails if either generated file differs from what the API and `openapi.json` produce |

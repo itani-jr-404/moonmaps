@@ -1,7 +1,7 @@
 'use client';
 
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { api, unwrap, type Scenario } from './client';
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import { api, unwrap, type ChatRequest, type Scenario } from './client';
 
 const HOUR = 3_600_000;
 
@@ -72,5 +72,22 @@ export function useValidation() {
     queryFn: async ({ signal }) =>
       unwrap(await api.GET('/validation', { signal })),
     staleTime: Infinity,
+  });
+}
+
+/**
+ * One turn of the assistant chat (POST /assistant/chat). The browser keeps the conversation and
+ * sends it whole each time; the server stores nothing. Pass `signal` to let the user stop a turn.
+ */
+export function useAssistantChat() {
+  return useMutation({
+    mutationFn: async ({
+      body,
+      signal,
+    }: {
+      body: ChatRequest;
+      signal?: AbortSignal;
+    }) => unwrap(await api.POST('/assistant/chat', { body, signal })),
+    retry: false,
   });
 }

@@ -1,3 +1,4 @@
+import { Assistant } from '@/features/assistant/components/assistant';
 import { AboutSection } from '@/features/about/components/about-section';
 import { HeroSection } from '@/features/hero/components/hero-section';
 import { LandingSection } from '@/features/landing/components/landing-section';
@@ -24,6 +25,7 @@ export default function HomePage() {
         <AboutSection />
       </main>
       <SiteFooter />
+      <Assistant />
       <Toast />
       <CustomCursor />
       <Reveals />

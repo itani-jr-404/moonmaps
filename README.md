@@ -36,9 +36,9 @@ You need Node.js 22, pnpm (through `corepack enable`) and uv. From the repositor
 ```bash
 pnpm install
 cd apps/api && uv sync && uv run python scripts/download_data.py && uv run python scripts/precompute_horizons.py
-uv run uvicorn app.main:app --reload            # terminal 1: API on http://localhost:8000
-cp apps/web/.env.example apps/web/.env.local     # terminal 2, from the root
-pnpm dev                                          # web app on http://localhost:3000
+cd ../..
+cp apps/web/.env.example apps/web/.env.local
+pnpm dev                                          # API on http://localhost:8000 and web app on http://localhost:3000
 ```
 
 Details and checks: [docs/developer/getting-started.md](docs/developer/getting-started.md).

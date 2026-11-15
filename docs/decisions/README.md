@@ -1,6 +1,6 @@
 # Decision records
 
-Last updated: 2026-11-14.
+Last updated: 2026-11-15.
 
 Each record states one decision, why it was made, and what follows from it. A record is not edited once accepted; if the decision changes, a new record replaces it and the old one is marked "Replaced by".
 
@@ -18,6 +18,7 @@ Each record states one decision, why it was made, and what follows from it. A re
 | [ADR-010](ADR-010-threejs-directly.md) | three.js is used directly, not through React Three Fiber | Accepted |
 | [ADR-011](ADR-011-sky-endpoint.md) | A `/sky` endpoint for single moments; the web app never computes positions | Accepted |
 | [ADR-012](ADR-012-visual-styling.md) | Tailwind tokens plus CSS modules for complex effects; no shadcn/ui yet | Accepted |
+| [ADR-013](ADR-013-assistant-model.md) | The assistant chains free model providers (NVIDIA, Groq, Gemini, Cloudflare, SambaNova, OpenRouter, Cohere) behind an OpenAI-compatible client | Accepted |
 
 ## Template
 

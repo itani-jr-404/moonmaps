@@ -1,15 +1,29 @@
 # Deployment
 
-Status: Design. Last updated: 2026-11-14.
+Status: Design; nothing deployed yet. Last updated: 2026-11-15.
 
-Where the app will run and how it gets there. Nothing is deployed yet. Both addresses must be public and need no login.
+Where the app will run and how it gets there. Nothing is deployed yet, and the Dockerfile has not yet been built on a host. Both addresses must be public and need no login.
 
 ## Overview
 
 | Part | Host | Built from |
 | --- | --- | --- |
-| Web app | Vercel | `apps/web` |
-| API | A container host, not chosen yet | `apps/api/Dockerfile` |
+| Web app | Vercel, Next.js | `apps/web` |
+| API | Vercel, container runtime (beta) | `apps/api/Dockerfile`, forced by `apps/api/vercel.json` |
+
+Both are Vercel projects imported from the same repository, one per folder. Vercel's container runtime is "in beta on all plans"; it builds the Dockerfile, serves it from a function that scales with traffic, listens on port 80 unless `PORT` is set, and scales to zero after five minutes without traffic in production ([Running Docker on Vercel](https://vercel.com/kb/guide/docker), read 2026-11-15). The API cannot run as a plain Vercel Python function without changes, because its NASA data (about 250 MB) is downloaded at build time and is not in git. If the container runtime fails, the same Dockerfile runs on any container host.
+
+## First deployment, step by step
+
+The order matters: the web app needs the API's address, and the API needs the web app's address.
+
+1. **API project.** In Vercel, import the repository and pick `apps/api`. `apps/api/vercel.json` sets `"framework": "container"`, so Vercel builds the Dockerfile instead of treating the folder as a Python app. Add the environment variables: `PORT=8000`, at least one assistant key (for example `MM_OPENROUTER_API_KEY`), and for now `MM_CORS_ORIGIN_REGEX=https://.*\.vercel\.app`. Deploy. The build downloads the NASA data, so it takes several minutes.
+2. **Check the API.** Open `https://<api-address>/health`. It must show `"ok": true` and both grids in `dem`.
+3. **Web project.** Import the repository again and pick `apps/web` (Next.js is detected). Keep "Include files outside the root directory" on, because the build uses `packages/contracts`. Set `NEXT_PUBLIC_API_URL=https://<api-address>` (no trailing slash). Deploy.
+4. **Lock CORS.** On the API project, set `MM_CORS_ORIGINS=["https://<web-address>"]`, keep or narrow the regex for preview addresses, and redeploy the API.
+5. **Check.** Open the web address in a private window: the planner loads, the globe answers, and the assistant replies.
+
+`NEXT_PUBLIC_API_URL` is built into the browser code, so a change needs a new web deployment. Vercel deploys whatever is on `main` in GitHub; work that is not merged is not deployed.
 
 The web app calls the API from the browser, so the API must allow the web app's address through CORS. The web app needs the API for every number and angle it shows; there is no fallback data ([ADR-011](../decisions/ADR-011-sky-endpoint.md)).
 
@@ -50,6 +64,7 @@ What the host must provide:
 | Memory | The grids are memory-mapped, so they are not loaded whole. The amount needed is to measure |
 | A public HTTPS address | The browser calls it directly |
 | A `PORT` variable, or port 8000 | The start command reads `PORT` |
+| Nothing writable | Horizons for custom spots are cached on disk when possible; on a read-only file system the API logs a warning and keeps them in memory only |
 
 If the host's free tier puts the container to sleep, the first request after a quiet period is slow. Open the app a few minutes before a demo.
 
@@ -71,9 +86,11 @@ API (all optional; read by `app/core/config.py`):
 | `MM_DATA_DIR` | `/srv/app/data` | Where `sites.json`, kernels, grids and cache live |
 | `MM_OBSERVER_HEIGHT_M` | `2.0` | Observer height above the ground |
 | `MM_HORIZON_MAX_KM` | `200` | Reach of the horizon walk |
-| `PORT` | `8000` | Port the container listens on |
+| `MM_NVIDIA_API_KEY`, `MM_GROQ_API_KEY`, `MM_GEMINI_API_KEY`, `MM_CLOUDFLARE_API_TOKEN` with `MM_CLOUDFLARE_ACCOUNT_ID`, `MM_SAMBANOVA_API_KEY`, `MM_OPENROUTER_API_KEY`, `MM_COHERE_API_KEY` | provider keys | Secrets: set them in the host's secret settings, never in the image or in git. Each one set adds a provider to the assistant's chain; with none, the assistant is off. See [backend/assistant.md](../backend/assistant.md#model) |
+| `MM_ASSISTANT_PER_MINUTE`, `MM_ASSISTANT_PER_DAY` | `6`, `60` | Assistant requests per client address. The limiter is in memory, so run one API instance |
+| `PORT` | `8000` | Port the container listens on. Set it on Vercel, which otherwise expects port 80 |
 
-Planned with the assistant: variables for the AI model and its key, and rate limits. Secrets are set in the host's settings. They are never in the repository, in the image, or in a `NEXT_PUBLIC_` variable.
+Every variable is listed with comments in the root `.env.example`. Secrets are set in the host's settings. They are never in the repository, in the image, or in a `NEXT_PUBLIC_` variable. The API's `.dockerignore` keeps `.env` files out of the image.
 
 ## Release steps
 

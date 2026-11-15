@@ -1,6 +1,6 @@
 # Getting started
 
-Status: Built. Last updated: 2026-11-14.
+Status: Built. Last updated: 2026-11-15.
 
 How to run the project on your machine.
 
@@ -40,17 +40,14 @@ cd ../..
 
 ## Run it
 
-Two terminals.
+One command, from the repository root, starts both servers. The web app shows "We could not reach the Moon Maps API" on every panel when the API is not running.
 
 ```bash
-# terminal 1: API on http://localhost:8000
-cd apps/api
-uv run uvicorn app.main:app --reload
-
-# terminal 2: web app on http://localhost:3000
-cp apps/web/.env.example apps/web/.env.local
-pnpm dev
+cp apps/web/.env.example apps/web/.env.local   # once
+pnpm dev   # API on http://localhost:8000 and web app on http://localhost:3000
 ```
+
+To run one server alone, use `pnpm dev:api` or `pnpm dev:web`. If a Moon Maps API is already running on port 8000, `pnpm dev` reuses it instead of starting a second one (`scripts/dev-api.mjs`); if another program holds the port, it says so and stops.
 
 Open http://localhost:3000 . The API's interactive documentation is at http://localhost:8000/docs .
 
@@ -62,11 +59,22 @@ Open http://localhost:3000 . The API's interactive documentation is at http://lo
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-The API needs no variables to run locally. Its defaults allow `http://localhost:3000` through CORS. To change a setting, set an `MM_` variable or put it in `apps/api/.env`, for example:
+The API needs no variables to run locally. Its defaults allow `http://localhost:3000` through CORS. To change a setting, set an `MM_` variable or put it in `apps/api/.env` (git ignores it), for example:
 
 ```bash
 MM_CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
 ```
+
+The chat assistant stays off until the API has at least one model key. Copy the example to the repository root and fill in the keys you have; each one adds free requests (see [backend/assistant.md](../backend/assistant.md#model)):
+
+```bash
+cp .env.example .env
+# edit .env and set, for example, MM_OPENROUTER_API_KEY=<your key>
+```
+
+Put each key on its own line, with nothing after it.
+
+Restart `pnpm dev` after changing the file.
 
 The full list is in [backend/service-layer.md](../backend/service-layer.md) and [deployment.md](deployment.md).
 

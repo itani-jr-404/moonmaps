@@ -1,6 +1,6 @@
 # Use of AI
 
-Last updated: 2026-11-14.
+Last updated: 2026-11-15.
 
 The Space Apps rules ask teams to say whether and how AI tools were used, to mark AI-made images and video with a visible watermark, and to disclose AI-made code, data and audio. This file is the project's record. Keep it accurate; it is the source for the "Use of Super Intelligence" answer in the submission.
 
@@ -10,9 +10,9 @@ The Space Apps rules ask teams to say whether and how AI tools were used, to mar
 | --- | --- | --- |
 | The assistant (chat panel) | Explains results and terms; runs calculations through the app's own API and reports them | Compute any number itself; influence the results shown elsewhere in the app |
 
-The assistant is labelled as an AI assistant in the interface and shows its sources. The model behind it is recorded here once chosen:
+The assistant is labelled as an AI assistant in the interface and shows its sources. The model behind it:
 
-- Provider and model: (to be filled in)
+- Provider and model: free models from whichever providers have a key (NVIDIA, Groq, Google Gemini, Cloudflare Workers AI, SambaNova, OpenRouter, Cohere), tried in that order. Each answer reports the provider and model that wrote it. See [ADR-013](../decisions/ADR-013-assistant-model.md).
 
 No other part of the product uses AI. Positions, horizons, visibility and metrics are deterministic calculations from NASA data.
 
@@ -23,6 +23,8 @@ No other part of the product uses AI. Positions, horizons, visibility and metric
 | 2026-11-14 | API code (`apps/api`) and its tests | Claude, an AI coding assistant made by Anthropic | Wrote the API (endpoints, ephemeris, terrain and horizon engines, visibility, scripts) and its tests from the team's design documents | The team lead |
 | 2026-11-14 | Web app (`apps/web`) | Claude | Ported the team's prototype into the Next.js app, following the team's design | The team lead |
 | 2026-11-14 | Documentation | Claude | Updated these documents to match the code, from the code and the sources listed in [references.md](references.md) | The team lead |
+| 2026-11-15 | Assistant (`apps/api/app/services/assistant.py` and related files, `apps/web/src/features/assistant`) and its tests | Claude | Wrote the chat endpoint, its guardrails, the chat panel and their tests from [backend/assistant.md](../backend/assistant.md) | The team lead |
+| 2026-11-15 | Assistant knowledge base (`apps/api/app/data/knowledge/`) | Claude | Wrote the files from the app's code, the repository's documents and the official Space Apps and NASA pages listed in each file | The team lead |
 
 How the output was checked:
 

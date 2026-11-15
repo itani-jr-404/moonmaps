@@ -15,7 +15,7 @@ pytestmark = needs_kernels
 
 @pytest.fixture
 def client(data_dir):
-    settings = Settings(data_dir=data_dir)
+    settings = Settings(_env_file=None, data_dir=data_dir)
     grid = synthetic_grid(size=801, scale_m=400.0, height=lambda x, y: 50 * np.sin(x / 9000.0))
     services = build_services(settings, grids=GridStack([grid]))
     with TestClient(create_app(settings, services)) as c:

@@ -6,3 +6,6 @@ app/data/kernels
 app/data/dem
 app/data/cache
 tests
+.env
+.env.*
+!.env.example
