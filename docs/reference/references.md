@@ -37,7 +37,7 @@ Used for the assistant's knowledge files `challenge.md` and `space-apps.md`. Not
 11. NASA 3D Resources. https://science.nasa.gov/3d-resources/ ; models used: https://science.nasa.gov/3d-resources/apollo-lunar-module/ , https://science.nasa.gov/3d-resources/z2-spacesuit/ , https://science.nasa.gov/3d-resources/astronaut/ ; GitHub mirror: https://github.com/nasa/NASA-3D-Resources (all read 2026-11-14). Details in [research/web-assets.md](../../research/web-assets.md).
 12. NASA Images and Media Usage Guidelines. https://www.nasa.gov/nasa-brand-center/images-and-media/ (read 2026-11-14).
 13. Arizona State University and NASA LRO, Quickmap. https://quickmap.lroc.asu.edu/
-14. NASA, Moon Trek. https://trek.nasa.gov/moon/
+14. NASA, Moon Trek. https://trek.nasa.gov/moon/ (linked from the assistant's Resources tab, with entry 2)
 14b. NASA NSSDCA, Sun Fact Sheet, Dr. David R. Williams, last updated 9 May 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html (read 2026-11-14). The Sun's radius in the comparison with NASA's maps.
 14c. NASA NSSDCA spacecraft pages for Apollo 11, Apollo 15 and Apollo 17 (launch and landing times). https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-096A (read 2026-11-14).
 14d. Brian W. Lawrence, "Sun Angles", Apollo Lunar Surface Journal, last revised 8 February 1999. https://www.apollojournals.org/alsj/sunangles.html (read 2026-11-14).

@@ -5,7 +5,7 @@ import type { AppLink } from '@/lib/api/client';
 import { useReducedMotion } from '@/lib/motion/reduced-motion';
 import type { ChatStatus } from '../hooks/use-chat-store';
 import {
-  CHALLENGE_QUESTION,
+  BEST_DATES_QUESTION,
   FOLLOW_UPS,
   SUGGESTED_QUESTIONS,
   type Turn,
@@ -93,7 +93,7 @@ export function MissionLog({
         </h3>
         <p className={styles.subtitle}>
           Ask what the app shows, whether a spot has sunlight and a view of
-          Earth, or about the NASA Space Apps challenge.
+          Earth, or when it is next good for landing.
         </p>
         <div className={styles.cards}>
           <button
@@ -107,13 +107,11 @@ export function MissionLog({
           <button
             type="button"
             className={styles.card}
-            onClick={() => onAsk(CHALLENGE_QUESTION)}
+            onClick={() => onAsk(BEST_DATES_QUESTION)}
             disabled={!idle}
           >
-            <span className="text-sm font-semibold">
-              About the NASA challenge
-            </span>
-            <span className="text-xs text-faint">What it asks for</span>
+            <span className="text-sm font-semibold">Best dates this month</span>
+            <span className="text-xs text-faint">For the spot on screen</span>
           </button>
         </div>
         <ul className={styles.commands} aria-label="Suggested questions">

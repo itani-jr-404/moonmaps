@@ -28,12 +28,15 @@ export function whyText(sun: boolean, earth: boolean): string {
   return 'Why bad: there is sunlight, but Earth is below the horizon, so the lander cannot radio home without a relay satellite.';
 }
 
-/** "Spot 85.3°S, 30.2°E", for a point that is not near a curated site. */
+/** "Spot 85.3°S, 30.2°E", for a point that is not a curated site. */
 export function spotLabel(lat: number, lon: number): string {
   return `Spot ${Math.abs(lat).toFixed(1)}°${lat < 0 ? 'S' : 'N'}, ${Math.abs(lon).toFixed(1)}°${lon < 0 ? 'W' : 'E'}`;
 }
 
-/** Aims closer than this to a curated site land on that site (the prototype's value). */
+/**
+ * A point closer than this to a curated site is labelled "near <site>" (the prototype's value).
+ * The point keeps its own coordinates; only a click on the pin picks the site (pick.ts).
+ */
 export const NEAR_SITE_DEG = 2.2;
 
 /** The curated site nearest to a point, if one lies within NEAR_SITE_DEG of arc. */

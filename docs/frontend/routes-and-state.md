@@ -39,13 +39,17 @@ The opening intro (preloader) plays only when the first page of a visit is `/`. 
 
 A window that reaches the end of the 30 days is shown as "at least" its length. The pure helpers are `features/sites/lib/outlook.ts` (windows, daily hours) and `features/sites/lib/panorama.ts` (drawing math), both with unit tests.
 
+On `/explore`, the point under the pointer is decided once, in `features/landing/lib/pick.ts`, and the aim card, the landing, the "See the best dates" link and the assistant's context all use it. A curated site is used only when the pointer is on its pin (within 0.8 degrees); anywhere else the point keeps its own coordinates (rounded to 0.1 degree, the same rounding as the aim card's answers), and a site within 2.2 degrees is only named as "near <site>". The surface panel appears when the dive animation ends, or at the latest 0.6 seconds after the dive's planned length by a plain timer, because GSAP's lag smoothing slows animations down to 33 ms per frame when frames take longer than 500 ms (software WebGL). In the surface view, a body the API calls visible is drawn over the decorative ground with its label, and a hidden body is not drawn.
+
+The home hero's 3D stage draws only while the hero section is on screen, its fade has not finished and the tab is shown (`features/hero/hooks/use-hero-scene.ts`); under reduced motion it draws single frames on demand. A click does not move the astronaut.
+
 The assistant (`assistant`) floats over every page: a launcher at the bottom right, opening a chat panel. Its conversation lives in an in-memory zustand store (`features/assistant/hooks/use-chat-store.ts`), never in storage. See [backend/assistant.md](../backend/assistant.md#in-the-interface).
 
 ## State
 
 | Kind | Examples | Home |
 | --- | --- | --- |
-| Scenario state | The chosen place (a curated site or a point) and moment | The zustand store in `src/lib/state/scenario-store.ts`, mirrored in the URL |
+| Scenario state | The chosen place (a curated site or a point) and moment | The zustand store in `src/lib/state/scenario-store.ts`, mirrored in the URL on `/planner`. A landing on `/explore` writes the landed place and time there too, so the assistant's context is the landed spot |
 | Server data | Sites, analysis results, sky answers | The TanStack Query cache |
 | Local UI state | Open panels, hover, the aimed point | The component or the scene |
 
@@ -76,7 +80,7 @@ Hooks in `src/lib/api/hooks.ts`, built on TanStack Query and the typed client in
 | `useMissions()` | `GET /missions` | Kept for the whole visit; the site page's "Getting there" |
 | `useDepartures(arrival)` | `GET /missions/departures` | Off until the next good window is known; the site page's "When to leave Earth" |
 
-`fetchSkyRounded` in `src/lib/api/fetch-sky.ts` serves the globe while aiming: it rounds the point to 0.1 degree and the time to 10 minutes and caches answers in memory ([ADR-011](../decisions/ADR-011-sky-endpoint.md)).
+`fetchSkyRounded` in `src/lib/api/fetch-sky.ts` serves the globe while aiming: it rounds the point to 0.1 degree and the time to 10 minutes and caches answers in memory ([ADR-011](../decisions/ADR-011-sky-endpoint.md)). A click lands on the same 0.1-degree point and asks `/sky` again for the exact time.
 
 An error from the API becomes an `ApiError` with the API's code and message. Every view handles loading, error and data; shared state components are in `src/components/ui/states.tsx`.
 

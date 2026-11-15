@@ -28,6 +28,7 @@ Positions, horizons, visibility and metrics are deterministic calculations from 
 | 2026-11-15 | Distance from a site to the Earth's surface, leave-Earth times for the next good window (`GET /missions/departures`), the About page's accuracy sentence | Claude | Wrote the code, tests and docs from the team's test notes; recomputed the JPL Horizons differences by running the validation service | The team lead |
 | 2026-11-15 | Assistant knowledge base (`apps/api/app/data/knowledge/`) | Claude | Wrote the files from the app's code, the repository's documents and the official Space Apps and NASA pages listed in each file | The team lead |
 | 2026-11-15 | Navy theme, star field, navigation bar, card contrast, why-section drawings and home order (`apps/web/src/app/globals.css`, `site-chrome`, `home`, `why`, planner and about styles) | Claude | Changed the styles from the team's test notes and screenshots, and worked out the contrast ratios; the star field and the Moon ground drawings are CSS and SVG it wrote, not images | The team lead |
+| 2026-11-15 | Fixes from the team's test notes: chat resources and welcome, globe point picking and chat context, 3D Sun and Earth drawing, hero render loop, the landed panel on slow frames (`apps/web/src/features/assistant`, `landing`, `hero`) | Claude | Investigated the notes against the code, wrote the fixes, unit tests and document updates | The team lead |
 
 How the output was checked:
 

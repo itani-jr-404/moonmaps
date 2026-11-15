@@ -150,9 +150,9 @@ export const SUGGESTED_QUESTIONS = [
   'What does Earthrise mean?',
 ] as const;
 
-/** Sent by the welcome block's "About the NASA challenge" card. */
-export const CHALLENGE_QUESTION =
-  'What is the Lunar Landing Site Navigator challenge?';
+/** Sent by the welcome block's "Best dates this month" card. */
+export const BEST_DATES_QUESTION =
+  'What are the best landing dates in the next 30 days for the spot on screen?';
 
 /** "09:41 UTC". */
 export function fmtUtcClock(ms: number): string {

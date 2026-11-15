@@ -16,7 +16,7 @@ The preloader plays only when a visit starts on `/`.
 
 ## The globe page (`/explore`)
 
-A globe of the Moon with the curated sites. Aiming at a point asks the API whether the Sun and the Earth are visible there; choosing it opens a surface view of that point. When the landed spot is not good now, the panel says "Good again from (date), for (length)", from one `POST /analyze` over the next 30 days, or that it is not good at any time in those 30 days. "See everything about this spot" opens the site page: `/sites/(id)` near a curated site, else `/sites/spot?lat=&lon=`. "See the best dates" opens `/planner` on the spot.
+A globe of the Moon with the curated sites. Aiming at a point asks the API whether the Sun and the Earth are visible there; choosing it opens a surface view of that point. When the landed spot is not good now, the panel says "Good again from (date), for (length)", from one `POST /analyze` over the next 30 days, or that it is not good at any time in those 30 days. "See everything about this spot" opens the site page: `/sites/(id)` when the site's pin was clicked, else `/sites/spot?lat=&lon=` for the point itself (a nearby site is only named, "near (site)"). "See the best dates" opens `/planner` on the spot.
 
 Data credits and the statement that NASA does not endorse the project are in the footer of every page.
 
