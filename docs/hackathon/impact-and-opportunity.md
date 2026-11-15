@@ -41,10 +41,16 @@ Missions often have to change their landing date because of hardware or launch d
 These are the team's proposals, not tested plans.
 
 - **Free public tool.** The app stays free for education and outreach. It runs without accounts or a database, which keeps it cheap to host.
-- **Planning features for mission teams.** Features from our future scope could serve professional users: watching a site during the flight against new orbital images and hazard data, and finding the best spot and date in an area with a coarse-to-fine quadtree search and a sliding window over time.
+- **Planning features for mission teams.** Features from our future scope could serve professional users: relay satellite coverage, watching a site during the flight against new orbital images and hazard data, and finding the best spot and date in an area with a coarse-to-fine quadtree search and a sliding window over time.
 - **API for other tools.** Mission planning software, simulators and teaching platforms could call the Moon Maps API instead of building their own terrain and ephemeris pipeline.
 - **Partnerships.** Universities, planetariums and space agencies could use Moon Maps in teaching and public events.
 
-## 6. Limits to keep in mind
+## 6. Limitation and next step
 
-Moon Maps is a planning and learning tool, not flight software. It does not model the radio link itself or temperatures. Outside the south polar region the terrain map is about 1.9 km per pixel, so small nearby hills are smoothed. Side-by-side comparison of scenarios is in the API but not yet in the web app. The full list is in [approach-challenges-and-limits.md](approach-challenges-and-limits.md).
+Moon Maps checks the direct link between the landing site and the Earth. It does not yet count relay satellites, which could keep a lander connected even when the Earth is hidden. Adding relay coverage is the next step we are working on, and it opens the tool to missions that plan to use a relay.
+
+## 7. Future scope
+
+- **Relay satellites.** Count relay coverage alongside the direct Earth link, so a site hidden from the Earth can still be shown as connected.
+- **Watching the site during the flight.** Check the target again and again against new orbital images and hazard data, such as a fresh impact crater, so the crew can change site before landing.
+- **The best spot in an area.** From 4 corners and 2 dates, find the point and start date with the longest run of good days, with a coarse-to-fine quadtree search and a sliding window over time.

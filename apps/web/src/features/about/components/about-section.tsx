@@ -100,6 +100,16 @@ export function AboutSection() {
         <div className={styles.grid} aria-labelledby="future-h">
           <div className={styles.col} data-reveal>
             <span className={styles.n}>04</span>
+            <h3>Relay satellites</h3>
+            <p>
+              Moon Maps checks the direct link between the site and the Earth. A
+              relay satellite in orbit can keep a lander connected even when the
+              Earth is hidden behind the terrain. Counting relay coverage is the
+              next step we are working on.
+            </p>
+          </div>
+          <div className={styles.col} data-reveal>
+            <span className={styles.n}>05</span>
             <h3>Watching the site during the flight</h3>
             <p>
               The Sun and the Earth move on schedule, so a good landing time
@@ -110,7 +120,7 @@ export function AboutSection() {
             </p>
           </div>
           <div className={styles.col} data-reveal>
-            <span className={styles.n}>05</span>
+            <span className={styles.n}>06</span>
             <h3>The best spot in an area</h3>
             <p>
               You mark an area with 4 corners and pick a start and end date.
