@@ -245,6 +245,19 @@ function PastLandings({ data }: { data: Schemas['PastLandingsAccuracy'] }) {
         Apollo Lunar Surface Journal. Over {data.cases} times, Moon Maps and JPL
         Horizons differ by at most {fmtSmallDeg(data.max_diff_vs_horizons_deg)}.
       </p>
+      {/*
+        The Journal table ("Sun Angles", Brian W. Lawrence, 1999,
+        https://www.apollojournals.org/alsj/sunangles.html) rises 0.508 degrees an hour at both
+        sites, the rate at the lunar equator; see docs/VALIDATION.md section 3.
+      */}
+      <p className={styles.text}>
+        The Journal column is a table compiled by hand in 1999, not JPL
+        Horizons. Its Sun climbs at the rate of the Moon&apos;s equator (0.508
+        degrees an hour), so for the later Apollo 15 and 17 moonwalks, at 26 and
+        20 degrees north, it drifts away from both Moon Maps and JPL Horizons,
+        by up to 4.3 degrees. The 0.05 degree pass rule below is for the
+        comparison with JPL Horizons.
+      </p>
       {data.rows.length === 0 ? (
         <EmptyState>No past landings yet.</EmptyState>
       ) : (

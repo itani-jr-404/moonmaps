@@ -42,7 +42,7 @@ On a site's page, a chat opens on the right by itself after about a second (a bo
 
 - "Error rates": how close our Sun and Earth positions are to NASA JPL Horizons, how our Sun elevation at the 16 Apollo moonwalk times compares, and our long-term sunlight and Earth visibility against NASA's polar maps, before and after learning.
 - "Learning from past data": a small model (ridge regression) learned how our long-term values differ from NASA's maps at 300 points, tested on points it did not see. The page shows the error before and after, and its limits: counting any part of the Sun's or Earth's disc, with no learning, does even better, and the model is not applied to 30-day results.
-- "Past landings": a table of the Apollo moonwalk times with our value, JPL Horizons and the Apollo Lunar Surface Journal.
+- "Past landings": a table of the Apollo moonwalk times with our value, JPL Horizons and the Apollo Lunar Surface Journal. A note under the heading says the Journal column is a table compiled by hand in 1999 whose Sun climbs at the rate of the Moon's equator, so for the later Apollo 15 and 17 moonwalks it drifts away from both Moon Maps and JPL Horizons, by up to 4.3 degrees (Apollo 15, 2 August 1971 at 13:49 UTC). The pass rule of 0.05 degrees is for the comparison with JPL Horizons, and Moon Maps matches Horizons in every row.
 - "Positions vs JPL Horizons": the number of cases, the largest difference and the pass rule.
 
 ## Home (`/`)
