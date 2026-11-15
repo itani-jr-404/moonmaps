@@ -1,6 +1,6 @@
 # Rules and submission
 
-Last updated: 2026-11-14.
+Last updated: 2026-11-15.
 
 The official rules that shape what we build and how we submit it. This is a working summary; the full text of each guide is in [research/space-apps-guides/](../../research/space-apps-guides/KEY-FACTS.md), and [KEY-FACTS.md](../../research/space-apps-guides/KEY-FACTS.md) there names the guide behind every fact.
 
@@ -55,7 +55,7 @@ Our record is [reference/ai-use.md](../reference/ai-use.md).
 
 ## The link to the final project must be public
 
-This repository is private while we build. Before the final project link is submitted, either the repository is made public or the public link points to the running app. Before making the repository public, check that nothing private is in it (the `local/` folder is never committed).
+The repository is public: https://github.com/itani-jr-404/moonmaps. The live app is https://moonmaps.vercel.app/. The `local/` folder, which holds private files, is never committed.
 
 ## Help during the event
 
