@@ -1,6 +1,6 @@
 # Data sources
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
 Every dataset the app uses, where it comes from, how we use it, and how it must be credited. The challenge page lists four resources (JPL Horizons, Quickmap, Moon Trek, the Canadian Space Agency's Moon Exploration portal). The "In use now" column says which ones the code uses today.
 
@@ -10,7 +10,7 @@ Every dataset the app uses, where it comes from, how we use it, and how it must 
 | --- | --- | --- | --- | --- |
 | JPL ephemeris kernels | NASA JPL (NAIF) | Calculating positions live | Yes | Downloaded by script |
 | JPL Horizons | NASA JPL | Reference values for testing | Yes | Saved results are committed |
-| LOLA elevation grids | NASA LRO | Horizon profiles | Yes | Downloaded by script |
+| LOLA elevation grids | NASA LRO | Horizon profiles and the elevation map on the site page (`GET /terrain`) | Yes | Downloaded by script |
 | CGI Moon Kit | NASA SVS | Moon colour map and a greyscale relief map for the web app's globe | Yes | Web-size copies committed |
 | NASA 3D Resources | NASA | Lunar module, spacesuit and astronaut models in the web app | Yes | Committed |
 | PGDA illumination maps | NASA Goddard | Checking our sunlight and Earth-visibility percentages (script only) | Downloaded by script with `--pgda` | No |
@@ -88,6 +88,21 @@ Downloaded on 2026-11-14 by `apps/api/scripts/download_data.py` into `apps/api/a
 | `LDEM_75S_120M.LBL` | 4,991 bytes |
 
 The labels give the product creation time as 2017-06-15. A credit line for LOLA data is to confirm; until then we name the instrument, the mission and NASA.
+
+### Global grid
+
+For every point the polar grids do not cover, the API uses the global grid `LDEM_16`, in simple cylindrical projection at 16 pixels per degree. Folder: https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/ (listing read 2026-11-15). Label: https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/LDEM_16.LBL (read 2026-11-15). Why this grid and not a finer one: [ADR-015](../decisions/ADR-015-global-terrain-grid.md).
+
+The label names the producer as the LRO LOLA team (David E. Smith, Goddard Space Flight Center), data set `LRO-L-LOLA-4-GDR-V1.0`, product version `V3.1`, created 2019-03-15, from altimetry acquired 2009-07-13 to 2016-11-29. It describes heights in metres relative to a radius of 1737.4 km, 2880 lines by 5760 samples of 16-bit integers, `SCALING_FACTOR` 0.5, and 1895.21 m per pixel at the equator.
+
+Downloaded on 2026-11-15 by `apps/api/scripts/download_data.py` into `apps/api/app/data/dem/`:
+
+| File | Size |
+| --- | --- |
+| `LDEM_16.IMG` | 33,177,600 bytes (5760 x 2880 x 2) |
+| `LDEM_16.LBL` | 5,121 bytes |
+
+Credit: the same as the polar grids (to confirm; until then we name the instrument, the mission and NASA).
 
 NASA Goddard's PGDA group also publishes 5 m per pixel models of named south pole sites (20 km squares) at https://pgda.gsfc.nasa.gov/products/78 . They are useful for the site list and for close-up views, not for horizons.
 

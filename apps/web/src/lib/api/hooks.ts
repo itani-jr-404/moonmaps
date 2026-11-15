@@ -1,7 +1,13 @@
 'use client';
 
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
-import { api, unwrap, type ChatRequest, type Scenario } from './client';
+import {
+  api,
+  ApiError,
+  unwrap,
+  type ChatRequest,
+  type Scenario,
+} from './client';
 
 const HOUR = 3_600_000;
 
@@ -89,5 +95,111 @@ export function useAssistantChat() {
       signal?: AbortSignal;
     }) => unwrap(await api.POST('/assistant/chat', { body, signal })),
     retry: false,
+  });
+}
+
+/**
+ * One site over the coming days (POST /analyze for a single scenario), for the site page
+ * and the globe's "good again from" line. `startIso` should be rounded so that the cache
+ * key stays the same between renders.
+ */
+export function useSiteOutlook(
+  site: { id: string } | { lat: number; lon: number } | null,
+  startIso: string,
+  days: number,
+  includeSeries: boolean,
+) {
+  return useQuery({
+    queryKey: ['site-outlook', site, startIso, days, includeSeries],
+    queryFn: async ({ signal }) => {
+      const start = Date.parse(startIso);
+      const { results } = unwrap(
+        await api.POST('/analyze', {
+          body: {
+            scenarios: [
+              {
+                site: site!,
+                start: startIso,
+                end: new Date(start + days * 24 * HOUR).toISOString(),
+                step_minutes: 30,
+                include_series: includeSeries,
+              },
+            ],
+          },
+          signal,
+        }),
+      );
+      const result = results[0];
+      if (!result) throw new Error('The API returned no result.');
+      return result;
+    },
+    enabled: site !== null,
+    staleTime: HOUR,
+  });
+}
+
+/** Past landings with launch and landing times and travel times (GET /missions). */
+export function useMissions() {
+  return useQuery({
+    queryKey: ['missions'],
+    queryFn: async ({ signal }) =>
+      unwrap(await api.GET('/missions', { signal })),
+    staleTime: Infinity,
+  });
+}
+
+/**
+ * When to leave Earth to land at one moment, for each past mission's travel time
+ * (GET /missions/departures). The API does the subtraction; off until a landing time is known.
+ */
+export function useDepartures(arrivalIso: string | null) {
+  return useQuery({
+    queryKey: ['departures', arrivalIso],
+    queryFn: async ({ signal }) =>
+      unwrap(
+        await api.GET('/missions/departures', {
+          params: { query: { arrival: arrivalIso! } },
+          signal,
+        }),
+      ),
+    enabled: arrivalIso !== null,
+    staleTime: Infinity,
+  });
+}
+
+/** Error rates and learning from past landings (GET /accuracy), read from saved comparison files. */
+export function useAccuracy() {
+  return useQuery({
+    queryKey: ['accuracy'],
+    queryFn: async ({ signal }) =>
+      unwrap(await api.GET('/accuracy', { signal })),
+    staleTime: Infinity,
+  });
+}
+
+/**
+ * Ground heights on a square around a point (GET /terrain), for the elevation map on the site
+ * page. The answer depends only on the place, so it is kept for the whole visit.
+ */
+export function useTerrain(
+  point: { lat: number; lon: number } | null,
+  radiusKm: number,
+) {
+  return useQuery({
+    queryKey: ['terrain', point?.lat, point?.lon, radiusKm],
+    queryFn: async ({ signal }) =>
+      unwrap(
+        await api.GET('/terrain', {
+          params: {
+            query: { lat: point!.lat, lon: point!.lon, radius_km: radiusKm },
+          },
+          signal,
+        }),
+      ),
+    enabled: point !== null,
+    staleTime: Infinity,
+    // "No terrain here" is an answer, not a failure worth retrying.
+    retry: (count, error) =>
+      !(error instanceof ApiError && error.status === 404) && count < 2,
   });
 }

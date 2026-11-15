@@ -1,6 +1,7 @@
 'use client';
 
 import gsap from 'gsap';
+import { useRouter } from 'next/navigation';
 import {
   useCallback,
   useEffect,
@@ -15,7 +16,7 @@ import { errorMessage, type Site, type SkyResponse } from '@/lib/api/client';
 import { fetchSkyRounded } from '@/lib/api/fetch-sky';
 import { compassWord } from '@/lib/format/format';
 import { prefersReducedMotion } from '@/lib/motion/reduced-motion';
-import { useSmoothScroll } from '@/lib/motion/smooth-scroll';
+import { plannerPath } from '@/lib/routes';
 import { useScenarioStore } from '@/lib/state/scenario-store';
 import { createRenderer, observeVisibility } from '@/scene/renderer';
 import { moonMaps } from '@/scene/textures';
@@ -28,8 +29,8 @@ import {
   type GlobeHit,
 } from '../lib/globe-scene';
 import { fetchNextSunrise, fetchSkyAt } from '../lib/landing-api';
+import { pickPoint, placeOf } from '../lib/pick';
 import { SurfaceScene } from '../lib/surface-scene';
-import { nearestSite, spotLabel } from '../lib/verdict';
 
 /*
  * State machine of "Choose your landing": orbit (aiming at the globe), busy
@@ -56,6 +57,8 @@ export interface LandedState {
   lon: number;
   siteId: string | null;
   place: string;
+  /** A curated site close to a spot that is not itself a site, for "near <site>". */
+  near: string | null;
   /** The moment the HUD describes (the time of the last API answer). */
   timeMs: number;
   /** How far "Skip to sunrise" moved the clock ahead of now. */
@@ -75,12 +78,22 @@ const SKY_REFRESH_MS = 60_000;
  */
 const SUNRISE_MARGIN_MS = 15 * 60_000;
 const NO_SITES: readonly Site[] = [];
+/*
+ * Length of the dive, in seconds, up to the moment the surface shows (see
+ * land()). The surface is also shown by a plain timer DIVE_GRACE_MS after
+ * that: GSAP's lag smoothing advances at most 33 ms per frame when a frame
+ * takes over 500 ms (software WebGL, as in headless CI), which would stretch
+ * this dive to about a minute and keep the panel off the screen.
+ */
+const DIVE_TO_SURFACE_S = 2.15;
+const DIVE_GRACE_MS = 600;
 
 interface Landed {
   lat: number;
   lon: number;
   siteId: string | null;
   place: string;
+  near: string | null;
   offsetMs: number;
   timeMs: number;
   status: CheckStatus;
@@ -92,11 +105,6 @@ interface Controls {
   skipToSunrise: () => void;
   retrySky: () => void;
 }
-
-const round = (v: number, digits: number) => {
-  const k = 10 ** digits;
-  return Math.round(v * k) / k;
-};
 
 /** The renderer, or null when the browser has no WebGL. */
 function tryCreateRenderer(
@@ -137,7 +145,7 @@ export function useLanding(
   const [landed, setLanded] = useState<LandedState | null>(null);
   const [facing, setFacing] = useState('north');
   const [sunriseBusy, setSunriseBusy] = useState(false);
-  const { scrollTo } = useSmoothScroll();
+  const router = useRouter();
 
   useEffect(() => {
     const stageEl = stageRef.current;
@@ -195,6 +203,7 @@ export function useLanding(
     let skyClock = 0;
     let facingWord = '';
     const timelines = new Set<gsap.core.Timeline>();
+    const arrivalTimers = new Set<ReturnType<typeof setTimeout>>();
     const track = (tl: gsap.core.Timeline) => {
       timelines.add(tl);
       tl.eventCallback('onComplete', () => timelines.delete(tl));
@@ -226,16 +235,15 @@ export function useLanding(
       lz.toggleAttribute('data-up', h.y > h.h * 0.5);
       globe.setAim(h.local);
 
-      // Near a curated site the verdict is for the site itself, where a click lands.
-      const site = nearestSite(sitesRef.current, h.lat, h.lon);
-      const lat = site ? site.lat : round(h.lat, 1);
-      const lon = site ? site.lon : round(h.lon, 1);
-      const key = site ? `site:${site.id}` : `${lat},${lon}`;
+      // The same point a click lands on: a site only on its pin, otherwise the point itself.
+      const p = pickPoint(sitesRef.current, h.lat, h.lon);
+      const { lat, lon } = p;
+      const key = p.siteId ? `site:${p.siteId}` : `${lat},${lon}`;
       if (key === aimKey) return;
       aimKey = key;
       setAim({
         key,
-        label: site ? site.name : spotLabel(lat, lon),
+        label: p.near ? `${p.label}, near ${p.near}` : p.label,
         status: 'checking',
         sun: false,
         earth: false,
@@ -276,6 +284,7 @@ export function useLanding(
               lon: l.lon,
               siteId: l.siteId,
               place: l.place,
+              near: l.near,
               timeMs: l.timeMs,
               offsetMs: l.offsetMs,
               status: l.status,
@@ -331,13 +340,14 @@ export function useLanding(
       mode = 'busy';
       setBusy(true);
       show(null);
-      const site = nearestSite(sitesRef.current, h.lat, h.lon);
+      const p = pickPoint(sitesRef.current, h.lat, h.lon);
       const now = Date.now();
       const l: Landed = {
-        lat: site ? site.lat : round(h.lat, 4),
-        lon: site ? site.lon : round(h.lon, 4),
-        siteId: site?.id ?? null,
-        place: site ? site.name : 'Your chosen spot',
+        lat: p.lat,
+        lon: p.lon,
+        siteId: p.siteId,
+        place: p.label,
+        near: p.near,
         offsetMs: 0,
         timeMs: now,
         status: 'checking',
@@ -348,10 +358,39 @@ export function useLanding(
       requestSky(now);
       surface.build(l.lat, l.lon);
 
+      // On the surface: shown by the dive's timeline, or by the timer when frames are too slow.
+      let dive: gsap.core.Timeline | null = null;
+      const onSurface = (late: boolean) => {
+        clearTimeout(fallback);
+        arrivalTimers.delete(fallback);
+        if (current !== l || arrived) return;
+        if (late) {
+          if (dive) {
+            dive.kill();
+            timelines.delete(dive);
+          }
+          gsap.set(flash, { opacity: 0 });
+        }
+        mode = 'surface';
+        showing = 'surface';
+        arrived = true;
+        surface.arrive(l.sky, d);
+        skyClock = performance.now();
+        setView('surface');
+        setBusy(false);
+        publishFacing();
+        publishLanded();
+      };
+      const fallback = setTimeout(
+        () => onSurface(true),
+        d(DIVE_TO_SURFACE_S) * 1000 + DIVE_GRACE_MS,
+      );
+      arrivalTimers.add(fallback);
+
       // Turn the Moon so the chosen point faces the camera, dive in, flash.
       const turn = globe.turnToward(h.local);
       const o = { t: 0 };
-      track(
+      dive = track(
         gsap
           .timeline()
           .to(o, {
@@ -371,18 +410,7 @@ export function useLanding(
             { opacity: 1, duration: d(0.25), ease: 'power2.in' },
             reduce ? '>' : '-=0.2',
           )
-          .add(() => {
-            if (current !== l) return;
-            mode = 'surface';
-            showing = 'surface';
-            arrived = true;
-            surface.arrive(l.sky, d);
-            skyClock = performance.now();
-            setView('surface');
-            setBusy(false);
-            publishFacing();
-            publishLanded();
-          })
+          .add(() => onSurface(false))
           .to(flash, { opacity: 0, duration: d(0.8), ease: 'power2.out' }),
       );
     }
@@ -589,6 +617,7 @@ export function useLanding(
       stage.removeEventListener('pointercancel', onCancel);
       stage.removeEventListener('pointerleave', onLeave);
       clearTimeout(aimTimer);
+      for (const t of arrivalTimers) clearTimeout(t);
       aimSeq++;
       skySeq++;
       for (const tl of timelines) tl.kill();
@@ -617,18 +646,33 @@ export function useLanding(
   );
   const retrySky = useCallback(() => controlsRef.current?.retrySky(), []);
 
+  /*
+   * The landed point and moment are what is on screen, so the assistant's
+   * context ("ON SCREEN" strip and POST /assistant/chat) follows them.
+   */
+  const landedSiteId = landed?.siteId ?? null;
+  const landedLat = landed?.lat;
+  const landedLon = landed?.lon;
+  const landedTimeMs = landed?.timeMs;
+  useEffect(() => {
+    if (landedLat === undefined || landedLon === undefined) return;
+    const { setPlace, setTime } = useScenarioStore.getState();
+    setPlace(placeOf({ siteId: landedSiteId, lat: landedLat, lon: landedLon }));
+    // Floored to the minute, so the strip shows the same minute as the landed panel.
+    if (landedTimeMs !== undefined)
+      setTime(Math.floor(landedTimeMs / 60_000) * 60_000);
+  }, [landedSiteId, landedLat, landedLon, landedTimeMs]);
+
   const showBestDates = useCallback(() => {
     if (!landed) return;
     const { setPlace, setTime } = useScenarioStore.getState();
-    setPlace(
-      landed.siteId
-        ? { kind: 'site', id: landed.siteId }
-        : { kind: 'point', lat: landed.lat, lon: landed.lon },
-    );
-    setTime(Date.now() + landed.offsetMs);
-    scrollTo(document.getElementById('navigator'));
+    const place = placeOf(landed);
+    const timeMs = Date.now() + landed.offsetMs;
+    setPlace(place);
+    setTime(timeMs);
+    router.push(plannerPath(place, timeMs));
     useToast.getState().show('Showing the best dates for this spot.');
-  }, [landed, scrollTo]);
+  }, [landed, router]);
 
   return {
     status,

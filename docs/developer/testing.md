@@ -10,18 +10,20 @@ Everyone writes at least one test for the code they add. Calculations are also c
 
 ## API tests (pytest)
 
-In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15, with the data downloaded, 59 tests pass. `test_assistant.py` tests the chat endpoint with a scripted model, so it needs no key and no network.
+In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15, with the data downloaded, 83 tests pass. `test_assistant.py` tests the chat endpoint with a scripted model, so it needs no key and no network.
 
 | File | Tests | Needs data files |
 | --- | --- | --- |
 | `test_geometry.py` | Great-circle destination along a meridian, along the equator and from near the pole; the elevation-angle formula (same height close by is level, a tall point nearby is high, same height far away is below the horizontal); the sample distances cover the range in order | No |
-| `test_projection.py` | On a synthetic grid: the pole maps to the grid centre; longitude 0 points up and 90 E points right; heights are bilinear and NaN outside | No |
-| `test_horizon.py` | A flat synthetic grid gives a horizon just below level; one synthetic mountain to the east peaks at azimuth 90; `horizon_at` interpolates and wraps; the grid stack uses the first grid that covers a point | No |
+| `test_projection.py` | On a synthetic polar grid: the pole maps to the grid centre; longitude 0 points up and 90 E points right; heights are bilinear and NaN outside. On a synthetic global grid: pixel centres follow the LOLA catalogue, longitude wraps, the poles are covered, north is up | No |
+| `test_horizon.py` | A flat synthetic grid gives a horizon just below level; one synthetic mountain to the east peaks at azimuth 90; `horizon_at` interpolates and wraps; the grid stack uses the first grid that covers a point, and the global grid where the polar grids stop; an equatorial site sees a ridge on a global grid; the elevation tile has north up and east right | No |
 | `test_visibility.py` | Clearance uses the terrain in the body's direction; windows with interpolated edges and open at both ends; intersection; metrics for an all-light case and for next events; status thresholds | No |
 | `test_lola_grid.py` | On the real `LDEM_80S_80M`: the label values; Shackleton crater is a deep bowl and its mirror point is not; a point at 75 S is outside the grid | LOLA grid |
+| `test_lola_global.py` | On the real `LDEM_16`: the label values; it agrees with `LDEM_80S_80M` where both cover and not when mirrored; the Apollo 11 site gets a horizon that is not flat | LOLA global grid and 80 m grid |
 | `test_horizons.py` | Every saved JPL Horizons case is within 0.05 degrees | Kernels |
 | `test_apollo_sun.py` | Our Sun elevation at 16 Apollo moonwalk times (1969 to 1972) is within 0.05 degrees of the saved JPL Horizons values | Kernels |
-| `test_api.py` | Through the FastAPI test client with a synthetic grid: `/health`, `/sites`, `/analyze` for curated and custom sites, with and without the series, its error codes and the four-scenario limit, `/sky` and `/scene`, `/validation` | Kernels |
+| `test_api.py` | Through the FastAPI test client with a synthetic grid: `/health`, `/sites`, `/analyze` for curated and custom sites, with and without the series, its error codes and the four-scenario limit, `/sky` and `/scene`, `/terrain` and its errors, `/validation`; from the point under the Earth, the site-to-Earth-centre distance in `/sky` is the centre-to-centre distance in `/scene` minus the Moon's 1737.4 km radius, one radius more from the opposite point, and the surface distance is 6378.137 km less | Kernels |
+| `test_accuracy.py` | `/accuracy` and `/missions` read the saved files; `/missions/departures` subtracts each mission's travel time from the arrival (Apollo 11: 4 days 6 h 45 min 40 s), skips missions with no landing time, sorts shortest first, and rejects a missing, zone-less or out-of-range arrival; the calibration file's shape | Kernels |
 
 `tests/conftest.py` builds the synthetic grids and a temporary data folder. Tests that need the kernels or the real grid are skipped with a message when the files are missing, so the pure tests always run.
 
@@ -37,7 +39,8 @@ In `apps/web/src`, next to the code, as `*.test.ts`. Run with `pnpm test` from t
 
 | Area | Tests |
 | --- | --- |
-| `lib/format` | Durations, coordinates and angles format as expected |
+| `lib/format` | Durations, coordinates, angles, UTC times and trip lengths format as expected |
+| `features/sites` | The outlook and panorama helpers; the "Right now" distance rows (label, value, note, loading, error); "When to leave Earth" in "Getting there" (loading, no good window, the API's departure times at the next window start, error with retry) |
 | `lib/state/url-sync` | A place and a time round-trip through the URL; a bad URL falls back safely |
 | `scene/units` | Unit and direction helpers for the 3D scenes |
 | `features/planner/lib/calendar` | Turning API windows into the 30-day calendar and the best windows |
@@ -80,7 +83,7 @@ The workflow is `.github/workflows/ci.yml` (GitHub Actions, https://docs.github.
 | --- | --- | --- |
 | Documentation links | Always | `python3 scripts/check_docs_links.py`: every relative link in the repository's Markdown files must point at a file that exists. The saved copies of web pages under `research/` are skipped. |
 | Web app | Something changed under `apps/web` or `packages/contracts`, or in the root `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml` | Node 22; `corepack enable` (which reads `packageManager`, pnpm 11.3.0); `pnpm install --frozen-lockfile`; the contract types check; then the web app's `lint`, `typecheck`, `test` and `build` scripts |
-| API | Something changed under `apps/api` | Python 3.12, install with uv, `ruff check`, `ruff format --check`, the contract check (`export_openapi.py --check`), then `download_data.py --ci` (JPL kernels and the 80 m LOLA grid, cached between runs) and `pytest`. The job fails if any test is skipped. |
+| API | Something changed under `apps/api` | Python 3.12, install with uv, `ruff check`, `ruff format --check`, the contract check (`export_openapi.py --check`), then `download_data.py --ci` (JPL kernels, the 80 m LOLA grid and the global LOLA grid `LDEM_16`, cached between runs) and `pytest`. The job fails if any test is skipped. |
 | End-to-end | Something changed under `apps/web` or `apps/api` | Installs both sides, downloads the same data, builds the web app, installs Chromium and runs `pnpm --filter web test:e2e`. The report is kept as an artifact when a test fails. |
 
 A change to the workflow file itself runs every job.

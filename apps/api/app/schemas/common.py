@@ -24,8 +24,9 @@ HorizonSource = Annotated[
     str,
     Field(
         description=(
-            "Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when "
-            "no terrain is available (smooth Moon)"
+            "Elevation grid behind the horizon: lola-80s-80m or lola-75s-120m in the south "
+            "polar region, lola-global-16ppd everywhere else, or sphere when no grid is "
+            "loaded (smooth Moon)"
         )
     ),
 ]

@@ -3,13 +3,14 @@ import styles from './about-section.module.css';
 /*
   What the app does, the idea behind it, and its limits. Keep this text true to the app:
   - JPL ephemeris files and LOLA polar maps: docs/data/sources.md.
-  - 16 Horizons cases within 0.05 degrees: apps/api/app/data/validation/horizons.json
-    and docs/science/validation.md.
+  - The JPL Horizons check: 16 cases (2 places, Sun and Earth, 4 dates in 2026), pass rule
+    0.05 degrees, largest difference 0.0123 degrees. From apps/api/app/data/validation/horizons.json,
+    apps/api/tests/test_horizons.py and docs/science/validation.md; recomputed 2026-11-15.
 */
 export function AboutSection() {
   return (
     <section
-      className="section border-t border-line bg-bg-2"
+      className="section border-t border-line"
       id="about"
       aria-labelledby="about-h"
     >
@@ -18,7 +19,7 @@ export function AboutSection() {
           <p className="eyebrow" data-reveal>
             About
           </p>
-          <h2 className="h2" id="about-h" data-lines>
+          <h1 className="h2" id="about-h" data-lines>
             <span className="line">
               <span className="li">Moon landings,</span>
             </span>
@@ -27,7 +28,7 @@ export function AboutSection() {
                 <em>made easy to plan.</em>
               </span>
             </span>
-          </h2>
+          </h1>
         </div>
         <div className={styles.grid}>
           <div className={styles.col} data-reveal>
@@ -63,9 +64,14 @@ export function AboutSection() {
             <p>
               Positions of the Sun and the Earth come from NASA JPL&apos;s
               ephemeris files, and the horizon comes from NASA&apos;s LOLA laser
-              altimeter maps of the south pole. We test our angles against
-              NASA&apos;s JPL Horizons system: across 16 test cases they agree
-              to within 0.05 degrees.
+              altimeter maps of the south pole. We compared our Sun and Earth
+              directions with NASA&apos;s JPL Horizons system in 16 cases: both
+              bodies, seen from near the south pole (89.9° S, 0° E) and from the
+              Apollo 11 landing site, at 00:00 UTC on 15, 22 and 29 November and
+              6 December 2026. A case passes when azimuth and elevation are each
+              within 0.05 degrees. All 16 pass, and the largest difference is
+              0.0123 degrees. Like Horizons, this check uses a smooth Moon, so
+              it tests the positions, not the terrain horizon.
             </p>
           </div>
           <div className={styles.col} data-reveal>
@@ -75,8 +81,9 @@ export function AboutSection() {
               <li>Made for the NASA Space Apps Challenge 2026.</li>
               <li>A planning and learning tool, not flight software.</li>
               <li>
-                The horizon uses real LOLA terrain within about 15 degrees of
-                the south pole. Elsewhere the Moon is treated as a smooth ball.
+                The horizon uses real LOLA terrain: fine maps within about 15
+                degrees of the south pole, and a coarser global map (about 1.9
+                km per pixel) everywhere else.
               </li>
               <li>
                 The south pole matters because ice hides in its dark craters.

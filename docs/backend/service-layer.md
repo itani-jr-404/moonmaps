@@ -6,9 +6,9 @@ How the API in `apps/api` is organised inside. The layering rules are in [archit
 
 ## Start-up
 
-`app/main.py` has `create_app(settings, services)`. It adds gzip compression for responses over 1 KB, CORS (methods `GET` and `POST`, header `Content-Type`, origins from configuration), a middleware that logs one line per request and sets `x-request-id`, the error handlers, and the four routers. It also creates the assistant's rate limiter (`app/core/rate_limit.py`) on `app.state.chat_limiter`. At start-up, the lifespan hook calls `build_services(settings)` in `app/services/container.py` once and stores the result on `app.state.services`.
+`app/main.py` has `create_app(settings, services)`. It adds gzip compression for responses over 1 KB, CORS (methods `GET` and `POST`, header `Content-Type`, origins from configuration), a middleware that logs one line per request and sets `x-request-id`, the error handlers, and the routers. It also creates the assistant's rate limiter (`app/core/rate_limit.py`) on `app.state.chat_limiter`. At start-up, the lifespan hook calls `build_services(settings)` in `app/services/container.py` once and stores the result on `app.state.services`.
 
-`build_services` loads the JPL kernels, memory-maps the elevation grids that are present (`LDEM_80S_80M`, then `LDEM_75S_120M`; a missing grid is logged as a warning and skipped), reads `sites.json`, and builds every service. Routers receive the `Services` object through the `Deps` dependency in `app/routers/deps.py`.
+`build_services` loads the JPL kernels, memory-maps the elevation grids that are present (`LDEM_80S_80M`, then `LDEM_75S_120M`, then the global `LDEM_16`; `load_grid` picks the polar or the cylindrical reader from the label; a missing grid is logged as a warning and skipped), reads `sites.json`, and builds every service. Routers receive the `Services` object through the `Deps` dependency in `app/routers/deps.py`.
 
 ## Routers
 
@@ -19,6 +19,7 @@ One file per resource in `app/routers`. A router function validates input throug
 | `system.py` | `GET /health`, `GET /validation` |
 | `sites.py` | `GET /sites` |
 | `analysis.py` | `POST /analyze`, `GET /sky`, `GET /scene` |
+| `terrain.py` | `GET /terrain` |
 
 ```python
 @router.post("/analyze", response_model=AnalyzeResponse)
@@ -28,16 +29,17 @@ def analyze(body: AnalyzeRequest, services: Deps) -> AnalyzeResponse:
 
 ## Schemas
 
-The request and response models are in `app/schemas`: `common.py` (site, site reference, window, shared field types), `analyze.py` (scenario, result, series, metrics, limits), `sky.py` (`/sky` and `/scene`), `system.py` (health, errors, validation report). They are the contract; see [architecture/repository-structure.md](../architecture/repository-structure.md) for how it is exported.
+The request and response models are in `app/schemas`: `common.py` (site, site reference, window, shared field types), `analyze.py` (scenario, result, series, metrics, limits), `sky.py` (`/sky` and `/scene`), `terrain.py` (`/terrain`), `system.py` (health, errors, validation report). They are the contract; see [architecture/repository-structure.md](../architecture/repository-structure.md) for how it is exported.
 
 ## Services
 
 | Service | File | Main functions | What it does |
 | --- | --- | --- | --- |
 | `SiteService` | `services/sites.py` | `list()`, `resolve(ref)` | Loads `sites.json` once. Turns `{id}` into a curated site (or raises `unknown_site`), and `{lat, lon, name?}` into a site of kind `custom`, clamping latitude to 89.9999 and normalising longitude to -180..180 |
-| `HorizonService` | `services/horizons.py` | `get(lat, lon)` | Returns the horizon profile, its source grid and the ground height at the site, from the memory cache, the disk cache, or by building it |
+| `HorizonService` | `services/horizons.py` | `get(lat, lon)` | Returns the horizon profile, its source grid and the ground height at the site, from the memory cache, the disk cache (file names carry a tag of the loaded grids), or by building it |
 | `AnalysisService` | `services/analysis.py` | `run(scenarios)`, `run_one(scenario)` | Runs one scenario end to end; see below |
 | `SkyService` | `services/sky.py` | `at(lat, lon, t)`, `scene(t)` | The Sun and the Earth at one point and moment with clearance; the sub-solar and sub-Earth points |
+| `TerrainService` | `services/terrain.py` | `tile(lat, lon, radius_km, n)` | The elevation tile around a point from the grid stack (`engines/relief.py`), with the grid that covers the centre; raises `no_terrain` when no grid is loaded |
 | `ValidationService` | `services/validation.py` | `report()` | Recomputes our angles for the saved JPL Horizons cases and compares them; the report is built once and kept |
 | `AssistantService` | `services/assistant.py` | `chat(request)` | One assistant answer: system prompt, tool loop over the services above, guardrails. Uses `KnowledgeBase` (`services/knowledge.py`) and an `LLMClient` (`services/llm.py`); see [assistant.md](assistant.md) |
 

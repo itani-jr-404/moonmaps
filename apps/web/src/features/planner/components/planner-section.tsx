@@ -17,7 +17,7 @@ export function PlannerSection() {
 
   return (
     <section
-      className="section border-y border-line bg-bg-2"
+      className="section border-y border-line"
       id="navigator"
       aria-labelledby="nv-h"
     >
@@ -26,7 +26,7 @@ export function PlannerSection() {
           <p className="eyebrow" data-reveal>
             The planner
           </p>
-          <h2 className="h2" id="nv-h" data-lines>
+          <h1 className="h2" id="nv-h" data-lines>
             <span className="line">
               <span className="li">Is it a good time</span>
             </span>
@@ -35,7 +35,7 @@ export function PlannerSection() {
                 <em>to land there?</em>
               </span>
             </span>
-          </h2>
+          </h1>
           <p className="lead" data-reveal>
             Pick a place and a date. We tell you in plain words whether a lander
             would have sunlight for its solar panels and could talk to Earth.

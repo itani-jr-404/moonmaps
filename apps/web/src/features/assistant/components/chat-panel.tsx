@@ -10,6 +10,7 @@ import {
 import type { AppLink } from '@/lib/api/client';
 import { useSmoothScroll } from '@/lib/motion/smooth-scroll';
 import { useScenarioStore } from '@/lib/state/scenario-store';
+import { scenarioQuery } from '@/lib/state/url-sync';
 import { useChatStore, type ChatTab } from '../hooks/use-chat-store';
 import { useContainScroll } from '../hooks/use-contain-scroll';
 import type { useConversation } from '../hooks/use-conversation';
@@ -52,7 +53,8 @@ export function ChatPanel({
   open: boolean;
   conversation: ReturnType<typeof useConversation>;
   onClose: () => void;
-  onGoTo: (sectionId: string) => void;
+  /** Opens a page of the app, or a section of one ("/#why"). */
+  onGoTo: (href: string) => void;
 }) {
   const isPhone = useIsPhone();
   const tab = useChatStore((s) => s.tab);
@@ -116,7 +118,8 @@ export function ChatPanel({
     const { place, timeMs } = plannerTarget(link);
     setPlace(place);
     if (timeMs !== null) setTime(timeMs);
-    onGoTo('navigator');
+    const t = timeMs ?? useScenarioStore.getState().timeMs;
+    onGoTo(`/planner?${scenarioQuery(place, t)}`);
   };
 
   const newChat = () => {
@@ -126,7 +129,7 @@ export function ChatPanel({
 
   const runCommand = (action: CommandAction) => {
     setDraft('');
-    if (action.kind === 'section') onGoTo(action.id);
+    if (action.kind === 'route') onGoTo(action.href);
     else if (action.kind === 'resources') {
       setTab('resources');
       requestAnimationFrame(() => tabRefs.current.resources?.focus());

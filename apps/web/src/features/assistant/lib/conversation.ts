@@ -76,6 +76,13 @@ export function plannerTarget(link: AppLink): {
   return { place, timeMs: Number.isFinite(t) ? t : null };
 }
 
+/** An answer's sources without repeats (two tools can share a title), in their first order. */
+export function uniqueSources(sources: readonly ChatSource[]): ChatSource[] {
+  return sources.filter(
+    (s, i, all) => all.findIndex((o) => o.title === s.title) === i,
+  );
+}
+
 export const UNAVAILABLE_MESSAGE =
   'The assistant is not available right now. The rest of Moon Maps still works.';
 
@@ -143,9 +150,9 @@ export const SUGGESTED_QUESTIONS = [
   'What does Earthrise mean?',
 ] as const;
 
-/** Sent by the welcome block's "About the NASA challenge" card. */
-export const CHALLENGE_QUESTION =
-  'What is the Lunar Landing Site Navigator challenge?';
+/** Sent by the welcome block's "Best dates this month" card. */
+export const BEST_DATES_QUESTION =
+  'What are the best landing dates in the next 30 days for the spot on screen?';
 
 /** "09:41 UTC". */
 export function fmtUtcClock(ms: number): string {

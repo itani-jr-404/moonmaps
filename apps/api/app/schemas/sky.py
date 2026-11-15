@@ -22,6 +22,19 @@ class SkyResponse(ApiModel):
     horizon_source: HorizonSource
     sun: BodyInSky
     earth: BodyInSky
+    earth_centre_distance_km: float = Field(
+        description=(
+            "From the site, on the Moon's 1737.4 km reference sphere (terrain not counted), to "
+            "the centre of the Earth, km"
+        )
+    )
+    earth_surface_distance_km: float = Field(
+        description=(
+            "From the site to the nearest point of the Earth's surface, km: "
+            "earth_centre_distance_km minus the Earth's equatorial radius, 6378.137 km "
+            "(NASA NSSDCA Earth Fact Sheet), so the Earth is taken as a sphere"
+        )
+    )
 
 
 class SceneResponse(ApiModel):
@@ -32,4 +45,6 @@ class SceneResponse(ApiModel):
     subsolar_lon: float
     subearth_lat: float
     subearth_lon: float
-    earth_distance_km: float
+    earth_distance_km: float = Field(
+        description="Centre of the Moon to centre of the Earth, km (not surface to surface)"
+    )

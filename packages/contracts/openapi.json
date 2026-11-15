@@ -1,6 +1,37 @@
 {
   "components": {
     "schemas": {
+      "AccuracyReport": {
+        "additionalProperties": false,
+        "properties": {
+          "calibration": {
+            "$ref": "#/components/schemas/CalibrationSummary"
+          },
+          "error_rate": {
+            "$ref": "#/components/schemas/ErrorRate"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "past_landings": {
+            "$ref": "#/components/schemas/PastLandingsAccuracy"
+          },
+          "positions": {
+            "$ref": "#/components/schemas/PositionsAccuracy"
+          }
+        },
+        "required": [
+          "generated_at",
+          "positions",
+          "past_landings",
+          "calibration",
+          "error_rate"
+        ],
+        "title": "AccuracyReport",
+        "type": "object"
+      },
       "AnalyzeRequest": {
         "additionalProperties": false,
         "properties": {
@@ -165,6 +196,94 @@
           "visible"
         ],
         "title": "BodyInSky",
+        "type": "object"
+      },
+      "CalibrationBody": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "enum": [
+              "sun",
+              "earth"
+            ],
+            "title": "Body",
+            "type": "string"
+          },
+          "calibrated_mae": {
+            "description": "Mean absolute error after calibration, held out",
+            "title": "Calibrated Mae",
+            "type": "number"
+          },
+          "calibrated_within_0_05": {
+            "description": "Share within 0.05 after calibration",
+            "title": "Calibrated Within 0 05",
+            "type": "number"
+          },
+          "improvement_pct": {
+            "description": "Drop in mean absolute error, percent",
+            "title": "Improvement Pct",
+            "type": "number"
+          },
+          "raw_mae": {
+            "description": "Mean absolute error of the app's centre-of-disc share against NASA's map, on held-out folds",
+            "title": "Raw Mae",
+            "type": "number"
+          },
+          "raw_within_0_05": {
+            "description": "Share of points within 0.05 before calibration",
+            "title": "Raw Within 0 05",
+            "type": "number"
+          }
+        },
+        "required": [
+          "body",
+          "raw_mae",
+          "calibrated_mae",
+          "raw_within_0_05",
+          "calibrated_within_0_05",
+          "improvement_pct"
+        ],
+        "title": "CalibrationBody",
+        "type": "object"
+      },
+      "CalibrationSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "bodies": {
+            "items": {
+              "$ref": "#/components/schemas/CalibrationBody"
+            },
+            "title": "Bodies",
+            "type": "array"
+          },
+          "features": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Features",
+            "type": "array"
+          },
+          "folds": {
+            "title": "Folds",
+            "type": "integer"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "points",
+          "folds",
+          "method",
+          "features",
+          "bodies"
+        ],
+        "title": "CalibrationSummary",
         "type": "object"
       },
       "ChatContext": {
@@ -366,6 +485,69 @@
         "title": "ChatSource",
         "type": "object"
       },
+      "Departure": {
+        "additionalProperties": false,
+        "properties": {
+          "depart": {
+            "description": "When to leave Earth to land at the arrival time with that travel time, UTC",
+            "format": "date-time",
+            "title": "Depart",
+            "type": "string"
+          },
+          "mission_id": {
+            "title": "Mission Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "travel_hours": {
+            "description": "That mission's hours from launch to landing",
+            "title": "Travel Hours",
+            "type": "number"
+          }
+        },
+        "required": [
+          "mission_id",
+          "name",
+          "travel_hours",
+          "depart",
+          "source_url"
+        ],
+        "title": "Departure",
+        "type": "object"
+      },
+      "DeparturesResponse": {
+        "additionalProperties": false,
+        "description": "Leave-Earth times for one landing time, one per past mission with a known travel time.",
+        "properties": {
+          "arrival": {
+            "description": "The landing time asked for, UTC",
+            "format": "date-time",
+            "title": "Arrival",
+            "type": "string"
+          },
+          "departures": {
+            "description": "Shortest travel time first",
+            "items": {
+              "$ref": "#/components/schemas/Departure"
+            },
+            "title": "Departures",
+            "type": "array"
+          }
+        },
+        "required": [
+          "arrival",
+          "departures"
+        ],
+        "title": "DeparturesResponse",
+        "type": "object"
+      },
       "ErrorDetail": {
         "additionalProperties": false,
         "properties": {
@@ -383,6 +565,52 @@
           "message"
         ],
         "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorRate": {
+        "additionalProperties": false,
+        "properties": {
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorRateItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "headline",
+          "items"
+        ],
+        "title": "ErrorRate",
+        "type": "object"
+      },
+      "ErrorRateItem": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "detail"
+        ],
+        "title": "ErrorRateItem",
         "type": "object"
       },
       "ErrorResponse": {
@@ -459,7 +687,7 @@
             "title": "Site Height M"
           },
           "source": {
-            "description": "Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)",
+            "description": "Elevation grid behind the horizon: lola-80s-80m or lola-75s-120m in the south polar region, lola-global-16ppd everywhere else, or sphere when no grid is loaded (smooth Moon)",
             "title": "Source",
             "type": "string"
           }
@@ -566,6 +794,205 @@
           "sun_elevation_at_start"
         ],
         "title": "Metrics",
+        "type": "object"
+      },
+      "Mission": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "landing": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Landing time, UTC",
+            "title": "Landing"
+          },
+          "launch": {
+            "description": "Launch time, UTC",
+            "format": "date-time",
+            "title": "Launch",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Curated site id, when the site exists",
+            "title": "Site Id"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "travel_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Hours from launch to landing, computed from the two times",
+            "title": "Travel Hours"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "site_id",
+          "launch",
+          "landing",
+          "travel_hours",
+          "source_url"
+        ],
+        "title": "Mission",
+        "type": "object"
+      },
+      "MissionsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "missions": {
+            "items": {
+              "$ref": "#/components/schemas/Mission"
+            },
+            "title": "Missions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "missions"
+        ],
+        "title": "MissionsResponse",
+        "type": "object"
+      },
+      "PastLandingRow": {
+        "additionalProperties": false,
+        "properties": {
+          "horizons_el_deg": {
+            "description": "Sun elevation from JPL Horizons",
+            "title": "Horizons El Deg",
+            "type": "number"
+          },
+          "journal_el_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sun elevation in the Apollo Lunar Surface Journal table",
+            "title": "Journal El Deg"
+          },
+          "mission": {
+            "title": "Mission",
+            "type": "string"
+          },
+          "ours_el_deg": {
+            "description": "Sun elevation from our engine, smooth Moon",
+            "title": "Ours El Deg",
+            "type": "number"
+          },
+          "site": {
+            "description": "Curated site id, for example apollo-11",
+            "title": "Site",
+            "type": "string"
+          },
+          "t": {
+            "description": "Moonwalk start or end time, UTC",
+            "format": "date-time",
+            "title": "T",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mission",
+          "site",
+          "t",
+          "ours_el_deg",
+          "horizons_el_deg",
+          "journal_el_deg"
+        ],
+        "title": "PastLandingRow",
+        "type": "object"
+      },
+      "PastLandingsAccuracy": {
+        "additionalProperties": false,
+        "properties": {
+          "cases": {
+            "title": "Cases",
+            "type": "integer"
+          },
+          "max_diff_vs_horizons_deg": {
+            "title": "Max Diff Vs Horizons Deg",
+            "type": "number"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/PastLandingRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cases",
+          "max_diff_vs_horizons_deg",
+          "rows"
+        ],
+        "title": "PastLandingsAccuracy",
+        "type": "object"
+      },
+      "PositionsAccuracy": {
+        "additionalProperties": false,
+        "properties": {
+          "cases": {
+            "description": "Number of saved JPL Horizons cases",
+            "title": "Cases",
+            "type": "integer"
+          },
+          "max_diff_deg": {
+            "description": "Largest azimuth or elevation difference, degrees",
+            "title": "Max Diff Deg",
+            "type": "number"
+          },
+          "reference": {
+            "description": "Where the reference values came from",
+            "title": "Reference",
+            "type": "string"
+          },
+          "tolerance_deg": {
+            "title": "Tolerance Deg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "cases",
+          "max_diff_deg",
+          "tolerance_deg",
+          "reference"
+        ],
+        "title": "PositionsAccuracy",
         "type": "object"
       },
       "Scenario": {
@@ -709,6 +1136,7 @@
         "description": "Where the Sun and the Earth stand over the Moon at one moment, for the globe's lighting.",
         "properties": {
           "earth_distance_km": {
+            "description": "Centre of the Moon to centre of the Earth, km (not surface to surface)",
             "title": "Earth Distance Km",
             "type": "number"
           },
@@ -963,8 +1391,18 @@
           "earth": {
             "$ref": "#/components/schemas/BodyInSky"
           },
+          "earth_centre_distance_km": {
+            "description": "From the site, on the Moon's 1737.4 km reference sphere (terrain not counted), to the centre of the Earth, km",
+            "title": "Earth Centre Distance Km",
+            "type": "number"
+          },
+          "earth_surface_distance_km": {
+            "description": "From the site to the nearest point of the Earth's surface, km: earth_centre_distance_km minus the Earth's equatorial radius, 6378.137 km (NASA NSSDCA Earth Fact Sheet), so the Earth is taken as a sphere",
+            "title": "Earth Surface Distance Km",
+            "type": "number"
+          },
           "horizon_source": {
-            "description": "Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)",
+            "description": "Elevation grid behind the horizon: lola-80s-80m or lola-75s-120m in the south polar region, lola-global-16ppd everywhere else, or sphere when no grid is loaded (smooth Moon)",
             "title": "Horizon Source",
             "type": "string"
           },
@@ -997,9 +1435,108 @@
           "lon",
           "horizon_source",
           "sun",
-          "earth"
+          "earth",
+          "earth_centre_distance_km",
+          "earth_surface_distance_km"
         ],
         "title": "SkyResponse",
+        "type": "object"
+      },
+      "TerrainTile": {
+        "additionalProperties": false,
+        "description": "Ground heights on a square around a point, for the elevation picture. Read-only.\n\nRow 0 is the north edge and column 0 the west edge; the point is the centre sample.\nSample (i, j) lies at east = (j - c) * spacing_m, north = (c - i) * spacing_m, with\nc = (n - 1) / 2, measured along great circles from the centre.",
+        "properties": {
+          "centre_m": {
+            "description": "Height at the centre point, in metres",
+            "title": "Centre M",
+            "type": "number"
+          },
+          "heights_m": {
+            "description": "n rows of n heights in metres, rounded to 1 m; null where no grid covers",
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "title": "Heights M",
+            "type": "array"
+          },
+          "lat": {
+            "description": "Latitude in degrees, south negative",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "description": "East longitude, -180 to 180",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lon",
+            "type": "number"
+          },
+          "max_m": {
+            "title": "Max M",
+            "type": "number"
+          },
+          "min_m": {
+            "title": "Min M",
+            "type": "number"
+          },
+          "n": {
+            "description": "Samples per side",
+            "title": "N",
+            "type": "integer"
+          },
+          "radius_km": {
+            "description": "Half the width of the square, in km",
+            "title": "Radius Km",
+            "type": "number"
+          },
+          "reference_radius_km": {
+            "description": "Heights are metres above a sphere of this radius (the LOLA labels' OFFSET)",
+            "title": "Reference Radius Km",
+            "type": "number"
+          },
+          "resolution_m": {
+            "description": "Pixel size of that grid in metres (MAP_SCALE; for the global grid, at the equator)",
+            "title": "Resolution M",
+            "type": "number"
+          },
+          "source": {
+            "description": "Elevation grid that covers the centre: lola-80s-80m, lola-75s-120m or lola-global-16ppd. Samples outside it come from the next grid that covers them",
+            "title": "Source",
+            "type": "string"
+          },
+          "spacing_m": {
+            "description": "Distance between neighbouring samples, in metres",
+            "title": "Spacing M",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat",
+          "lon",
+          "radius_km",
+          "n",
+          "spacing_m",
+          "source",
+          "resolution_m",
+          "reference_radius_km",
+          "heights_m",
+          "centre_m",
+          "min_m",
+          "max_m"
+        ],
+        "title": "TerrainTile",
         "type": "object"
       },
       "ValidationCase": {
@@ -1164,6 +1701,58 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/accuracy": {
+      "get": {
+        "description": "Error rates against NASA references, and what the app learned from past data.",
+        "operationId": "accuracy_accuracy_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccuracyReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Accuracy",
+        "tags": [
+          "accuracy"
+        ]
+      }
+    },
     "/analyze": {
       "post": {
         "operationId": "analyze_analyze_post",
@@ -1354,6 +1943,124 @@
         "summary": "Health",
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/missions": {
+      "get": {
+        "description": "Past landings with launch and landing times and the travel time between them.",
+        "operationId": "missions_missions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissionsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Missions",
+        "tags": [
+          "accuracy"
+        ]
+      }
+    },
+    "/missions/departures": {
+      "get": {
+        "description": "When to leave Earth to land at `arrival`, using each past mission's travel time.",
+        "operationId": "departures_missions_departures_get",
+        "parameters": [
+          {
+            "description": "Wanted landing time on the Moon, UTC",
+            "in": "query",
+            "name": "arrival",
+            "required": true,
+            "schema": {
+              "description": "Wanted landing time on the Moon, UTC",
+              "format": "date-time",
+              "title": "Arrival",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeparturesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Departures",
+        "tags": [
+          "accuracy"
         ]
       }
     },
@@ -1579,6 +2286,113 @@
         "summary": "Sky",
         "tags": [
           "analysis"
+        ]
+      }
+    },
+    "/terrain": {
+      "get": {
+        "operationId": "terrain_terrain_get",
+        "parameters": [
+          {
+            "description": "Latitude in degrees, south negative",
+            "in": "query",
+            "name": "lat",
+            "required": true,
+            "schema": {
+              "description": "Latitude in degrees, south negative",
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Lat",
+              "type": "number"
+            }
+          },
+          {
+            "description": "East longitude in degrees, -180 to 360",
+            "in": "query",
+            "name": "lon",
+            "required": true,
+            "schema": {
+              "description": "East longitude in degrees, -180 to 360",
+              "maximum": 360,
+              "minimum": -180,
+              "title": "Lon",
+              "type": "number"
+            }
+          },
+          {
+            "description": "Half the width of the square, in km",
+            "in": "query",
+            "name": "radius_km",
+            "required": false,
+            "schema": {
+              "default": 30.0,
+              "description": "Half the width of the square, in km",
+              "maximum": 150,
+              "minimum": 1,
+              "title": "Radius Km",
+              "type": "number"
+            }
+          },
+          {
+            "description": "Samples per side",
+            "in": "query",
+            "name": "n",
+            "required": false,
+            "schema": {
+              "default": 64,
+              "description": "Samples per side",
+              "maximum": 128,
+              "minimum": 16,
+              "title": "N",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerrainTile"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Terrain",
+        "tags": [
+          "terrain"
         ]
       }
     },

@@ -104,8 +104,56 @@ def test_sky_and_scene(client):
     scene = client.get("/scene", params={"t": "2026-11-15T00:00:00Z"}).json()
     assert abs(scene["subsolar_lat"]) < 1.6
     assert 356_000 < scene["earth_distance_km"] < 407_000
+    surface, centre = body["earth_surface_distance_km"], body["earth_centre_distance_km"]
+    assert surface == pytest.approx(centre - 6378.137, abs=0.11)
+
+
+MOON_RADIUS_KM = 1737.4  # BODY301_RADII in pck00008.tpc (docs/science/conventions-and-ephemeris.md)
+EARTH_RADIUS_KM = 6378.137  # NASA NSSDCA Earth Fact Sheet, equatorial radius
+
+
+def test_sky_distances_to_earth(client):
+    """Seen from the sub-Earth point, the Earth is one Moon radius nearer than centre to centre;
+    from the opposite point it is one Moon radius farther."""
+    t = "2026-11-15T00:00:00Z"
+    scene = client.get("/scene", params={"t": t}).json()
+    lat, lon = scene["subearth_lat"], scene["subearth_lon"]
+    near = client.get("/sky", params={"lat": lat, "lon": lon, "t": t}).json()
+    centre_to_centre = scene["earth_distance_km"]
+    # Both distances are geometric, so only the rounding to 0.1 km separates them.
+    assert near["earth_centre_distance_km"] == pytest.approx(
+        centre_to_centre - MOON_RADIUS_KM, abs=0.2
+    )
+    assert near["earth_surface_distance_km"] == pytest.approx(
+        centre_to_centre - EARTH_RADIUS_KM - MOON_RADIUS_KM, abs=0.2
+    )
+    far_lon = lon + 180 if lon < 0 else lon - 180
+    far = client.get("/sky", params={"lat": -lat, "lon": far_lon, "t": t}).json()
+    assert far["earth_centre_distance_km"] == pytest.approx(
+        centre_to_centre + MOON_RADIUS_KM, abs=0.2
+    )
+    assert near["earth"]["el"] > 89 and far["earth"]["el"] < -89
 
 
 def test_validation_endpoint(client):
     body = client.get("/validation").json()
     assert body["all_passed"] is True and len(body["cases"]) >= 16
+
+
+def test_terrain_tile(client):
+    r = client.get("/terrain", params={"lat": -89.5, "lon": 90, "radius_km": 10, "n": 16})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["source"] == "synthetic" and body["n"] == 16
+    assert body["reference_radius_km"] == 1737.4 and body["resolution_m"] == 400.0
+    assert len(body["heights_m"]) == 16 and all(len(row) == 16 for row in body["heights_m"])
+    assert body["min_m"] <= body["centre_m"] <= body["max_m"]
+    assert body["spacing_m"] == pytest.approx(20_000 / 15, abs=0.01)
+
+
+def test_terrain_errors(client):
+    # The synthetic stack has no global grid, so a point near the equator has no terrain.
+    r = client.get("/terrain", params={"lat": 10, "lon": 0})
+    assert r.status_code == 404 and r.json()["error"]["code"] == "no_terrain"
+    r = client.get("/terrain", params={"lat": -89.5, "lon": 0, "radius_km": 500})
+    assert r.status_code == 422 and r.json()["error"]["code"] == "invalid_input"

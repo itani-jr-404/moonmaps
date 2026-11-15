@@ -6,6 +6,7 @@ import {
   fmtLatLon,
   fmtUtcClock,
   fmtUtcDateTime,
+  BEST_DATES_QUESTION,
   FLOATING_QUESTIONS,
   SUGGESTED_QUESTIONS,
   chatContext,
@@ -173,6 +174,15 @@ describe('follow-ups and suggestions', () => {
   it('floats at most two questions and lists three suggestions', () => {
     expect(FLOATING_QUESTIONS.length).toBeLessThanOrEqual(2);
     expect(SUGGESTED_QUESTIONS).toHaveLength(3);
+  });
+  it('suggests tasks in the app, not the hackathon challenge', () => {
+    const all = [
+      ...FLOATING_QUESTIONS,
+      ...SUGGESTED_QUESTIONS,
+      ...FOLLOW_UPS.map((f) => f.text),
+      BEST_DATES_QUESTION,
+    ];
+    for (const q of all) expect(q).not.toMatch(/challenge|Space Apps/i);
   });
 });
 

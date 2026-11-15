@@ -6,40 +6,64 @@ How the web app is laid out, where state lives, and how data is fetched. Layerin
 
 ## Routes
 
-One page, `/` (`src/app/page.tsx`). Its sections, in order:
+The app has one page per task (Next.js App Router, `src/app`). The navigation bar, the phone menu and the footer link to Home and every page, and the bar and the menu mark the current page with `aria-current="page"`. The list is `NAV_PAGES` (Home, then `PAGES`) in `src/lib/routes.ts`.
 
-| Section | Feature folder | What it does |
+| Route | File | Feature folder | What it shows |
+| --- | --- | --- | --- |
+| `/` | `app/page.tsx` | `hero`, `home`, `why` | The hero with the opening intro, a card for each page, then why the south pole |
+| `/explore` | `app/explore/page.tsx` | `landing` | The 3D globe: aim at any point, land, look around. The landed panel says when a spot that is not good now is next good, and links to the spot's site page |
+| `/planner` | `app/planner/page.tsx` | `planner` | Pick a site and a moment; a verdict, a 30-day calendar, the best windows and a 3D diorama. Only this page keeps the choice in the address |
+| `/sites` | `app/sites/page.tsx` | `sites` | Every curated site from `GET /sites`, grouped by kind, each with one `GET /sky` line for right now |
+| `/sites/[id]` | `app/sites/[id]/page.tsx` | `sites` | Everything about one curated site (below). An unknown id shows a not-found state |
+| `/sites/spot?lat=&lon=` | `app/sites/spot/page.tsx` | `sites` | The same page for any point on the Moon. Longitudes from 180 to 360 are converted to -180 to 0; bad values show a not-found state |
+| `/accuracy` | `app/accuracy/page.tsx` | `accuracy` | Error rates and checks against past landings |
+| `/about` | `app/about/page.tsx` | `about` | What the app does and how, and its limits |
+
+`app/layout.tsx` holds what every page shares: the skip link (to `#main`), the navigation, the footer, the assistant, the toast, the custom cursor, the scroll reveals and `RouteEffects` (`site-chrome`). A page with no route shows `app/not-found.tsx`.
+
+The opening intro (preloader) plays only when the first page of a visit is `/`. Opening any other page first counts the intro as done, so the navigation and reveals start at once; going to `/` later does not replay it. Each new page starts at the top.
+
+### The site page
+
+`features/sites/components/site-detail.tsx`. "Now" is rounded down to ten minutes when the page opens, so every panel asks about the same moment and answers are cached. Every number comes from the API.
+
+| Panel | Source | What it says |
 | --- | --- | --- |
-| Hero | `hero` | Opening, with a live readout of the Sun and the Earth at the south pole |
-| Choose a landing | `landing` | A globe to aim at any point, then a surface view of that point |
-| Why | `why` | Why the south pole and why light and line of sight matter |
-| Planner | `planner` | Pick a site and a moment; a verdict, a 30-day calendar, the best windows and a 3D diorama |
-| About | `about` | What the app does and how; the footer carries the data credits |
+| Header | `GET /sites` | Name, kind, mission date, coordinates, description, source link; "Open in planner" and "Copy link" |
+| Right now | `GET /sky`, `GET /scene` | Sun and Earth in view or not, elevation, azimuth, the terrain horizon in that direction, clearance. "How far away is the Earth?": "From this site to the nearest point on Earth's surface" (`earth_surface_distance_km` from `/sky`) and "Centre of the Earth to centre of the Moon" (`earth_distance_km` from `/scene`), each with a one-line note on what it means and its own loading and error state |
+| Is it a good landing site, and for how long? | `POST /analyze`, 30 days from now, 30-minute steps, with series | Good now and until when, or when it is next good and for how long; the next three good windows; next sunset and Earthset (or sunrise and Earthrise); the longest dark spell and the longest time without the Earth; the sunlight, Earth and both fractions. Good means both the Sun and the Earth are in view, the same rule as the globe's verdict; a body is in view when its centre is above the terrain ([ADR-005](../decisions/ADR-005-visibility-by-disc-centre.md)). No survival threshold is applied |
+| Sky forecast | The same `POST /analyze` | Fourteen UTC day cards with the hours of sunlight, of Earth in view and of both; a horizon panorama (SVG) of `horizon.elevation_deg` with the Sun and Earth tracks for the next three days |
+| The ground | `GET /terrain`, 30 km each way, 64 by 64 samples | A shaded elevation map on a canvas, north up, with the site as a dot at the centre, a north arrow, a scale bar and a colour legend in metres; the lowest, highest and site heights as text (and as the canvas's text alternative); the grid used and its pixel size. Light from the north-west, heights exaggerated 3 times for the shading only. Loading, empty (`no_terrain`: no grid loaded) and error states. It is drawn once and does not move, so reduced motion needs nothing more |
+| Getting there | `GET /missions`; the same `POST /analyze` as the outlook; `GET /missions/departures` | The mission that landed at this site, if any, and the range of past travel times, each with its source link. "When to leave Earth": the start of the next good window (from the outlook, in UTC) and, for each past mission with a travel time, the time to leave Earth that the API computes, marked "already past" when it is before now. Loading, empty (no good window in 30 days) and error states |
+| How sure are we | none | A link to `/accuracy` |
+| Site assistant | `features/site-assistant` | The chat about this site |
 
-Navigation, the footer, the custom cursor and reveal effects are in `site-chrome`. A skip link jumps to the planner.
+A window that reaches the end of the 30 days is shown as "at least" its length. The pure helpers are `features/sites/lib/outlook.ts` (windows, daily hours) and `features/sites/lib/panorama.ts` (drawing math), and `features/sites/lib/relief.ts` (colours, shading and the scale bar of the elevation map), all with unit tests.
 
-The assistant (`assistant`) floats over every section: a launcher at the bottom right, opening a chat panel. Its conversation lives in an in-memory zustand store (`features/assistant/hooks/use-chat-store.ts`), never in storage. See [backend/assistant.md](../backend/assistant.md#in-the-interface).
+On `/explore`, the point under the pointer is decided once, in `features/landing/lib/pick.ts`, and the aim card, the landing, the "See the best dates" link and the assistant's context all use it. A curated site is used only when the pointer is on its pin (within 0.8 degrees); anywhere else the point keeps its own coordinates (rounded to 0.1 degree, the same rounding as the aim card's answers), and a site within 2.2 degrees is only named as "near <site>". The surface panel appears when the dive animation ends, or at the latest 0.6 seconds after the dive's planned length by a plain timer, because GSAP's lag smoothing slows animations down to 33 ms per frame when frames take longer than 500 ms (software WebGL). In the surface view, a body the API calls visible is drawn over the decorative ground with its label, and a hidden body is not drawn.
 
-Planned, not built: an accuracy page for `GET /validation`, a comparison view and a horizon panorama.
+The home hero's 3D stage draws only while the hero section is on screen, its fade has not finished and the tab is shown (`features/hero/hooks/use-hero-scene.ts`); under reduced motion it draws single frames on demand. A click does not move the astronaut.
+
+The assistant (`assistant`) floats over every page: a launcher at the bottom right, opening a chat panel. Its conversation lives in an in-memory zustand store (`features/assistant/hooks/use-chat-store.ts`), never in storage. See [backend/assistant.md](../backend/assistant.md#in-the-interface).
 
 ## State
 
 | Kind | Examples | Home |
 | --- | --- | --- |
-| Scenario state | The chosen place (a curated site or a point) and moment | The zustand store in `src/lib/state/scenario-store.ts`, mirrored in the URL |
+| Scenario state | The chosen place (a curated site or a point) and moment | The zustand store in `src/lib/state/scenario-store.ts`, mirrored in the URL on `/planner`. A landing on `/explore` writes the landed place and time there too, so the assistant's context is the landed spot |
 | Server data | Sites, analysis results, sky answers | The TanStack Query cache |
 | Local UI state | Open panels, hover, the aimed point | The component or the scene |
 
 ### URL format
 
 ```text
-/?site=shackleton-ridge&t=2026-11-14T14:56Z
-/?lat=-89.4500&lon=-137.3000&t=2026-11-14T14:56Z
+/planner?site=shackleton-ridge&t=2026-11-14T14:56Z
+/planner?lat=-89.4500&lon=-137.3000&t=2026-11-14T14:56Z
 ```
 
 - `site` is a curated id (lower case letters, digits and hyphens), or `lat` and `lon` give a point. Longitudes from 180 to 360 are converted to -180 to 0.
 - `t` is the moment in UTC, to the minute.
-- Bad values are ignored and the defaults are used. The URL is updated with `replaceState` as the choice changes (`src/lib/state/url-sync.ts`), so a link reproduces the same result.
+- Bad values are ignored and the defaults are used. The URL is updated with `replaceState` as the choice changes (`src/lib/state/url-sync.ts`), so a link reproduces the same result. This runs only on `/planner` (`features/planner/components/planner-url-sync.tsx`). "See the best dates" on the globe and "Open in planner" on a site page open `/planner` with these parameters (`plannerPath` in `src/lib/routes.ts`).
 
 ### Server data
 
@@ -50,11 +74,15 @@ Hooks in `src/lib/api/hooks.ts`, built on TanStack Query and the typed client in
 | `useSites()` | `GET /sites` | Kept for the whole visit |
 | `useAnalyze(scenarios)` | `POST /analyze` | Keyed by the scenarios; the planner sends two (the verdict span and the 30-day calendar), without series |
 | `useSky(point, t)` | `GET /sky` | Kept for a minute |
-| `useScene(t)` | `GET /scene` | Available; not used by a section yet |
+| `useScene(t)` | `GET /scene` | The site page's Earth to Moon distance, centre to centre |
 | `useAssistantChat()` | `POST /assistant/chat` | A mutation; nothing is cached |
 | `useValidation()` | `GET /validation` | Available; not used by a section yet |
+| `useSiteOutlook(site, start, days, series)` | `POST /analyze` | One site over the coming days, 30-minute steps. The site page (30 days, with series) and the globe's "Good again from" line (30 days, no series) |
+| `useMissions()` | `GET /missions` | Kept for the whole visit; the site page's "Getting there" |
+| `useDepartures(arrival)` | `GET /missions/departures` | Off until the next good window is known; the site page's "When to leave Earth" |
+| `useTerrain(point, radiusKm)` | `GET /terrain` | Kept for the whole visit; the site page's "The ground". A 404 (`no_terrain`) is shown as the empty state and is not retried |
 
-`fetchSkyRounded` in `src/lib/api/fetch-sky.ts` serves the globe while aiming: it rounds the point to 0.1 degree and the time to 10 minutes and caches answers in memory ([ADR-011](../decisions/ADR-011-sky-endpoint.md)).
+`fetchSkyRounded` in `src/lib/api/fetch-sky.ts` serves the globe while aiming: it rounds the point to 0.1 degree and the time to 10 minutes and caches answers in memory ([ADR-011](../decisions/ADR-011-sky-endpoint.md)). A click lands on the same 0.1-degree point and asks `/sky` again for the exact time.
 
 An error from the API becomes an `ApiError` with the API's code and message. Every view handles loading, error and data; shared state components are in `src/components/ui/states.tsx`.
 
@@ -65,7 +93,7 @@ An error from the API becomes an `ApiError` with the API's code and message. Eve
 | Loading | A placeholder of the same size as the final content, so the layout does not jump |
 | Error | The message, and a way to retry |
 | Nothing to show | A short prompt |
-| No terrain for this site | The result, with a notice that the horizon is a smooth Moon |
+| No terrain for this site (only when no elevation grid is loaded) | The result, with a notice that the horizon is a smooth Moon |
 
 ## Accessibility
 

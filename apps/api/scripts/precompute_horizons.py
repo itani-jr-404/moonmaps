@@ -24,7 +24,7 @@ def main() -> int:
     )
     for site in SiteService(settings.data_dir / "sites.json").list():
         hz = horizons.get(site.lat, site.lon)
-        print(f"{site.id:28s} {hz.source:14s} max horizon {hz.profile_deg.max():6.2f} deg")
+        print(f"{site.id:28s} {hz.source:18s} max horizon {hz.profile_deg.max():6.2f} deg")
     return 0
 
 

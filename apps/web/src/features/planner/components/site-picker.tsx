@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useSites } from '@/lib/api/hooks';
 import { errorMessage } from '@/lib/api/client';
 import { useScenarioStore } from '@/lib/state/scenario-store';
@@ -57,13 +58,13 @@ export function SitePicker() {
         </div>
       )}
       <p className="mt-3 text-[13px] text-faint">
-        Or click any spot on the Moon in the{' '}
-        <a
-          href="#land"
+        Or click any spot on the Moon on the{' '}
+        <Link
+          href="/explore"
           className="text-accent-2 underline underline-offset-[3px]"
         >
-          landing section
-        </a>
+          Choose a landing page
+        </Link>
         .
       </p>
     </PlannerStep>

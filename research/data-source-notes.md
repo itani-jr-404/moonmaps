@@ -63,6 +63,13 @@ https://pgda.gsfc.nasa.gov/products/69 (Mazarico et al. 2011, Icarus 211, 1066-1
 
 - Quickmap https://quickmap.lroc.asu.edu/ and Moon Trek https://trek.nasa.gov/moon/ : eyeball terrain and site locations; screenshots for slides are fine only with attribution.
 
+## 5. Earth's radius for the site-to-Earth-surface distance [VERIFIED: page read 2026-11-15]
+
+- NASA NSSDCA, Earth Fact Sheet, Dr. David R. Williams, last updated 15 November 2024: https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
+- Equatorial radius 6378.137 km, polar radius 6356.752 km, volumetric mean radius 6371.000 km.
+- Used: the equatorial radius, as `EARTH_EQUATORIAL_RADIUS_KM` in `apps/api/app/services/sky.py`, for `earth_surface_distance_km` in `GET /sky`. The polar radius shows the size of the sphere approximation: up to about 21 km.
+- The Moon's radius for the site, 1737.4 km, is `BODY301_RADII` in the NAIF kernel `pck00008.tpc`, the same sphere as the LOLA labels (section 2).
+
 ## What to list in the submission "NASA Data" field
 
 JPL Horizons (DE441 ephemerides), LRO LOLA gridded DEMs, PGDA lunar polar illumination and Earth visibility maps, plus Quickmap/Moon Trek if used. Partner data: CSA Moon Exploration, only if we actually use it.

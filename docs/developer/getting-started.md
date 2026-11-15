@@ -31,12 +31,12 @@ pnpm install
 # API
 cd apps/api
 uv sync
-uv run python scripts/download_data.py        # kernels and elevation grids, about 250 MB
+uv run python scripts/download_data.py        # kernels and elevation grids, about 285 MB
 uv run python scripts/precompute_horizons.py  # horizon profiles for the curated sites
 cd ../..
 ```
 
-`download_data.py` is safe to run again; it skips files that are already there. `--no-dem` skips the elevation grids; every site then uses a smooth Moon. `--pgda` also downloads NASA Goddard's illumination maps (232 MB), which only `scripts/compare_pgda.py` needs.
+`download_data.py` is safe to run again; it skips files that are already there. `--no-dem` skips the elevation grids; every site then uses a smooth Moon. `--ci` gets the kernels, the 80 m polar grid and the 33 MB global grid only. `--pgda` also downloads NASA Goddard's illumination maps (232 MB), which only `scripts/compare_pgda.py` needs.
 
 ## Run it
 

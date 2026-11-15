@@ -14,7 +14,7 @@ The assistant is labelled as an AI assistant in the interface and shows its sour
 
 - Provider and model: free models from whichever providers have a key (NVIDIA, Groq, Google Gemini, Cloudflare Workers AI, SambaNova, OpenRouter, Cohere), tried in that order. Each answer reports the provider and model that wrote it. See [ADR-013](../decisions/ADR-013-assistant-model.md).
 
-No other part of the product uses AI. Positions, horizons, visibility and metrics are deterministic calculations from NASA data.
+Positions, horizons, visibility and metrics are deterministic calculations from NASA data. The Accuracy page also shows a small statistical model (ridge regression, `scripts/train_calibration.py`) that learned how our long-term values differ from NASA's maps; it is reported there and not applied to any result. See [ADR-014](../decisions/ADR-014-calibration.md).
 
 ## AI used to build the project
 
@@ -24,12 +24,17 @@ No other part of the product uses AI. Positions, horizons, visibility and metric
 | 2026-11-14 | Web app (`apps/web`) | Claude | Ported the team's prototype into the Next.js app, following the team's design | The team lead |
 | 2026-11-14 | Documentation | Claude | Updated these documents to match the code, from the code and the sources listed in [references.md](references.md) | The team lead |
 | 2026-11-15 | Assistant (`apps/api/app/services/assistant.py` and related files, `apps/web/src/features/assistant`) and its tests | Claude | Wrote the chat endpoint, its guardrails, the chat panel and their tests from [backend/assistant.md](../backend/assistant.md) | The team lead |
+| 2026-11-15 | Pages, site page, site assistant, accuracy page, learning from past data (`/accuracy`, `scripts/train_calibration.py`), missions | Claude | Wrote the code, tests and docs from the team's requests and the judges' feedback | The team lead |
+| 2026-11-15 | Distance from a site to the Earth's surface, leave-Earth times for the next good window (`GET /missions/departures`), the About page's accuracy sentence | Claude | Wrote the code, tests and docs from the team's test notes; recomputed the JPL Horizons differences by running the validation service | The team lead |
 | 2026-11-15 | Assistant knowledge base (`apps/api/app/data/knowledge/`) | Claude | Wrote the files from the app's code, the repository's documents and the official Space Apps and NASA pages listed in each file | The team lead |
+| 2026-11-15 | Navy theme, star field, navigation bar, card contrast, why-section drawings and home order (`apps/web/src/app/globals.css`, `site-chrome`, `home`, `why`, planner and about styles) | Claude | Changed the styles from the team's test notes and screenshots, and worked out the contrast ratios; the star field and the Moon ground drawings are CSS and SVG it wrote, not images | The team lead |
+| 2026-11-15 | Fixes from the team's test notes: chat resources and welcome, globe point picking and chat context, 3D Sun and Earth drawing, hero render loop, the landed panel on slow frames (`apps/web/src/features/assistant`, `landing`, `hero`) | Claude | Investigated the notes against the code, wrote the fixes, unit tests and document updates | The team lead |
+| 2026-11-15 | Terrain everywhere and the elevation map (global LOLA grid reader, `GET /terrain`, the site page's "The ground", ADR-015) | Claude | Wrote the code, tests and docs from the team's test notes; read the LOLA labels and catalogue files it cites | The team lead |
 
 How the output was checked:
 
-- The Sun and Earth angles are compared with JPL Horizons by an automated test (`apps/api/tests/test_horizons.py`): 16 cases, all within 0.05 degrees. See [science/validation.md](../science/validation.md).
-- The LOLA grid reading is checked by a test against a known crater (Shackleton) on the real grid.
+- The Sun and Earth angles are compared with JPL Horizons by an automated test (`apps/api/tests/test_horizons.py`): 16 cases (2 places, Sun and Earth, 4 dates in November and December 2026), all within the 0.05 degree pass rule; the largest difference is 0.0123 degrees. See [science/validation.md](../science/validation.md).
+- The LOLA grid reading is checked by a test against a known crater (Shackleton) on the real grid, and the global grid by a test that it matches the polar grid where both cover.
 - Items the tool could not confirm against a source are marked "to confirm" in the documents.
 - AI-written code and text can still contain mistakes that the tests do not catch.
 

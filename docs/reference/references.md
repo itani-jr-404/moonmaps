@@ -30,6 +30,8 @@ Used for the assistant's knowledge files `challenge.md` and `space-apps.md`. Not
 4. NASA Lunar Reconnaissance Orbiter, Lunar Orbiter Laser Altimeter (LOLA) gridded elevation, south pole. Browse: https://imbrium.mit.edu/BROWSE/LOLA_GDR/POLAR/SOUTH_POLE ; files: https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/ (`LDEM_80S_80M`, `LDEM_75S_120M`, downloaded 2026-11-14).
 5. LOLA PDS label of the 80 m south polar grid. https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/LDEM_80S_80M.LBL (read 2026-11-14). The `LDEM_75S_120M.LBL` label is at the same address pattern.
 6. LOLA catalogue, polar stereographic map projection description, DSMAP_POLAR.CAT. https://imbrium.mit.edu/CATALOG/DSMAP_POLAR.CAT (read 2026-11-14).
+6a. NASA Lunar Reconnaissance Orbiter, LOLA gridded elevation, global, simple cylindrical: `LDEM_16` (16 pixels per degree). Files: https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/ (listing read and `LDEM_16` downloaded 2026-11-15); label https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/LDEM_16.LBL (read 2026-11-15). The labels of `LDEM_4`, `LDEM_64` and `LDEM_128` in the same folder were read the same day for [ADR-015](../decisions/ADR-015-global-terrain-grid.md).
+6b. LOLA catalogue, simple cylindrical map projection description, DSMAP.CAT. https://imbrium.mit.edu/CATALOG/DSMAP.CAT (read 2026-11-15). The pixel formulas of the global grid reader.
 7. NASA Goddard, Planetary Geodesy Data Archive, lunar polar illumination maps. https://pgda.gsfc.nasa.gov/products/69
 8. NASA Goddard, Planetary Geodesy Data Archive, high-resolution LOLA models of south pole sites. https://pgda.gsfc.nasa.gov/products/78
 9. NASA's Scientific Visualization Studio, CGI Moon Kit (ID 4720). https://svs.gsfc.nasa.gov/4720 (read 2026-11-14). Files used: `lroc_color_2k.jpg`, `ldem_3_8bit.jpg`. Usage terms: https://svs.gsfc.nasa.gov/help/ (read 2026-11-14).
@@ -37,11 +39,12 @@ Used for the assistant's knowledge files `challenge.md` and `space-apps.md`. Not
 11. NASA 3D Resources. https://science.nasa.gov/3d-resources/ ; models used: https://science.nasa.gov/3d-resources/apollo-lunar-module/ , https://science.nasa.gov/3d-resources/z2-spacesuit/ , https://science.nasa.gov/3d-resources/astronaut/ ; GitHub mirror: https://github.com/nasa/NASA-3D-Resources (all read 2026-11-14). Details in [research/web-assets.md](../../research/web-assets.md).
 12. NASA Images and Media Usage Guidelines. https://www.nasa.gov/nasa-brand-center/images-and-media/ (read 2026-11-14).
 13. Arizona State University and NASA LRO, Quickmap. https://quickmap.lroc.asu.edu/
-14. NASA, Moon Trek. https://trek.nasa.gov/moon/
+14. NASA, Moon Trek. https://trek.nasa.gov/moon/ (linked from the assistant's Resources tab, with entry 2)
 14b. NASA NSSDCA, Sun Fact Sheet, Dr. David R. Williams, last updated 9 May 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html (read 2026-11-14). The Sun's radius in the comparison with NASA's maps.
 14c. NASA NSSDCA spacecraft pages for Apollo 11, Apollo 15 and Apollo 17 (launch and landing times). https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-096A (read 2026-11-14).
 14d. Brian W. Lawrence, "Sun Angles", Apollo Lunar Surface Journal, last revised 8 February 1999. https://www.apollojournals.org/alsj/sunangles.html (read 2026-11-14).
 14e. LOLA polar illumination and Earth-visibility maps (PGDA product 69): `AVGVISIB_75S_120M_201608` and `AVGVISIB_75S_120M_201608_EARTH`. https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/ (downloaded 2026-11-14).
+14f. NASA NSSDCA, Earth Fact Sheet, Dr. David R. Williams, last updated 15 November 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html (read 2026-11-15). The Earth's equatorial radius, 6378.137 km (polar radius 6356.752 km), used for the distance from a site to the Earth's surface in `GET /sky`.
 14a. NASA NSSDCA, Moon Fact Sheet, Dr. David R. Williams, last updated 11 January 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html (read 2026-11-14). Used for the distance and radius checks in [VALIDATION.md](../VALIDATION.md).
 
 ## Site coordinates
@@ -72,10 +75,13 @@ Used for the assistant's knowledge file `missions.md`.
 21g. NASA Science, Lunar Reconnaissance Orbiter (LRO). https://science.nasa.gov/mission/lro/ (read 2026-11-15).
 21h. NASA Science, LCROSS. https://science.nasa.gov/mission/lcross/ (read 2026-11-15).
 21i. Indian Space Research Organisation, Chandrayaan-3 and Chandrayaan-3 Details. https://www.isro.gov.in/Chandrayaan3.html , https://www.isro.gov.in/Chandrayaan3_Details.html (read 2026-11-15).
+21k. NASA NSSDCA spacecraft pages for the Apollo 12, 14 and 16 command modules and lunar modules (launch and landing times in `apps/api/app/data/missions.json`). https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099C , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-008A , https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-031A (read 2026-11-15). The Apollo 11, 15 and 17 pages are those cited in [VALIDATION.md](../VALIDATION.md#3-past-missions).
+21l. JAXA, "JAXA Confirms Smart Lander for Investigating Moon (SLIM) Landed on Moon", press release, 20 January 2024 (landing at 0:20 am JST on 20 January 2024). https://global.jaxa.jp/press/2024/01/20240120-1_e.html (read 2026-11-15). JAXA, SLIM project page (launch at 8:42:11 a.m. JST on 7 September 2023, 23:42:11 UTC on 6 September). https://global.jaxa.jp/projects/sas/slim/ (read 2026-11-15).
 21j. LROC (Arizona State University / NASA GSFC), "Chandrayaan-3 Landing Site" and "IM-2 Athena Seen Obliquely", already listed under 15. https://lroc.im-ldi.com/images/1314 , https://lroc.im-ldi.com/images/1408 (read again 2026-11-15).
 
 ## Papers
 
+22a. Hoerl, A. E., Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. Technometrics 12(1), 55-67. doi:10.1080/00401706.1970.10488634. The method of `apps/api/scripts/train_calibration.py` (ADR-014).
 22. Mazarico, E., Neumann, G. A., Smith, D. E., Zuber, M. T., Torrence, M. H. (2011). Illumination conditions of the lunar polar regions using LOLA topography. Icarus 211, 1066-1081. doi:10.1016/j.icarus.2010.10.030
 
 ## Software
@@ -166,6 +172,9 @@ Free tiers, model ids, base URLs and limits, read 2026-11-15 from each provider'
 | Checked and not used (no free API use) | https://inference-docs.cerebras.ai/support/rate-limits.md , https://docs.mistral.ai/admin/billing-usage/usage-limits.md , https://docs.together.ai/docs/billing-credits.md , https://huggingface.co/docs/inference-providers/pricing.md |
 
 ## Design references
+
+- Wikipedia, "Lambert's cosine law". https://en.wikipedia.org/wiki/Lambert%27s_cosine_law (read 2026-11-15). The shading of the elevation map on the site page (`apps/web/src/features/sites/lib/relief.ts`): brightness is the cosine of the angle between the ground's normal and the light.
+- Wikipedia, "Terrain cartography", section "Shaded relief". https://en.wikipedia.org/wiki/Terrain_cartography (read 2026-11-15). The convention of a light from the north-west on maps with north up; the article cites Eduard Imhof, *Cartographic relief presentation* (2007), ISBN 978-1-58948-026-1.
 
 - Prompt Motion, a library of motion design examples with source code. Used as a reference for the landing page scenes and the demo video. https://www.promptsmotion.com
 

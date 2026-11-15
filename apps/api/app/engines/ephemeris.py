@@ -92,6 +92,19 @@ class Ephemeris:
             earth_km=np.atleast_1d(e_dist.km),
         )
 
+    def site_earth_km(self, lat: float, lon: float, unix_second: float) -> float:
+        """Distance in km from a point on the Moon's reference sphere to the centre of the Earth.
+
+        The point is at height 0, on the 1737.4 km sphere that Skyfield takes from
+        BODY301_RADII in pck00008.tpc, so the terrain does not change it. The distance is
+        geometric (both bodies at the same instant), like earth_distance_km in subpoints(): a
+        light-time corrected distance from observe() would differ by up to about 40 km, because
+        the Earth and the Moon move together at about 30 km/s around the Sun.
+        """
+        site = self._moon + self._pc.build_latlon_degrees(self._frame, lat, lon, elevation_m=0.0)
+        t = self._times(np.array([unix_second]))[0]
+        return float((self._earth - site).at(t).distance().km)
+
     def subpoints(self, unix_second: float) -> SubPoints:
         """Points on the Moon directly under the Sun and under the Earth."""
         t = self._times(np.array([unix_second]))[0]

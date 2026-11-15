@@ -37,7 +37,7 @@ export interface HeroProgress {
   /** Smoothed pointer position, -1..1. */
   px: number;
   py: number;
-  /** 0 = three extra turns still to go, 1 = at rest. */
+  /** 0 = three extra turns still to go, 1 = at rest. Only the intro tweens it, once. */
   spin: number;
   /** Sun glow opacity. */
   sunA: number;

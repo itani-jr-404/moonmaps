@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 import { prefersReducedMotion } from '@/lib/motion/reduced-motion';
 import { useSmoothScroll } from '@/lib/motion/smooth-scroll';
 import { useIntroStore } from '@/lib/state/intro-store';
+import { observeVisibility } from '@/scene/renderer';
 
 import { showCopyNow, startIntro, type Intro } from '../lib/hero-intro';
 import type { HeroScene } from '../lib/hero-scene';
@@ -29,8 +30,10 @@ const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 /**
  * Owns the hero's 3D stage and the opening sequence: loads the scene, counts
  * real loading work on the preloader, plays the intro, then wires the scroll
- * dolly, the stage fade and click-to-spin. Under reduced motion the intro is
- * skipped and the scene is drawn as still frames.
+ * dolly and the stage fade. The render loop runs only while the hero is on
+ * screen and the tab is shown (hero-scene.ts checks document.hidden). Under
+ * reduced motion the intro is skipped and the scene is drawn as still frames.
+ * A click does nothing to the scene: the astronaut turns only once, in the intro.
  *
  * `skySettled` is true once the live readout's first /sky request has an
  * answer or has failed; the preloader counts it as one loading step.
@@ -89,6 +92,14 @@ export function useHeroScene(refs: HeroSceneRefs, skySettled: boolean) {
     let intro: Intro | null = null;
     let skipRequested = false;
     const removers: Array<() => void> = [];
+    // The loop draws only while the hero section is on screen and the stage has not faded out.
+    let heroInView = true;
+    let stageFaded = false;
+    const syncVisible = () => scene?.setVisible(heroInView && !stageFaded);
+    const stopObserving = observeVisibility(section, (v) => {
+      heroInView = v;
+      syncVisible();
+    });
 
     const listen = <K extends keyof WindowEventMap>(
       type: K,
@@ -111,17 +122,17 @@ export function useHeroScene(refs: HeroSceneRefs, skySettled: boolean) {
           },
         });
       }
-      const land = document.getElementById('land');
-      if (land && stage) {
-        // Fade the fixed stage out as the landing section comes up, and stop drawing once it is gone.
+      if (stage) {
+        // Fade the fixed stage out as the hero leaves, and stop drawing once it is gone.
         const apply = (p: number) => {
           stage.style.opacity = String(1 - p);
-          s?.setVisible(p < 1);
+          stageFaded = p >= 1;
+          syncVisible();
         };
         ScrollTrigger.create({
-          trigger: land,
-          start: 'top 85%',
-          end: 'top 25%',
+          trigger: section,
+          start: 'bottom 85%',
+          end: 'bottom 25%',
           onUpdate: (st) => apply(st.progress),
           onRefresh: (st) => apply(st.progress),
         });
@@ -185,22 +196,6 @@ export function useHeroScene(refs: HeroSceneRefs, skySettled: boolean) {
       });
     }
 
-    // Click the empty part of the hero to make the astronaut spin three times.
-    const onHeroClick = (e: MouseEvent) => {
-      const s = scene;
-      if (!s || reduced || !finished) return;
-      if (e.target instanceof Element && e.target.closest('a,button')) return;
-      ctx.add(() => {
-        gsap.fromTo(
-          s.P,
-          { spin: 0 },
-          // 'auto' only stops an earlier spin; `true` would also kill the scroll dolly on P.
-          { spin: 1, duration: 2.8, ease: 'power2.out', overwrite: 'auto' },
-        );
-      });
-    };
-    section.addEventListener('click', onHeroClick);
-
     const skyReady = () =>
       new Promise<void>((resolve) => {
         if (skyState.settled) resolve();
@@ -215,6 +210,7 @@ export function useHeroScene(refs: HeroSceneRefs, skySettled: boolean) {
           animate: !reduced,
           getCopyLeft: () => copy.getBoundingClientRect().left,
         });
+        syncVisible();
       } catch {
         // No WebGL or the chunk failed: the page works without the stage.
         scene = null;
@@ -295,7 +291,7 @@ export function useHeroScene(refs: HeroSceneRefs, skySettled: boolean) {
     return () => {
       disposed = true;
       removers.splice(0).forEach((off) => off());
-      section.removeEventListener('click', onHeroClick);
+      stopObserving();
       skyState.wake = null;
       intro?.kill();
       ctx.revert();

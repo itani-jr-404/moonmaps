@@ -14,7 +14,7 @@ Terms a visitor meets in Moon Maps or in the assistant's answers, trimmed from t
 
 **Curated site.** A place from the app's own list, with a source for its coordinates.
 
-**Smooth Moon.** North of 75 S the app has no terrain data, so the Moon is treated as a perfect ball with a level horizon.
+**Smooth Moon.** A perfect ball with a level horizon. The app uses it only if no elevation data is loaded; normally every place has a terrain horizon from LOLA.
 
 ## Position and direction
 

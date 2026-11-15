@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRef } from 'react';
 
 import { ArrowIcon } from '@/components/ui/icons';
@@ -59,25 +60,21 @@ export function HeroSection() {
                 </span>
               </span>
             </h1>
-            <p
-              className={styles.sub}
-              data-hero-fade
-              title="Tip: click the empty space to spin the astronaut"
-            >
+            <p className={styles.sub} data-hero-fade>
               Find out in seconds whether a place and a date on the Moon are
               good for landing: enough sunlight for power, and Earth in sight to
               call home.
             </p>
             <div className={styles.cta} data-hero-fade>
-              <a href="#navigator" className="btn btn-accent" data-magnetic>
+              <Link href="/planner" className="btn btn-accent" data-magnetic>
                 <span className="btn-label">
                   Plan a landing
                   <ArrowIcon />
                 </span>
-              </a>
-              <a href="#land" className="btn btn-ghost" data-magnetic>
+              </Link>
+              <Link href="/explore" className="btn btn-ghost" data-magnetic>
                 <span className="btn-label">Choose a landing</span>
-              </a>
+              </Link>
             </div>
             <HeroLive sky={sky} />
           </div>

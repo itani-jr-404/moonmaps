@@ -14,18 +14,19 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | 4 | Timeline | Building: a 30-day calendar and the best windows in the planner, instead of bars | `POST /analyze` (built) |
 | 5 | Power and communication metrics | Building: the planner's verdict | `POST /analyze` (built) |
 | 6 | Comparison | Planned | `POST /analyze` (built) |
-| 7 | Accuracy page | Planned | `GET /validation` (built) |
+| 7 | Accuracy page | Built: `/accuracy` with error rates and learning from past data | `GET /accuracy` (built) |
 | 8 | Moon globe | Building: the globe in "choose a landing" | `GET /sites`, `GET /sky` (built) |
-| 9 | Site view in 3D | Building: surface view and planner diorama with decorative ground; real terrain planned | `GET /sky` (built), `GET /terrain` (not built) |
+| 9 | Site view in 3D | Building: surface view and planner diorama with decorative ground; real terrain planned | `GET /sky` (built), `GET /terrain` (built) |
 | 10 | Solar System view | Planned | Planet positions in `GET /scene` (not built) |
-| 11 | Landing page | Building: hero, why and about sections on the one page | None |
+| 11 | Landing page | Building: home page with the hero, a card for each page, then the why section; navy theme with a star field | None |
 | 12 | Assistant | Built: chat panel on every screen; needs at least one model provider key on the API | `POST /assistant/chat` (built) |
 | 13 | Planner and Explorer modes | Planned | None |
 | 14 | Data export | Planned | `POST /analyze` (built) |
-| 15 | Checks against past landings (judges' feedback) | Started: 16 Apollo moonwalk times, LCROSS and SLIM in [VALIDATION.md](../VALIDATION.md); Chandrayaan-3 and robotic south pole landers planned | `GET /sky`, `POST /analyze` (built) |
-| 16 | Earth to Moon distance on screen (judges' feedback) | Planned; the value exists in `GET /scene` | `GET /scene` (built) |
-| 17 | Travel time to the Moon for past missions (judges' feedback) | Planned for the app; launch-to-landing times for Apollo 11, 15 and 17 with sources are in [VALIDATION.md](../VALIDATION.md#3-past-missions) | None |
-| 18 | Sky forecast for each site: where the Earth and the Sun will be over the coming days (judges' feedback) | Planned; the planner's 30-day calendar already forecasts good windows | `POST /analyze` (built) |
+| 15 | Checks against past landings (judges' feedback) | Built on `/accuracy`, with learning from past data; started: 16 Apollo moonwalk times, LCROSS and SLIM in [VALIDATION.md](../VALIDATION.md); Chandrayaan-3 and robotic south pole landers planned | `GET /sky`, `POST /analyze` (built) |
+| 16 | Earth to Moon distance on screen (judges' feedback) | Built on each site's page: from the site to the nearest point of the Earth's surface, and centre to centre | `GET /sky`, `GET /scene` (built) |
+| 17 | Travel time to the Moon for past missions (judges' feedback) | Built: "Getting there" on each site's page, with when to leave Earth to land as the next good window opens | `GET /missions`, `GET /missions/departures` (built) |
+| 18 | Sky forecast for each site: where the Earth and the Sun will be over the coming days (judges' feedback) | Built: 14-day forecast and horizon panorama on each site's page | `POST /analyze` (built) |
+| 19 | Terrain everywhere and an elevation map of each site (team test notes) | Built: every site has a terrain horizon from LOLA (polar grids near the south pole, the global grid elsewhere), and each site's page shows a shaded elevation map | `GET /terrain`, `POST /analyze` (built) |
 
 The web app is one page, `/`, with the sections hero, choose a landing, why, planner and about. Its code is in `apps/web/src/features/` (`hero`, `landing`, `why`, `planner`, `about`, `site-chrome`). The "Code" paths in the sections below are planned folders; where a feature is built inside one of the folders above, that folder is where to look. The API side of every built endpoint is described in [backend/api-reference.md](../backend/api-reference.md).
 
@@ -116,6 +117,8 @@ Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md), scene 2. Code: `feature
 
 Done when: clicking a pin selects that site, clicking elsewhere creates a custom site at the right coordinates, and the lit side matches the date.
 
+Status: the globe on `/explore` picks a curated site only on its pin; anywhere else it lands on the point's own coordinates and names a site within 2.2 degrees as "near (site)" (`features/landing/lib/pick.ts`). The landed spot becomes the assistant's context. The lit side is fixed, not the real Sun.
+
 ## 9. Site view in 3D
 
 The terrain around the site with moving shadows.
@@ -162,6 +165,17 @@ Download what is on screen.
 - The file states the site, the range, the step, the data sources and the date it was generated.
 
 Code: `features/metrics`. No new endpoint; the browser writes the file from the analysis it already holds.
+
+## 19. Terrain everywhere and an elevation map
+
+From the team's test notes: the horizon far from the pole must use terrain, and the site page should show the elevation of the ground.
+
+- The API uses the LOLA south polar grids where they cover a point and the global 16 pixel-per-degree grid everywhere else ([ADR-015](../decisions/ADR-015-global-terrain-grid.md)). The horizon text in the planner names the grid.
+- "The ground" on each site's page: a 60 km square around the site, coloured by height and shaded, with a legend in metres, a north arrow, a scale bar and the lowest, highest and site heights as text.
+
+Code: `apps/api/app/engines/relief.py`, `apps/api/app/services/terrain.py`, `apps/web/src/features/sites/components/terrain-map.tsx`, `apps/web/src/features/sites/lib/relief.ts`. Method: [science/terrain-and-horizon.md](../science/terrain-and-horizon.md).
+
+Done when: Apollo 11 shows a terrain horizon named as the global grid, and its page shows the elevation map with its heights from the API.
 
 ---
 

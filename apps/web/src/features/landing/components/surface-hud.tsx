@@ -11,6 +11,7 @@ import { useReducedMotion } from '@/lib/motion/reduced-motion';
 import type { LandedState } from '../hooks/use-landing';
 import { isGood, verdictText, whyText } from '../lib/verdict';
 import styles from './landing.module.css';
+import { SpotOutlook } from './spot-outlook';
 
 interface SurfaceHudProps {
   landed: LandedState;
@@ -68,7 +69,12 @@ export function SurfaceHud({
     >
       <div className={styles.hudTop}>
         <span className={styles.hudTag}>Landed</span>
-        <b className="font-mono">{landed.place}</b>
+        <b className="font-mono" data-testid="landed-place">
+          {landed.place}
+        </b>
+        {landed.near ? (
+          <span className="text-xs text-faint">near {landed.near}</span>
+        ) : null}
       </div>
       {ok ? (
         <>
@@ -83,6 +89,7 @@ export function SurfaceHud({
             {verdictText(good)}
           </div>
           <p className={styles.hudWhy}>{whyText(landed.sun, landed.earth)}</p>
+          <SpotOutlook landed={landed} good={good} />
         </>
       ) : landed.status === 'checking' ? (
         <LoadingState label="Checking the sky here…" />
@@ -145,8 +152,9 @@ export function SurfaceHud({
         </button>
       </div>
       <p className={styles.hudNote}>
-        Drag to look around. The Sun and Earth are where they really are in the
-        sky at this moment.
+        Drag to look around. The Sun and Earth are drawn where the API puts them
+        at this moment. The ground is only a drawing; the yes and no answers
+        come from the API&rsquo;s terrain horizon.
       </p>
     </div>
   );

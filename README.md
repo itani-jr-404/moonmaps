@@ -1,6 +1,6 @@
 # Moon Maps
 
-Moon Maps is a 3D web app for the NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". You pick a landing site on the Moon and a date, and it shows when the site has sunlight (power) and when it can see the Earth (a direct radio link), using real NASA terrain for the horizon near the south pole. A side-by-side comparison and a chat assistant are planned.
+Moon Maps is a 3D web app for the NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". You pick a landing site on the Moon and a date, and it shows when the site has sunlight (power) and when it can see the Earth (a direct radio link), using real NASA terrain for the horizon (fine maps near the south pole, a global map elsewhere). A side-by-side comparison and a chat assistant are planned.
 
 Built by team Lunar Titans at the Beirut local event, 14 to 15 November 2026.
 

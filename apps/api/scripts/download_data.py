@@ -3,12 +3,14 @@
 Sources (docs/data/sources.md):
 - JPL kernels from NAIF: https://naif.jpl.nasa.gov/pub/naif/generic_kernels/
 - LOLA polar elevation grids: https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/
+- LOLA global elevation grid, 16 pixels per degree (LDEM_16, 33 MB), for every site outside
+  the polar grids: https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/
 - With --pgda, NASA Goddard's average sunlight and Earth-visibility maps (PGDA product 69,
   https://pgda.gsfc.nasa.gov/products/69), used only by scripts/compare_pgda.py:
   https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/
 
-With --ci, only the kernels and the 80 m grid are fetched: enough for every test and the
-end-to-end tests, at half the size.
+With --ci, only the kernels, the 80 m grid and the global grid are fetched: enough for every
+test and the end-to-end tests, at about half the size.
 
 Usage: uv run python scripts/download_data.py [--no-dem] [--pgda] [--ci]
 """
@@ -21,7 +23,8 @@ from pathlib import Path
 
 DATA = Path(__file__).resolve().parent.parent / "app" / "data"
 NAIF = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels"
-LOLA = "https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG"
+LOLA_POLAR = "https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG"
+LOLA_GLOBAL = "https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG"
 
 KERNELS = {
     "de421.bsp": f"{NAIF}/spk/planets/a_old_versions/de421.bsp",
@@ -29,7 +32,13 @@ KERNELS = {
     "moon_080317.tf": f"{NAIF}/fk/satellites/moon_080317.tf",
     "pck00008.tpc": f"{NAIF}/pck/a_old_versions/pck00008.tpc",
 }
-GRIDS = ["LDEM_80S_80M", "LDEM_75S_120M"]
+# Grid file name -> folder. The choice of the global grid: docs/decisions/ADR-015.
+GRIDS = {
+    "LDEM_80S_80M": LOLA_POLAR,
+    "LDEM_75S_120M": LOLA_POLAR,
+    "LDEM_16": LOLA_GLOBAL,
+}
+CI_GRIDS = ["LDEM_80S_80M", "LDEM_16"]
 PGDA = "https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG"
 PGDA_MAPS = ["AVGVISIB_75S_120M_201608", "AVGVISIB_75S_120M_201608_EARTH"]
 
@@ -50,14 +59,16 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-dem", action="store_true", help="Skip the elevation grids")
     parser.add_argument("--pgda", action="store_true", help="Also get NASA's illumination maps")
-    parser.add_argument("--ci", action="store_true", help="Kernels and the 80 m grid only")
+    parser.add_argument(
+        "--ci", action="store_true", help="Kernels, the 80 m grid and the global grid only"
+    )
     args = parser.parse_args()
     for name, url in KERNELS.items():
         fetch(url, DATA / "kernels" / name)
     if not args.no_dem:
-        for grid in GRIDS[:1] if args.ci else GRIDS:
+        for grid in CI_GRIDS if args.ci else GRIDS:
             for ext in ("LBL", "IMG"):
-                fetch(f"{LOLA}/{grid}.{ext}", DATA / "dem" / f"{grid}.{ext}")
+                fetch(f"{GRIDS[grid]}/{grid}.{ext}", DATA / "dem" / f"{grid}.{ext}")
     if args.pgda:
         for name in PGDA_MAPS:
             for ext in ("LBL", "IMG"):

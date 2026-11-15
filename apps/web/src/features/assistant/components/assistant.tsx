@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
 import { useReducedMotion } from '@/lib/motion/reduced-motion';
 import { useSmoothScroll } from '@/lib/motion/smooth-scroll';
@@ -17,18 +18,35 @@ const PANEL_ID = 'moon-maps-assistant';
 /** On a phone the panel closes first; the page scrolls once its scroll lock is released. */
 const CLOSE_THEN_SCROLL_MS = 60;
 
+/** Site pages have their own assistant (features/site-assistant); the global one stays hidden there. */
+export function isSitePage(pathname: string | null): boolean {
+  return !!pathname && pathname.startsWith('/sites/');
+}
+
+/**
+ * Hides the global assistant on a site page. A separate component, so the assistant's own hooks
+ * are not called on a page where it is hidden.
+ */
+export function Assistant() {
+  const pathname = usePathname();
+  if (isSitePage(pathname)) return null;
+  return <GlobalAssistant />;
+}
+
 /**
  * The Moon Maps assistant: a launcher tile in the bottom-right corner, up to two suggested
  * questions beside it before the first use, and the panel above it. Answers come from
  * POST /assistant/chat.
  */
-export function Assistant() {
+function GlobalAssistant() {
   const introDone = useIntroStore((s) => s.done);
   const reduced = useReducedMotion();
   const open = useChatStore((s) => s.open);
   const setOpen = useChatStore((s) => s.setOpen);
   const conversation = useConversation();
   const { scrollTo } = useSmoothScroll();
+  const router = useRouter();
+  const pathname = usePathname();
   const shellRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
 
@@ -49,17 +67,23 @@ export function Assistant() {
     return () => document.removeEventListener('keydown', onKey);
   }, [open, close]);
 
-  /** Jumps to a section of the page. The panel stays open on a large screen. */
-  const goToSection = useCallback(
-    (id: string) => {
-      const target = document.getElementById(id);
-      if (!target) return;
+  /**
+   * Opens a page of the app with the router, or scrolls to a section when it is on this page
+   * ("/#why" on the home page). The panel stays open on a large screen.
+   */
+  const goTo = useCallback(
+    (href: string) => {
+      const url = new URL(href, window.location.origin);
+      const id = url.hash.slice(1);
+      const target =
+        url.pathname === pathname && id ? document.getElementById(id) : null;
+      const go = () => (target ? scrollTo(target) : router.push(href));
       if (isPhoneWidth()) {
         setOpen(false);
-        window.setTimeout(() => scrollTo(target), CLOSE_THEN_SCROLL_MS);
-      } else scrollTo(target);
+        window.setTimeout(go, CLOSE_THEN_SCROLL_MS);
+      } else go();
     },
-    [scrollTo, setOpen],
+    [pathname, router, scrollTo, setOpen],
   );
 
   const askFromPill = useCallback(
@@ -79,7 +103,7 @@ export function Assistant() {
         open={open}
         conversation={conversation}
         onClose={close}
-        onGoTo={goToSection}
+        onGoTo={goTo}
       />
       <Launcher
         ref={launcherRef}

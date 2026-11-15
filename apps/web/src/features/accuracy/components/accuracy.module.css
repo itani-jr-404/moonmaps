@@ -1,0 +1,246 @@
+/* The accuracy page: large readable tiles, simple CSS bars and a table. No animation. */
+
+.hero {
+  padding: calc(var(--nav-h) + 56px) 0 32px;
+  max-width: 820px;
+}
+.h1 {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: 300;
+  line-height: 1.1;
+  margin-top: 12px;
+}
+.lead {
+  margin-top: 18px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.block {
+  padding: 40px 0;
+  border-top: 1px solid var(--color-line);
+}
+.block:last-child {
+  padding-bottom: 96px;
+}
+.h2 {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 400;
+  margin-bottom: 16px;
+}
+.text {
+  max-width: 760px;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--color-muted);
+  margin-bottom: 20px;
+}
+.small {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-faint);
+  overflow-wrap: anywhere;
+}
+.small a,
+.link {
+  color: var(--color-accent-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  list-style: none;
+}
+.tile,
+.stat {
+  padding: 22px;
+  border-radius: 18px;
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-line-2);
+}
+.tileLabel {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-faint);
+}
+.tileValue {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+.tileDetail {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+
+.bars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+.barGroup {
+  padding: 22px;
+  border-radius: 18px;
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-line-2);
+}
+.barTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+.badge {
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--color-ok);
+  border: 1px solid color-mix(in srgb, var(--color-ok) 40%, transparent);
+}
+.barList {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.barRow {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: center;
+  gap: 12px;
+}
+.barLabel {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+.barCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.barTrack {
+  flex: 1;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--color-bg-3);
+  overflow: hidden;
+}
+.barFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-faint);
+}
+.barFill[data-kind='calibrated'] {
+  background: var(--color-accent-2);
+}
+.barValue {
+  min-width: 48px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.features {
+  margin-top: 20px;
+}
+.features ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  list-style: none;
+}
+.feature {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--color-muted);
+  border: 1px solid var(--color-line-2);
+}
+
+.note {
+  margin-top: 24px;
+  max-width: 760px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border-left: 3px solid var(--color-sun);
+  background: color-mix(in srgb, var(--color-sun) 6%, var(--color-bg-2));
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+.noteTitle {
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid var(--color-line);
+}
+.tableWrap:focus-visible {
+  outline: 2px solid var(--color-accent-2);
+  outline-offset: 2px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th,
+.table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-line);
+}
+.table thead th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-faint);
+  background: var(--color-bg-2);
+  white-space: nowrap;
+}
+.table tbody th {
+  font-weight: 500;
+  white-space: nowrap;
+}
+.table tbody tr:last-child th,
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  list-style: none;
+  margin-bottom: 16px;
+}
+.statValue {
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1.1;
+}
