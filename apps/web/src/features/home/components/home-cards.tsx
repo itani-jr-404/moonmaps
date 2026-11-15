@@ -33,7 +33,7 @@ const CARDS = [
 /** "What you can do": one card per page of the site. */
 export function HomeCards() {
   return (
-    <section className="section bg-bg" aria-labelledby="do-h">
+    <section className="section" aria-labelledby="do-h">
       <div className="wrap">
         <p className="eyebrow" data-reveal>
           What you can do
@@ -53,9 +53,11 @@ export function HomeCards() {
             <li key={c.href} data-reveal>
               <Link
                 href={c.href}
-                className="panel group flex h-full flex-col p-6 transition-colors hover:border-line-2 focus-visible:border-accent-2"
+                className="panel group flex h-full flex-col p-6 transition-colors hover:border-accent-2 focus-visible:border-accent-2"
               >
-                <b className="font-display text-2xl font-light">{c.title}</b>
+                <b className="font-display text-2xl font-normal text-ink">
+                  {c.title}
+                </b>
                 <span className="mt-3 flex-1 text-[15px] text-muted">
                   {c.text}
                 </span>

@@ -17,7 +17,7 @@ export function BestWindows({
 }) {
   return (
     <div
-      className="min-w-0 rounded-3xl border border-line bg-bg-2 p-7"
+      className="min-w-0 rounded-3xl border border-line-2 bg-bg-2 p-7"
       data-reveal
     >
       <h3 className="font-display text-[26px] font-normal">

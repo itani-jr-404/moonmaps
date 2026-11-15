@@ -18,7 +18,7 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | 8 | Moon globe | Building: the globe in "choose a landing" | `GET /sites`, `GET /sky` (built) |
 | 9 | Site view in 3D | Building: surface view and planner diorama with decorative ground; real terrain planned | `GET /sky` (built), `GET /terrain` (not built) |
 | 10 | Solar System view | Planned | Planet positions in `GET /scene` (not built) |
-| 11 | Landing page | Building: hero, why and about sections on the one page | None |
+| 11 | Landing page | Building: home page with the hero, a card for each page, then the why section; navy theme with a star field | None |
 | 12 | Assistant | Built: chat panel on every screen; needs at least one model provider key on the API | `POST /assistant/chat` (built) |
 | 13 | Planner and Explorer modes | Planned | None |
 | 14 | Data export | Planned | `POST /analyze` (built) |

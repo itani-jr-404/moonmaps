@@ -9,8 +9,8 @@ The home page is `/`. It introduces the problem and links to the other pages: th
 | Section | What happens |
 | --- | --- |
 | Hero | A preloader, then the Moon, the Earth's limb and the NASA Z2 astronaut behind the title. A live line gives the Sun and the Earth at the south pole now, from `GET /sky`. "Plan a landing" opens `/planner`; "Choose a landing" opens `/explore`. |
-| Why | Why missions want the south pole, and why light and a line of sight to the Earth decide a landing. |
 | What you can do | One card for each page: Choose a landing, Plan a landing, Browse the sites, How sure are we, About. |
+| Why | Why missions want the south pole, and why light and a line of sight to the Earth decide a landing. It comes after the cards, so the tools come first. Each card's drawing has light grey Moon ground with a few craters, drawn by the team in SVG. |
 
 The preloader plays only when a visit starts on `/`.
 

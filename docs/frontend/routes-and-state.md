@@ -6,11 +6,11 @@ How the web app is laid out, where state lives, and how data is fetched. Layerin
 
 ## Routes
 
-The app has one page per task (Next.js App Router, `src/app`). The navigation bar, the phone menu and the footer link to every page, and the bar marks the current page with `aria-current="page"`. The page list is `PAGES` in `src/lib/routes.ts`.
+The app has one page per task (Next.js App Router, `src/app`). The navigation bar, the phone menu and the footer link to Home and every page, and the bar and the menu mark the current page with `aria-current="page"`. The list is `NAV_PAGES` (Home, then `PAGES`) in `src/lib/routes.ts`.
 
 | Route | File | Feature folder | What it shows |
 | --- | --- | --- | --- |
-| `/` | `app/page.tsx` | `hero`, `why`, `home` | The hero with the opening intro, why the south pole, and a card for each page |
+| `/` | `app/page.tsx` | `hero`, `home`, `why` | The hero with the opening intro, a card for each page, then why the south pole |
 | `/explore` | `app/explore/page.tsx` | `landing` | The 3D globe: aim at any point, land, look around. The landed panel says when a spot that is not good now is next good, and links to the spot's site page |
 | `/planner` | `app/planner/page.tsx` | `planner` | Pick a site and a moment; a verdict, a 30-day calendar, the best windows and a 3D diorama. Only this page keeps the choice in the address |
 | `/sites` | `app/sites/page.tsx` | `sites` | Every curated site from `GET /sites`, grouped by kind, each with one `GET /sky` line for right now |

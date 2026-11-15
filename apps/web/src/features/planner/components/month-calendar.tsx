@@ -50,7 +50,7 @@ export function MonthCalendar({
 }) {
   return (
     <div
-      className="mt-6 rounded-3xl border border-line bg-bg-2 p-7"
+      className="mt-6 rounded-3xl border border-line-2 bg-bg-2 p-7"
       data-reveal
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">

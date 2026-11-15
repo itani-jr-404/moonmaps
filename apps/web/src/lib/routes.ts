@@ -10,6 +10,12 @@ export const PAGES = [
   { href: '/about', label: 'About', short: 'About' },
 ] as const;
 
+/** Home first, then every page: the top navigation, the phone menu and the footer list these. */
+export const NAV_PAGES = [
+  { href: '/', label: 'Home', short: 'Home' },
+  ...PAGES,
+] as const;
+
 /** True when `pathname` is this page or one of its sub-pages. */
 export function isActive(pathname: string, href: string): boolean {
   if (href === '/') return pathname === '/';

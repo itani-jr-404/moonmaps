@@ -70,6 +70,7 @@ test('every page is reachable from the navigation', async ({ page }) => {
     ['Sites', '/sites'],
     ['Accuracy', '/accuracy'],
     ['About', '/about'],
+    ['Home', '/'],
   ] as const) {
     const link = page
       .getByRole('navigation', { name: 'Primary' })

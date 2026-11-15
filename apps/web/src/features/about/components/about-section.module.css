@@ -13,9 +13,9 @@
 
 .col {
   padding: 32px;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-line-2);
   border-radius: 24px;
-  background: linear-gradient(180deg, #0f182b, #0a1120);
+  background: var(--card-grad);
   min-width: 0;
 }
 .n {

@@ -16,20 +16,21 @@
   opacity: 0;
   pointer-events: none;
 }
+/* The bar is always a lighter navy than the page, with a border under it, so it reads as its own band. */
 .nav::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgb(7 11 20 / 0.62);
+  background: color-mix(in srgb, var(--color-nav) 97%, transparent);
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
-  border-bottom: 1px solid var(--color-line);
-  opacity: 0;
-  transition: opacity 0.5s var(--ease);
+  border-bottom: 1px solid var(--color-line-2);
+  transition: box-shadow 0.5s var(--ease);
 }
+/* Once the page has moved, a shadow separates the bar from the content under it. */
 .solid::before,
 .menuOpen::before {
-  opacity: 1;
+  box-shadow: 0 12px 32px -16px rgb(2 6 18 / 0.85);
 }
 
 .bar {
@@ -78,7 +79,7 @@
 
 .links {
   display: none;
-  gap: 32px;
+  gap: 28px;
 }
 .links a {
   position: relative;
