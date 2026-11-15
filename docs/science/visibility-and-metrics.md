@@ -73,7 +73,7 @@ Each scenario gets a status for power and one for communication. The thresholds 
 | caution | Neither go nor no-go | Neither go nor no-go |
 | no-go | `sunlight_fraction` below 0.30, or `longest_dark_hours` above 168 | `earth_visible_fraction` below 0.10 |
 
-The interface always shows the numbers next to the badge, and a tooltip states the rule. A badge is a summary, not a verdict on a real mission.
+The web app does not show these statuses; it shows the visibility, the windows and the metrics themselves. The status is in the API response and in the assistant's `analyze_site` tool result. A status is a summary, not a verdict on a real mission.
 
 ## Worked example
 

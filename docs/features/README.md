@@ -10,16 +10,16 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | --- | --- | --- | --- |
 | 1 | Site list and custom coordinates | Building: site picker in the planner, and choosing a point on the globe | `GET /sites` (built) |
 | 2 | Date range and time slider | Building: the planner's moment picker; no range slider yet | None |
-| 3 | Horizon panorama | Planned | `POST /analyze` (built) |
+| 3 | Horizon panorama | Built: on each site's page, the terrain skyline with the Sun's and the Earth's tracks for the next 3 days | `POST /analyze` (built) |
 | 4 | Timeline | Building: a 30-day calendar and the best windows in the planner, instead of bars | `POST /analyze` (built) |
 | 5 | Power and communication metrics | Building: the planner's verdict | `POST /analyze` (built) |
 | 6 | Comparison | Planned | `POST /analyze` (built) |
-| 7 | Accuracy page | Built: `/accuracy` with error rates and learning from past data | `GET /accuracy` (built) |
+| 7 | Accuracy page | Built: `/accuracy` with error rates, learning from past data, past landings and positions against JPL Horizons | `GET /accuracy` (built) |
 | 8 | Moon globe | Building: the globe in "choose a landing" | `GET /sites`, `GET /sky` (built) |
 | 9 | Site view in 3D | Built: landed view with the API's LOLA horizon as its skyline and decorative near ground (ADR-016); planner diorama with decorative ground | `GET /sky` (built), `GET /terrain` (built) |
 | 10 | Solar System view | Planned | Planet positions in `GET /scene` (not built) |
-| 11 | Landing page | Building: home page with the hero, a card for each page, then the why section; navy theme with a star field | None |
-| 12 | Assistant | Built: chat panel on every screen; needs at least one model provider key on the API | `POST /assistant/chat` (built) |
+| 11 | Landing page | Building: home page (`/`) with the hero, a card for each page, then the why section; navy theme with a star field | None |
+| 12 | Assistant | Built: chat panel on every page and a site assistant on each site's page; needs at least one model provider key on the API | `POST /assistant/chat` (built) |
 | 13 | Planner and Explorer modes | Planned | None |
 | 14 | Data export | Planned | `POST /analyze` (built) |
 | 15 | Checks against past landings (judges' feedback) | Built on `/accuracy`, with learning from past data; started: 16 Apollo moonwalk times, LCROSS and SLIM in [VALIDATION.md](../VALIDATION.md); Chandrayaan-3 and robotic south pole landers planned | `GET /sky`, `POST /analyze` (built) |
@@ -28,7 +28,7 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | 18 | Sky forecast for each site: where the Earth and the Sun will be over the coming days (judges' feedback) | Built: 14-day forecast and horizon panorama on each site's page | `POST /analyze` (built) |
 | 19 | Terrain everywhere and an elevation map of each site (team test notes) | Built: every site has a terrain horizon from LOLA (polar grids near the south pole, the global grid elsewhere), and each site's page shows a shaded elevation map | `GET /terrain`, `POST /analyze` (built) |
 
-The web app is one page, `/`, with the sections hero, choose a landing, why, planner and about. Its code is in `apps/web/src/features/` (`hero`, `landing`, `why`, `planner`, `about`, `site-chrome`). The "Code" paths in the sections below are planned folders; where a feature is built inside one of the folders above, that folder is where to look. The API side of every built endpoint is described in [backend/api-reference.md](../backend/api-reference.md).
+The web app has separate pages: home (`/`), choose a landing (`/explore`), the planner (`/planner`), sites (`/sites`), a page per site (`/sites/<id>`, and `/sites/spot?lat=&lon=` for any point), accuracy (`/accuracy`), about (`/about`) and a not-found page. The routes are in `apps/web/src/app/`, and the navigation list is in `apps/web/src/lib/routes.ts`. The code is in `apps/web/src/features/` (`hero`, `home`, `why`, `landing`, `planner`, `sites`, `accuracy`, `about`, `assistant`, `site-assistant`, `site-chrome`). Where a section below names a folder that does not exist, it is a planned folder; the status line of a built feature says where its code is. The API side of every built endpoint is described in [backend/api-reference.md](../backend/api-reference.md).
 
 Features 1 to 5 are the core path. With only those, a user can pick a site and a date and read the answer.
 
@@ -65,9 +65,11 @@ The view from the site, all the way around.
 - The terrain outline, the Sun's path and the Earth's path over the range, and where each is now.
 - Parts of a path that are hidden by terrain are drawn faint.
 
-Code: `features/panorama`. Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md).
+Code: `features/sites/components/sky-forecast.tsx`, `features/sites/lib/panorama.ts`. Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md).
 
 Done when: for a known site the Sun marker goes behind the terrain at the same time the metrics say sunset.
+
+Status: on each site's page, under the sky forecast. It draws the API's terrain horizon (`horizon` of `POST /analyze`), the Sun's and the Earth's tracks over the next 3 days, and dots where they are now. The skyline is drawn over the tracks, so the parts behind terrain are covered, not drawn faint.
 
 ## 4. Timeline
 
@@ -107,13 +109,15 @@ Evidence that the numbers are right.
 - A short section comparing our sunlight percentages with NASA's illumination maps for a few sites.
 - A plain statement of what the app does not model.
 
-Code: `app/accuracy`. Method: [science/validation.md](../science/validation.md).
+Code: `app/accuracy/page.tsx`, `features/accuracy`. Method: [science/validation.md](../science/validation.md).
+
+Status: `/accuracy` reads `GET /accuracy` and shows error rates (including the app's long-term sunlight and Earth visibility against NASA Goddard's polar maps), learning from past data, past landings and positions against JPL Horizons. Under "Past landings" a note says that the Apollo Lunar Surface Journal column is a table compiled by hand in 1999, whose Sun climbs at the rate of the Moon's equator and drifts from both Moon Maps and JPL Horizons by up to 4.3 degrees, and that the 0.05 degree pass rule is for the comparison with JPL Horizons.
 
 ## 8. Moon globe
 
 Pick a site on a realistic Moon.
 
-Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md), scene 2. Code: `features/moon-globe`.
+Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md), scene 2. Code: `features/landing` (`lib/globe-scene.ts`).
 
 Done when: clicking a pin selects that site, clicking elsewhere creates a custom site at the right coordinates, and the lit side matches the date.
 
@@ -123,9 +127,11 @@ Status: the globe on `/explore` picks a curated site only on its pin; anywhere e
 
 The terrain around the site with moving shadows.
 
-Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md). Planned code: `features/site-view`.
+Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md). Code: `features/landing` (`lib/surface-scene.ts`, `lib/skyline.ts`) for the landed view on `/explore`, and `features/planner` (`lib/diorama-scene.ts`) for the planner diorama.
 
 Done when: the shadows move with the slider, and the scene goes dark at the times the metrics say the Sun is hidden.
+
+Status: in the landed view the far skyline is the API's LOLA terrain horizon (`horizon` of `POST /analyze`), and the decorative near ground is kept 0.2 degrees below it. The Sun and the Earth are drawn with normal depth testing behind the skyline, and a body the API says is hidden is not drawn ([ADR-016](../decisions/ADR-016-landed-view-real-skyline.md)). The view has no time slider; when it is dark, "Skip to sunrise" moves to the next sunrise the API finds. The ground near the site is not built from real terrain.
 
 ## 10. Solar System view
 
@@ -135,7 +141,7 @@ Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md), scene 1. Code: `feature
 
 ## 11. Landing page
 
-Spec: [frontend/landing-page.md](../frontend/landing-page.md). Code: `features/landing`.
+Spec: [frontend/landing-page.md](../frontend/landing-page.md). Code: `features/hero`, `features/home`, `features/why`. (`features/landing` is "choose a landing" on `/explore`.)
 
 Done when: it works with reduced motion turned on, and the button to the app is usable before the 3D has loaded.
 
@@ -143,7 +149,7 @@ Done when: it works with reduced motion turned on, and the button to the app is 
 
 A chat that explains results and can run comparisons.
 
-Spec: [backend/assistant.md](../backend/assistant.md). Code: `features/assistant`, `app/services/assistant.py`.
+Spec: [backend/assistant.md](../backend/assistant.md). Code: `apps/web/src/features/assistant` (the chat panel on every page), `apps/web/src/features/site-assistant` (the assistant on each site's page), `apps/api/app/services/assistant.py` and its instructions `apps/api/app/services/assistant_prompt.md`.
 
 Done when: it answers a glossary question from the knowledge base, answers a "which site" question by calling the analysis tool, shows its sources, and declines an unrelated question.
 

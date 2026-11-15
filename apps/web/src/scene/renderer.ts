@@ -9,6 +9,19 @@ import * as THREE from 'three';
  * to look the same.
  */
 
+/**
+ * Side of the square shadow map for the sunlit 3D views, in pixels. Phones,
+ * touch-only devices and machines with four or fewer CPU cores get 2048
+ * (a quarter of the memory and fill cost of 4096), everything else 4096.
+ */
+export function shadowMapSize(): number {
+  if (typeof window === 'undefined') return 2048;
+  const small = window.innerWidth < 700;
+  const touchOnly = window.matchMedia('(pointer: coarse)').matches;
+  const cores = navigator.hardwareConcurrency || 4;
+  return small || touchOnly || cores <= 4 ? 2048 : 4096;
+}
+
 export interface CreateRendererOptions {
   canvas?: HTMLCanvasElement;
   /** Transparent background so the page shows through. */

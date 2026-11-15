@@ -7,6 +7,7 @@ import {
   createRenderer,
   disposeObject,
   observeVisibility,
+  shadowMapSize,
 } from '@/scene/renderer';
 import { setSpriteText, textSprite } from '@/scene/text-sprite';
 import { glowTexture } from '@/scene/textures';
@@ -72,7 +73,7 @@ export function createDioramaScene(
 
   const sun = new THREE.DirectionalLight(0xfff4e4, SUN_ON);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(4096, 4096);
+  sun.shadow.mapSize.set(shadowMapSize(), shadowMapSize());
   Object.assign(sun.shadow.camera, {
     left: -17,
     right: 17,

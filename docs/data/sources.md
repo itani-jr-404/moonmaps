@@ -16,8 +16,10 @@ Every dataset the app uses, where it comes from, how we use it, and how it must 
 | PGDA illumination maps | NASA Goddard | Checking our sunlight and Earth-visibility percentages (script only) | Downloaded by script with `--pgda` | No |
 | Blue Marble | NASA | Earth surface map | No, planned | No |
 | Quickmap | Arizona State University, with NASA LRO data | Checking site coordinates by hand | Not yet (the check is still to do) | No |
-| Moon Trek | NASA | Visual comparison of terrain and horizons | No | No |
-| Moon Exploration portal | Canadian Space Agency | Background for site descriptions and the assistant's documents | No | No |
+| Moon Trek | NASA | Visual comparison of terrain and horizons | Linked from the assistant's Resources tab; no data used | No |
+| Moon Exploration portal | Canadian Space Agency | Background for the assistant's mission notes | Yes, cited in the assistant's `missions.md` | No |
+| Apollo Lunar Surface Journal, "Sun Angles" | Brian W. Lawrence, Apollo Lunar Surface Journal | Sun elevations at Apollo moonwalk times, shown next to ours on the accuracy page | Yes | The values used are saved in `apps/api/app/data/validation/apollo_sun.json` |
+| Mission launch and landing times | NASA NSSDCA, JAXA, ISRO | `GET /missions` and `GET /missions/departures` | Yes | `apps/api/app/data/missions.json` |
 | LROC, USGS, IAU and arXiv pages | Various | Site coordinates | Yes | Values in `sites.json`, sources in [research/site-coordinates.md](../../research/site-coordinates.md) |
 
 ## JPL ephemeris kernels
@@ -148,6 +150,12 @@ https://science.nasa.gov/3d-resources/ . The page says "All of these assets are 
 
 The pages give no credit line, and NASA's media guidelines ask that NASA be acknowledged as the source. Details, checksums and the compression command are in [research/web-assets.md](../../research/web-assets.md).
 
+## Apollo Lunar Surface Journal and mission times
+
+The Sun elevations at 16 Apollo moonwalk times come from "Sun Angles" in the Apollo Lunar Surface Journal, compiled by Brian W. Lawrence, last revised 8 February 1999 (https://www.apollojournals.org/alsj/sunangles.html, read 2026-11-14). `apps/api/scripts/check_apollo_sun.py` saves them in `apps/api/app/data/validation/apollo_sun.json` with our values and JPL Horizons values. Method and results: [VALIDATION.md](../VALIDATION.md#3-past-missions).
+
+Launch and landing times of past landings are in `apps/api/app/data/missions.json`, each with the official page it came from (`source_url`) and a note quoting it: NASA NSSDCA for Apollo, JAXA for SLIM and ISRO for Chandrayaan-3. Sources: [reference/references.md](../reference/references.md#missions).
+
 ## Blue Marble
 
 https://visibleearth.nasa.gov/collection/1484/blue-marble . NASA's composite images of the Earth. Planned for an Earth surface in the 3D scenes; not downloaded yet.
@@ -167,14 +175,14 @@ We do not pull data from these at run time. The plan is to use them by hand: to 
 
 https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/
 
-Background on past, current and future Moon missions. Planned for our own short summaries in site descriptions and the assistant's documents, each with a link back to the page it came from. Not used yet. Follow the site's terms of use.
+Background on past, current and future Moon missions. Two of its pages ("The Artemis campaign" and "Canada's role in Moon exploration", read 2026-11-15) are the source of the Canada paragraph in the assistant's `apps/api/app/data/knowledge/missions.md`, which links back to them. The code does not use the portal otherwise. Follow the site's terms of use.
 
 ## Size and storage
 
 | Item | Size | Where |
 | --- | --- | --- |
 | Kernels | About 18.7 MB | `apps/api/app/data/kernels/`, not in git |
-| Two elevation grids | About 232 MB | `apps/api/app/data/dem/`, not in git |
+| Three elevation grids (`LDEM_80S_80M`, `LDEM_75S_120M`, `LDEM_16`) | About 265 MB (115,520,000 + 116,250,752 + 33,177,600 bytes for the `.IMG` files) | `apps/api/app/data/dem/`, not in git |
 | Horizon cache | One small `.npz` file per point | `apps/api/app/data/cache/horizon/`, not in git |
 | Saved Horizons results | 3,712 bytes | `apps/api/app/data/validation/horizons.json`, in git |
 | Web textures | About 0.57 MB | `apps/web/public/textures/`, in git |
@@ -182,4 +190,4 @@ Background on past, current and future Moon missions. Planned for our own short 
 
 ## Credits shown in the app
 
-The footer of the web app carries a short data credit (NASA's Scientific Visualization Studio, NASA LRO LOLA, NASA JPL Horizons) and says that NASA does not endorse this project. A full list of every source above in the app, and the credit lines for the 3D models, are still to add.
+The footer of every page has a "Credits" list, each line linking to its source (`features/site-chrome/components/site-footer.tsx`): "Moon maps: NASA's Scientific Visualization Studio (CGI Moon Kit)", "Astronaut and lunar module models: NASA 3D Resources", "Terrain: NASA LRO LOLA" and "Positions checked against NASA JPL Horizons". It says that NASA does not endorse this project, and names team Lunar Titans. The app does not show a full list of every source above, nor the per-file credit lines for the 3D models in the table above.

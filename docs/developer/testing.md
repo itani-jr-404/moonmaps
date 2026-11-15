@@ -25,28 +25,34 @@ In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15,
 | `test_time_scale.py` | Unix times become the right UTC instant on both sides of the 1972 and 2016 leap seconds, against Skyfield's own datetime conversion | Kernels |
 | `test_error_budget.py` | Helpers of the error study (`app/engines/error_budget.py`): splitting Unix time into day and seconds gives the right UTC instant, and the whole-seconds form is 27 s early; angular separation; time equivalent of a position error; edges of a sine and their pairing; classes, confusion matrix and kappa; the global-grid pixel layout and longitude wrap | No |
 | `test_api.py` | Through the FastAPI test client with a synthetic grid: `/health`, `/sites`, `/analyze` for curated and custom sites, with and without the series, its error codes and the four-scenario limit, `/sky` and `/scene`, `/terrain` and its errors, `/validation`; from the point under the Earth, the site-to-Earth-centre distance in `/sky` is the centre-to-centre distance in `/scene` minus the Moon's 1737.4 km radius, one radius more from the opposite point, and the surface distance is 6378.137 km less | Kernels |
+| `test_assistant.py` | With a scripted model: the assistant is off with no key; message limits; the tool loop, its sources and the planner link; tool errors go back to the model; tool rounds are capped; prompt leaks, links, images, HTML, hidden characters, forged fences and markdown are removed from replies; model errors map to API errors; the rate limit per client; the chain of providers moves on from a limited or failing provider and uses only providers with keys; the site brief for a curated site and a custom spot; the accuracy and missions tools | Kernels |
 | `test_accuracy.py` | `/accuracy` and `/missions` read the saved files; `/missions/departures` subtracts each mission's travel time from the arrival (Apollo 11: 4 days 6 h 45 min 40 s), skips missions with no landing time, sorts shortest first, and rejects a missing, zone-less or out-of-range arrival; the calibration file's shape | Kernels |
 
 `tests/conftest.py` builds the synthetic grids and a temporary data folder. Tests that need the kernels or the real grid are skipped with a message when the files are missing, so the pure tests always run.
 
 ## End-to-end tests (Playwright)
 
-In `apps/web/e2e/`. They open the production build in a real browser with the real API running on its NASA data, capture each API response the page receives, and check that the screen shows exactly that answer: the planner, the 30-day calendar, the best times, the live readout, the globe's aim card and the landed view. They also cover the error state, a phone-size screen, reduced motion, the navigation, and the assistant panel (`assistant.spec.ts`, with `/assistant/chat` mocked so no model key is needed). Any uncaught page error fails a test.
+In `apps/web/e2e/`: 20 tests in 5 files (`planner.spec.ts`, `landing.spec.ts`, `accessibility-and-layout.spec.ts`, `assistant.spec.ts`, `site-assistant.spec.ts`), all passing on 2026-11-15. They open the production build in a real browser with the real API running on its NASA data, capture each API response the page receives, and check that the screen shows exactly that answer: the planner, the 30-day calendar, the best times, the live readout, the globe's aim card and the landed view. They also cover the error state, a phone-size screen, reduced motion, the navigation to every page, a site's page and an unknown site, the assistant panel (`assistant.spec.ts`) and the site assistant (`site-assistant.spec.ts`); both mock `/assistant/chat`, so no model key is needed. Any uncaught page error fails a test.
 
 Run from `apps/web`: `pnpm build && pnpm test:e2e`. Playwright starts the API and the web server itself (`playwright.config.ts`); the API needs `scripts/download_data.py` first. Locally the tests use the installed Chrome; CI installs Playwright's Chromium.
 
 ## Web tests (Vitest)
 
-In `apps/web/src`, next to the code, as `*.test.ts`. Run with `pnpm test` from the root. Vitest uses jsdom (`apps/web/vitest.config.ts`). The web app is being written, so this list changes; today the tests cover:
+In `apps/web/src`, next to the code, as `*.test.ts` and `*.test.tsx`. Run with `pnpm test` from the root. Vitest uses jsdom (`apps/web/vitest.config.ts`). On 2026-11-15, 173 tests in 27 files pass. They cover:
 
 | Area | Tests |
 | --- | --- |
 | `lib/format` | Durations, coordinates, angles, UTC times and trip lengths format as expected |
-| `features/sites` | The outlook and panorama helpers; the "Right now" distance rows (label, value, note, loading, error); "When to leave Earth" in "Getting there" (loading, no good window, the API's departure times at the next window start, error with retry) |
+| `features/sites` | The outlook and panorama helpers; the elevation map's colour ramp, hill shading, pixels, scale bar and grid names; the "Right now" distance rows (label, value, note, loading, error); "When to leave Earth" in "Getting there" (loading, no good window, the API's departure times at the next window start, error with retry) |
 | `lib/state/url-sync` | A place and a time round-trip through the URL; a bad URL falls back safely |
+| `lib/routes` | The active page, and the links to a site's page and to the planner |
 | `scene/units` | Unit and direction helpers for the 3D scenes |
-| `features/planner/lib/calendar` | Turning API windows into the 30-day calendar and the best windows |
-| `features/landing/lib` | The verdict for a point and the nearest curated site |
+| `scene/renderer` | The shadow map size: 4096 px on desktops, 2048 px on phones, touch-only devices and machines with four or fewer cores |
+| `features/planner/lib` | Turning API windows into the 30-day calendar and the best windows; the horizon text that names the grid |
+| `features/landing/lib` | The verdict for a point, the nearest curated site, and the skyline drawn from the API's terrain horizon |
+| `features/accuracy/lib` | Number formats on the accuracy page |
+| `features/assistant` | The conversation and its context, slash commands, reply blocks and links, resources, retry backoff, the reveal of an answer, scroll containment, the launcher and the floating pills |
+| `features/site-assistant` | The site assistant's store (one conversation per site) and its typing effect |
 
 3D scenes are not unit tested; their math helpers are.
 
@@ -94,15 +100,17 @@ A change to the workflow file itself runs every job.
 
 ## Manual checklist before a demo
 
-1. `GET /health` lists both grids, and `GET /validation` reports `all_passed: true`.
+1. `GET /health` lists the three grids, and `GET /validation` reports `all_passed: true`.
 2. Open a curated south pole site in the planner. The verdict, the calendar and the best windows agree with each other.
 3. Choose a point on the globe away from the curated sites. A result appears.
 4. Open a link with `?site=` and `?t=` in a new window. The same result appears.
 5. Turn on reduced motion and reload the page.
 6. Open the app in a private window on a phone.
 7. Stop the API and reload. Every section shows its error state, and nothing shows a number.
+8. Open `/accuracy`. Every section loads.
+9. Ask the assistant a question about a site. It answers (this needs a model provider key on the API).
 
-Planned with the features they test: comparing scenarios, the accuracy page, the assistant, and fallback results when the API is down.
+Planned with the features they test: comparing scenarios, and fallback results when the API is down.
 
 ## When a test fails
 

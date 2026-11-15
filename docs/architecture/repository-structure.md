@@ -1,22 +1,29 @@
 # Repository structure
 
-Status: Partly built. Last updated: 2026-11-15.
+Status: Built. Last updated: 2026-11-15.
 
 One repository holds the web app, the API and the contract between them. The root is a pnpm workspace (`pnpm-workspace.yaml`: `apps/web`, `packages/contracts`); the API is a separate uv project.
 
 ```text
 moon-maps/
   apps/
-    web/                          Next.js app (being written)
+    web/                          Next.js app
       src/
-        app/                      the one route: page.tsx (/), layout.tsx, providers.tsx,
-                                  globals.css (Tailwind v4 tokens)
-        features/                 one folder per page section
-          hero/                   opening section and its 3D scene
-          landing/                "choose a landing": globe and surface view
-          why/                    why the south pole
+        app/                      the routes: page.tsx (/), explore/, planner/, sites/ (with
+                                  [id]/ and spot/), accuracy/, about/, not-found.tsx;
+                                  layout.tsx, providers.tsx, globals.css (Tailwind v4 tokens)
+        features/                 one folder per page or part of a page
+          hero/                   home page opening section and its 3D scene
+          home/                   home page cards, one for each page
+          why/                    why the south pole (home page)
+          landing/                "choose a landing" (/explore): globe and landed view
           planner/                verdict, 30-day calendar, best windows, 3D diorama
+          sites/                  sites index and each site's page: outlook, sky forecast,
+                                  horizon panorama, elevation map, distances, travel times
+          accuracy/               the accuracy page
           about/                  what the app does and how
+          assistant/              the chat panel on every page
+          site-assistant/         the assistant on each site's page
           site-chrome/            navigation, footer, cursor, reveal effects
         scene/                    shared three.js pieces: renderer, materials, models,
                                   textures, decorative ground, units
@@ -26,6 +33,8 @@ moon-maps/
           state/                  zustand scenario store and URL sync
           format/                 dates, angles, durations
           motion/                 reduced motion, smooth scrolling
+          routes.ts               the list of pages and the paths between them
+      e2e/                        Playwright end-to-end tests (playwright.config.ts)
       public/
         textures/                 Moon colour and relief maps (web sizes)
         models/                   NASA 3D models (.glb)
@@ -33,21 +42,32 @@ moon-maps/
     api/                          FastAPI app
       app/
         main.py                   creates the app: middleware, error handlers, routers
-        routers/                  system.py, sites.py, analysis.py, terrain.py, assistant.py, deps.py
-        schemas/                  common.py, analyze.py, sky.py, terrain.py, system.py, assistant.py: the contract
-        services/                 sites, horizons, analysis, sky, terrain, validation, assistant, knowledge, llm, container
-        engines/                  ephemeris, terrain, horizon, relief, visibility (no FastAPI imports)
-        core/                     config, errors, cache
+        routers/                  system.py, sites.py, analysis.py, terrain.py, accuracy.py,
+                                  assistant.py, deps.py
+        schemas/                  common.py, analyze.py, sky.py, terrain.py, system.py,
+                                  accuracy.py, assistant.py: the contract
+        services/                 sites, horizons, analysis, sky, terrain, validation, accuracy,
+                                  assistant (and assistant_prompt.md), knowledge, llm,
+                                  providers, container
+        engines/                  ephemeris, terrain, horizon, relief, visibility, error_budget
+                                  (no FastAPI imports)
+        core/                     config, errors, cache, rate_limit
         data/
           sites.json              curated sites
-          validation/             saved JPL Horizons results (horizons.json)
+          missions.json           past missions' launch and landing times, with sources
+          knowledge/              the assistant's knowledge base (Markdown files)
+          validation/             saved comparison results (JPL Horizons, Apollo, NASA
+                                  Goddard's maps, calibration, error study)
           kernels/                downloaded, not in git
           dem/                    downloaded, not in git
           cache/                  horizon profiles, not in git
-      scripts/                    download_data, precompute_horizons, fetch_horizons, export_openapi
+      scripts/                    download_data, precompute_horizons, export_openapi, and the
+                                  validation scripts (fetch_horizons, fetch_horizons_wide,
+                                  check_apollo_sun, compare_pgda, compare_pgda_grids,
+                                  train_calibration, error_study)
       tests/
       pyproject.toml, uv.lock, .python-version
-      Dockerfile, .dockerignore
+      Dockerfile, .dockerignore, vercel.json
   packages/
     contracts/
       openapi.json                exported from the API
@@ -55,21 +75,22 @@ moon-maps/
   docs/                           these documents
   research/                       source notes, including site coordinates and web assets
   team/                           team notes
-  scripts/                        repository checks (documentation links)
+  scripts/                        check_docs_links.py, dev-api.mjs (used by pnpm dev)
   .github/workflows/ci.yml
   .husky/pre-commit               runs lint-staged
   package.json                    workspace scripts, lint-staged, packageManager pnpm@11.3.0
   pnpm-workspace.yaml, pnpm-lock.yaml
   .prettierrc.json, .prettierignore
+  .env.example                    every environment variable, with comments
   README.md, LICENSE, CLAUDE.md, AGENTS.md
 ```
 
-Planned, not present yet: `apps/api/app/data/knowledge/` for the assistant, and the features for the assistant, comparison, panorama and accuracy page.
+Planned, not present yet: a feature for comparing scenarios.
 
 ## Rules for where things go
 
-- **A feature folder** holds everything for one section: `components/`, `hooks/`, `lib/` and tests. A feature does not import from inside another feature. Shared code moves to `components/ui`, `scene/` or `lib/`.
-- **`app/`** holds the route only. The page puts the sections in order.
+- **A feature folder** holds everything for one page or one part of a page: `components/`, `hooks/`, `lib/` and tests. A feature does not import from inside another feature. Shared code moves to `components/ui`, `scene/` or `lib/`.
+- **`app/`** holds the routes only. Each `page.tsx` puts its feature views in order; `layout.tsx` adds the navigation, the footer and the assistant to every page.
 - **`schemas/`** is the only place request and response shapes are defined. Routers and services import from it.
 - **`engines/`** is pure calculation. Functions take numbers and arrays and return numbers and arrays. They can be tested without starting the API.
 - **Downloaded data** (`kernels/`, `dem/`, `cache/`) is in `.gitignore`. `scripts/download_data.py` fetches it. See [data/sources.md](../data/sources.md).

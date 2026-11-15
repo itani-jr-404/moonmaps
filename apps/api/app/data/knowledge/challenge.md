@@ -38,7 +38,7 @@ Status as the project documents give it on 2026-11-15 [5][6]. "Planned" means no
 - **Comparison.** The API accepts up to four scenarios. The web app analyses one site at a time; side-by-side comparison is planned [5].
 - **Views.** A Moon globe, a 3D landed view and a planner diorama are built. In the landed view the far skyline is the LOLA terrain horizon from the API; the near ground in the 3D views is decorative. Each site's page has a horizon panorama [5][6].
 - **Assistant.** Built: a chat panel that answers from these documents and from the app's API. It works only when a model key is set on the server [5].
-- **Checks.** Results are compared with JPL Horizons and with NASA Goddard's polar illumination maps [5].
+- **Checks.** Results are compared with JPL Horizons, with Sun elevations at the Apollo moonwalk times, and with NASA Goddard's polar illumination maps. The Accuracy page (`/accuracy`) shows these comparisons [5].
 
 ## Official challenge resources
 

@@ -40,7 +40,7 @@ The opening intro (preloader) plays only when the first page of a visit is `/`. 
 
 A window that reaches the end of the 30 days is shown as "at least" its length. The pure helpers are `features/sites/lib/outlook.ts` (windows, daily hours) and `features/sites/lib/panorama.ts` (drawing math), and `features/sites/lib/relief.ts` (colours, shading and the scale bar of the elevation map), all with unit tests.
 
-On `/explore`, the point under the pointer is decided once, in `features/landing/lib/pick.ts`, and the aim card, the landing, the "See the best dates" link and the assistant's context all use it. A curated site is used only when the pointer is on its pin (within 0.8 degrees); anywhere else the point keeps its own coordinates (rounded to 0.1 degree, the same rounding as the aim card's answers), and a site within 2.2 degrees is only named as "near <site>". The surface panel appears when the dive animation ends, or at the latest 0.6 seconds after the dive's planned length by a plain timer, because GSAP's lag smoothing slows animations down to 33 ms per frame when frames take longer than 500 ms (software WebGL). In the surface view, a body the API calls visible is drawn over the decorative ground with its label, and a hidden body is not drawn.
+On `/explore`, the point under the pointer is decided once, in `features/landing/lib/pick.ts`, and the aim card, the landing, the "See the best dates" link and the assistant's context all use it. A curated site is used only when the pointer is on its pin (within 0.8 degrees); anywhere else the point keeps its own coordinates (rounded to 0.1 degree, the same rounding as the aim card's answers), and a site within 2.2 degrees is only named as "near <site>". The surface panel appears when the dive animation ends, or at the latest 0.6 seconds after the dive's planned length by a plain timer, because GSAP's lag smoothing slows animations down to 33 ms per frame when frames take longer than 500 ms (software WebGL). In the surface view, the far skyline is the point's terrain horizon from `POST /analyze` (`features/landing/lib/skyline.ts`, [ADR-016](../decisions/ADR-016-landed-view-real-skyline.md)). A body the API calls visible is drawn with its label behind that skyline, with normal depth testing, and a hidden body is not drawn. See [3d-scenes.md](3d-scenes.md).
 
 The home hero's 3D stage draws only while the hero section is on screen, its fade has not finished and the tab is shown (`features/hero/hooks/use-hero-scene.ts`); under reduced motion it draws single frames on demand. A click does not move the astronaut.
 
@@ -76,7 +76,8 @@ Hooks in `src/lib/api/hooks.ts`, built on TanStack Query and the typed client in
 | `useSky(point, t)` | `GET /sky` | Kept for a minute |
 | `useScene(t)` | `GET /scene` | The site page's Earth to Moon distance, centre to centre |
 | `useAssistantChat()` | `POST /assistant/chat` | A mutation; nothing is cached |
-| `useValidation()` | `GET /validation` | Available; not used by a section yet |
+| `useValidation()` | `GET /validation` | Available; not used by a page |
+| `useAccuracy()` | `GET /accuracy` | Kept for the whole visit; the `/accuracy` page |
 | `useSiteOutlook(site, start, days, series)` | `POST /analyze` | One site over the coming days, 30-minute steps. The site page (30 days, with series) and the globe's "Good again from" line (30 days, no series) |
 | `useMissions()` | `GET /missions` | Kept for the whole visit; the site page's "Getting there" |
 | `useDepartures(arrival)` | `GET /missions/departures` | Off until the next good window is known; the site page's "When to leave Earth" |
