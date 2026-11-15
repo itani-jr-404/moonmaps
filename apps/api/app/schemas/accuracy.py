@@ -89,3 +89,20 @@ class Mission(ApiModel):
 
 class MissionsResponse(ApiModel):
     missions: list[Mission]
+
+
+class Departure(ApiModel):
+    mission_id: str
+    name: str
+    travel_hours: float = Field(description="That mission's hours from launch to landing")
+    depart: datetime = Field(
+        description="When to leave Earth to land at the arrival time with that travel time, UTC"
+    )
+    source_url: str
+
+
+class DeparturesResponse(ApiModel):
+    """Leave-Earth times for one landing time, one per past mission with a known travel time."""
+
+    arrival: datetime = Field(description="The landing time asked for, UTC")
+    departures: list[Departure] = Field(description="Shortest travel time first")

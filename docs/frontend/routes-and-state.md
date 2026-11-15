@@ -30,10 +30,10 @@ The opening intro (preloader) plays only when the first page of a visit is `/`. 
 | Panel | Source | What it says |
 | --- | --- | --- |
 | Header | `GET /sites` | Name, kind, mission date, coordinates, description, source link; "Open in planner" and "Copy link" |
-| Right now | `GET /sky`, `GET /scene` | Sun and Earth in view or not, elevation, azimuth, the terrain horizon in that direction, clearance; the Earth to Moon distance (centre to centre, `earth_distance_km`) |
+| Right now | `GET /sky`, `GET /scene` | Sun and Earth in view or not, elevation, azimuth, the terrain horizon in that direction, clearance. "How far away is the Earth?": "From this site to the nearest point on Earth's surface" (`earth_surface_distance_km` from `/sky`) and "Centre of the Earth to centre of the Moon" (`earth_distance_km` from `/scene`), each with a one-line note on what it means and its own loading and error state |
 | Is it a good landing site, and for how long? | `POST /analyze`, 30 days from now, 30-minute steps, with series | Good now and until when, or when it is next good and for how long; the next three good windows; next sunset and Earthset (or sunrise and Earthrise); the longest dark spell and the longest time without the Earth; the sunlight, Earth and both fractions. Good means both the Sun and the Earth are in view, the same rule as the globe's verdict; a body is in view when its centre is above the terrain ([ADR-005](../decisions/ADR-005-visibility-by-disc-centre.md)). No survival threshold is applied |
 | Sky forecast | The same `POST /analyze` | Fourteen UTC day cards with the hours of sunlight, of Earth in view and of both; a horizon panorama (SVG) of `horizon.elevation_deg` with the Sun and Earth tracks for the next three days |
-| Getting there | `GET /missions` | The mission that landed at this site, if any, and the range of past travel times, each with its source link |
+| Getting there | `GET /missions`; the same `POST /analyze` as the outlook; `GET /missions/departures` | The mission that landed at this site, if any, and the range of past travel times, each with its source link. "When to leave Earth": the start of the next good window (from the outlook, in UTC) and, for each past mission with a travel time, the time to leave Earth that the API computes, marked "already past" when it is before now. Loading, empty (no good window in 30 days) and error states |
 | How sure are we | none | A link to `/accuracy` |
 | Site assistant | `features/site-assistant` | The chat about this site |
 
@@ -69,11 +69,12 @@ Hooks in `src/lib/api/hooks.ts`, built on TanStack Query and the typed client in
 | `useSites()` | `GET /sites` | Kept for the whole visit |
 | `useAnalyze(scenarios)` | `POST /analyze` | Keyed by the scenarios; the planner sends two (the verdict span and the 30-day calendar), without series |
 | `useSky(point, t)` | `GET /sky` | Kept for a minute |
-| `useScene(t)` | `GET /scene` | The site page's Earth to Moon distance |
+| `useScene(t)` | `GET /scene` | The site page's Earth to Moon distance, centre to centre |
 | `useAssistantChat()` | `POST /assistant/chat` | A mutation; nothing is cached |
 | `useValidation()` | `GET /validation` | Available; not used by a section yet |
 | `useSiteOutlook(site, start, days, series)` | `POST /analyze` | One site over the coming days, 30-minute steps. The site page (30 days, with series) and the globe's "Good again from" line (30 days, no series) |
 | `useMissions()` | `GET /missions` | Kept for the whole visit; the site page's "Getting there" |
+| `useDepartures(arrival)` | `GET /missions/departures` | Off until the next good window is known; the site page's "When to leave Earth" |
 
 `fetchSkyRounded` in `src/lib/api/fetch-sky.ts` serves the globe while aiming: it rounds the point to 0.1 degree and the time to 10 minutes and caches answers in memory ([ADR-011](../decisions/ADR-011-sky-endpoint.md)).
 

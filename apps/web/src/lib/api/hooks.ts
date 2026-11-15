@@ -142,6 +142,25 @@ export function useMissions() {
   });
 }
 
+/**
+ * When to leave Earth to land at one moment, for each past mission's travel time
+ * (GET /missions/departures). The API does the subtraction; off until a landing time is known.
+ */
+export function useDepartures(arrivalIso: string | null) {
+  return useQuery({
+    queryKey: ['departures', arrivalIso],
+    queryFn: async ({ signal }) =>
+      unwrap(
+        await api.GET('/missions/departures', {
+          params: { query: { arrival: arrivalIso! } },
+          signal,
+        }),
+      ),
+    enabled: arrivalIso !== null,
+    staleTime: Infinity,
+  });
+}
+
 /** Error rates and learning from past landings (GET /accuracy), read from saved comparison files. */
 export function useAccuracy() {
   return useQuery({

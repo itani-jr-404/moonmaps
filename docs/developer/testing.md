@@ -10,7 +10,7 @@ Everyone writes at least one test for the code they add. Calculations are also c
 
 ## API tests (pytest)
 
-In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15, with the data downloaded, 69 tests pass. `test_assistant.py` tests the chat endpoint with a scripted model, so it needs no key and no network.
+In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15, with the data downloaded, 72 tests pass. `test_assistant.py` tests the chat endpoint with a scripted model, so it needs no key and no network.
 
 | File | Tests | Needs data files |
 | --- | --- | --- |
@@ -21,7 +21,8 @@ In `apps/api/tests/`. Run with `cd apps/api && uv run pytest -q`. On 2026-11-15,
 | `test_lola_grid.py` | On the real `LDEM_80S_80M`: the label values; Shackleton crater is a deep bowl and its mirror point is not; a point at 75 S is outside the grid | LOLA grid |
 | `test_horizons.py` | Every saved JPL Horizons case is within 0.05 degrees | Kernels |
 | `test_apollo_sun.py` | Our Sun elevation at 16 Apollo moonwalk times (1969 to 1972) is within 0.05 degrees of the saved JPL Horizons values | Kernels |
-| `test_api.py` | Through the FastAPI test client with a synthetic grid: `/health`, `/sites`, `/analyze` for curated and custom sites, with and without the series, its error codes and the four-scenario limit, `/sky` and `/scene`, `/validation` | Kernels |
+| `test_api.py` | Through the FastAPI test client with a synthetic grid: `/health`, `/sites`, `/analyze` for curated and custom sites, with and without the series, its error codes and the four-scenario limit, `/sky` and `/scene`, `/validation`; from the point under the Earth, the site-to-Earth-centre distance in `/sky` is the centre-to-centre distance in `/scene` minus the Moon's 1737.4 km radius, one radius more from the opposite point, and the surface distance is 6378.137 km less | Kernels |
+| `test_accuracy.py` | `/accuracy` and `/missions` read the saved files; `/missions/departures` subtracts each mission's travel time from the arrival (Apollo 11: 4 days 6 h 45 min 40 s), skips missions with no landing time, sorts shortest first, and rejects a missing, zone-less or out-of-range arrival; the calibration file's shape | Kernels |
 
 `tests/conftest.py` builds the synthetic grids and a temporary data folder. Tests that need the kernels or the real grid are skipped with a message when the files are missing, so the pure tests always run.
 
@@ -37,7 +38,8 @@ In `apps/web/src`, next to the code, as `*.test.ts`. Run with `pnpm test` from t
 
 | Area | Tests |
 | --- | --- |
-| `lib/format` | Durations, coordinates and angles format as expected |
+| `lib/format` | Durations, coordinates, angles, UTC times and trip lengths format as expected |
+| `features/sites` | The outlook and panorama helpers; the "Right now" distance rows (label, value, note, loading, error); "When to leave Earth" in "Getting there" (loading, no good window, the API's departure times at the next window start, error with retry) |
 | `lib/state/url-sync` | A place and a time round-trip through the URL; a bad URL falls back safely |
 | `scene/units` | Unit and direction helpers for the 3D scenes |
 | `features/planner/lib/calendar` | Turning API windows into the 30-day calendar and the best windows |

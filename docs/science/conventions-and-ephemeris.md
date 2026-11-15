@@ -1,6 +1,6 @@
 # Conventions and ephemeris
 
-Status: Built. Last updated: 2026-11-14.
+Status: Built. Last updated: 2026-11-15.
 
 This file defines the units and sign conventions for the whole project, and how the positions of the Sun and the Earth are calculated. The code is `apps/api/app/engines/ephemeris.py`.
 
@@ -30,12 +30,13 @@ These match what JPL Horizons reports for an observer on the Moon (airless appar
 | Constant | Value | Source |
 | --- | --- | --- |
 | Moon reference radius | 1737.4 km | The LOLA grid labels (`A_AXIS_RADIUS = 1737.4 <km>`, `OFFSET = 1737400.`, for example https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/LDEM_80S_80M.LBL ); the header of a JPL Horizons answer for an observer on the Moon states the same sphere |
+| Earth equatorial radius | 6378.137 km | NASA NSSDCA Earth Fact Sheet, https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html (last updated 15 November 2024, read 2026-11-15). The same page gives a polar radius of 6356.752 km. Used only for `earth_surface_distance_km` in `GET /sky` (`EARTH_EQUATORIAL_RADIUS_KM` in `app/services/sky.py`) |
 | Sun's angular radius seen from the Moon | about 0.27 degrees | Solar radius over distance; varies slightly. Source to confirm |
 | Earth's angular radius seen from the Moon | about 0.95 degrees | Earth radius over distance; varies with distance. Source to confirm |
 | Length of a lunar day (noon to noon) | about 29.53 Earth days | Synodic month. Source to confirm |
 | Tilt of the Moon's axis to the ecliptic | about 1.54 degrees | This is why the Sun stays so low at the poles. Source to confirm |
 
-Only the radius is used by the code. The angular radii, the lunar day and the tilt are for reading results; the API does not use them, because visibility is decided by the centre of each disc ([ADR-005](../decisions/ADR-005-visibility-by-disc-centre.md)).
+Only the two radii are used by the code: the Moon's for the observer and the horizon, the Earth's for the distance from a site to the Earth's surface. The angular radii, the lunar day and the tilt are for reading results; the API does not use them, because visibility is decided by the centre of each disc ([ADR-005](../decisions/ADR-005-visibility-by-disc-centre.md)).
 
 ## Library and files
 

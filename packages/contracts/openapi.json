@@ -485,6 +485,69 @@
         "title": "ChatSource",
         "type": "object"
       },
+      "Departure": {
+        "additionalProperties": false,
+        "properties": {
+          "depart": {
+            "description": "When to leave Earth to land at the arrival time with that travel time, UTC",
+            "format": "date-time",
+            "title": "Depart",
+            "type": "string"
+          },
+          "mission_id": {
+            "title": "Mission Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "travel_hours": {
+            "description": "That mission's hours from launch to landing",
+            "title": "Travel Hours",
+            "type": "number"
+          }
+        },
+        "required": [
+          "mission_id",
+          "name",
+          "travel_hours",
+          "depart",
+          "source_url"
+        ],
+        "title": "Departure",
+        "type": "object"
+      },
+      "DeparturesResponse": {
+        "additionalProperties": false,
+        "description": "Leave-Earth times for one landing time, one per past mission with a known travel time.",
+        "properties": {
+          "arrival": {
+            "description": "The landing time asked for, UTC",
+            "format": "date-time",
+            "title": "Arrival",
+            "type": "string"
+          },
+          "departures": {
+            "description": "Shortest travel time first",
+            "items": {
+              "$ref": "#/components/schemas/Departure"
+            },
+            "title": "Departures",
+            "type": "array"
+          }
+        },
+        "required": [
+          "arrival",
+          "departures"
+        ],
+        "title": "DeparturesResponse",
+        "type": "object"
+      },
       "ErrorDetail": {
         "additionalProperties": false,
         "properties": {
@@ -1073,6 +1136,7 @@
         "description": "Where the Sun and the Earth stand over the Moon at one moment, for the globe's lighting.",
         "properties": {
           "earth_distance_km": {
+            "description": "Centre of the Moon to centre of the Earth, km (not surface to surface)",
             "title": "Earth Distance Km",
             "type": "number"
           },
@@ -1327,6 +1391,16 @@
           "earth": {
             "$ref": "#/components/schemas/BodyInSky"
           },
+          "earth_centre_distance_km": {
+            "description": "From the site, on the Moon's 1737.4 km reference sphere (terrain not counted), to the centre of the Earth, km",
+            "title": "Earth Centre Distance Km",
+            "type": "number"
+          },
+          "earth_surface_distance_km": {
+            "description": "From the site to the nearest point of the Earth's surface, km: earth_centre_distance_km minus the Earth's equatorial radius, 6378.137 km (NASA NSSDCA Earth Fact Sheet), so the Earth is taken as a sphere",
+            "title": "Earth Surface Distance Km",
+            "type": "number"
+          },
           "horizon_source": {
             "description": "Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)",
             "title": "Horizon Source",
@@ -1361,7 +1435,9 @@
           "lon",
           "horizon_source",
           "sun",
-          "earth"
+          "earth",
+          "earth_centre_distance_km",
+          "earth_surface_distance_km"
         ],
         "title": "SkyResponse",
         "type": "object"
@@ -1820,6 +1896,72 @@
           }
         },
         "summary": "Missions",
+        "tags": [
+          "accuracy"
+        ]
+      }
+    },
+    "/missions/departures": {
+      "get": {
+        "description": "When to leave Earth to land at `arrival`, using each past mission's travel time.",
+        "operationId": "departures_missions_departures_get",
+        "parameters": [
+          {
+            "description": "Wanted landing time on the Moon, UTC",
+            "in": "query",
+            "name": "arrival",
+            "required": true,
+            "schema": {
+              "description": "Wanted landing time on the Moon, UTC",
+              "format": "date-time",
+              "title": "Arrival",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeparturesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Departures",
         "tags": [
           "accuracy"
         ]

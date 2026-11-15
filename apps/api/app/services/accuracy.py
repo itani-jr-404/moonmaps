@@ -12,7 +12,7 @@ No number in this file is typed by hand: every value in the report is read from 
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -21,6 +21,8 @@ from app.schemas.accuracy import (
     AccuracyReport,
     CalibrationBody,
     CalibrationSummary,
+    Departure,
+    DeparturesResponse,
     ErrorRate,
     ErrorRateItem,
     Mission,
@@ -29,6 +31,7 @@ from app.schemas.accuracy import (
     PastLandingsAccuracy,
     PositionsAccuracy,
 )
+from app.services.analysis import check_range
 from app.services.validation import ValidationService
 
 
@@ -102,6 +105,31 @@ class AccuracyService:
                 )
             self._missions = MissionsResponse(missions=out)
         return self._missions
+
+    def departures(self, arrival: datetime) -> DeparturesResponse:
+        """When to leave Earth to land at `arrival`, for each past mission's travel time.
+
+        The travel time is landing minus launch from missions.json, to the second; missions
+        without an official landing time are left out.
+        """
+        check_range(arrival, arrival)
+        raw = json.loads(self._missions_file.read_text(encoding="utf-8"))
+        out: list[Departure] = []
+        for m in raw["missions"]:
+            if not m.get("landing"):
+                continue
+            travel = datetime.fromisoformat(m["landing"]) - datetime.fromisoformat(m["launch"])
+            out.append(
+                Departure(
+                    mission_id=m["id"],
+                    name=m["name"],
+                    travel_hours=round(travel / timedelta(hours=1), 2),
+                    depart=arrival - travel,
+                    source_url=m["source_url"],
+                )
+            )
+        out.sort(key=lambda d: d.travel_hours)
+        return DeparturesResponse(arrival=arrival, departures=out)
 
     def _build(self) -> AccuracyReport:
         val = self._validation.report()

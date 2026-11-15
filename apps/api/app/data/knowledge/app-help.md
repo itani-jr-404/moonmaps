@@ -25,11 +25,11 @@ Moon Maps has separate pages. The menu at the top links to them: Explore, Planne
 Open it from a card on Sites, from "See everything about this spot" in the landing panel on Choose a landing, or by link.
 
 - Header: the name, the kind of site, coordinates, mission date, description and its source; "Open in planner" and "Copy link".
-- "Right now": whether the Sun and the Earth are in view, their elevation and azimuth, the terrain horizon in that direction, and the distance from the Earth to the Moon.
+- "Right now": whether the Sun and the Earth are in view, their elevation and azimuth, the terrain horizon in that direction, and "How far away is the Earth?" with two distances. "From this site to the nearest point on Earth's surface" is measured from the site at the Moon's reference radius (local hills not counted) to the closest point of the Earth, taken as a ball of its equatorial radius (from `GET /sky`, the `sky_at` tool). "Centre of the Earth to centre of the Moon" is the usual Earth–Moon distance, the same for every site (from `GET /scene`, the `moon_scene` tool). The first is shorter by about one Moon radius plus one Earth radius on the side facing the Earth.
 - "Is it a good landing site, and for how long?": if good now, until when; if not, when it is next good and for how long; the next good windows.
 - "Can a lander stay, or must it leave?": next sunset or sunrise, next Earthset or Earthrise, the longest dark spell and the longest time without the Earth in view in the next 30 days.
 - "Sky forecast": the next 14 days, day by day, with hours of Sun, Earth and both; and a horizon panorama with the terrain skyline and the paths of the Sun and the Earth over the next 3 days.
-- "Getting there": how long past missions took from launch to landing, with sources, and the mission that landed at this site if any.
+- "Getting there": how long past missions took from launch to landing, with sources, and the mission that landed at this site if any. Under "When to leave Earth": "To land when the next good window opens on <date UTC>, leave Earth by:" and one line per past mission with a known travel time, for example "<date> UTC, Apollo 11-style trip, 4.3 days". The API subtracts each mission's launch-to-landing time from the start of the next window with the Sun and the Earth both in view (`GET /missions/departures`). A time marked "already past" cannot be met with that trip length. If there is no good window in the next 30 days, it says so instead.
 - "How sure are we": a link to the Accuracy page.
 - An unknown site or bad coordinates show "We do not know this site" or "This spot is not on the Moon map".
 

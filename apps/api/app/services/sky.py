@@ -11,6 +11,12 @@ from app.services.analysis import check_range
 from app.services.horizons import HorizonService
 from app.services.sites import clamp_lat, normalise_lon
 
+# The Earth's equatorial radius, 6378.137 km: NASA NSSDCA Earth Fact Sheet,
+# https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html (last updated 15 November 2024,
+# read 2026-11-15). Subtracting it treats the Earth as a sphere of that radius; the polar radius
+# is 6356.752 km on the same page, so the true nearest point can be up to about 21 km farther.
+EARTH_EQUATORIAL_RADIUS_KM = 6378.137
+
 
 def _body(az: float, el: float, profile: np.ndarray) -> BodyInSky:
     horizon_el = float(horizon_at(profile, az))
@@ -39,6 +45,7 @@ class SkyService:
             hz.observer_base_m + self._horizons.observer_height_m,
             np.array([t.timestamp()]),
         )
+        centre_km = self._ephemeris.site_earth_km(lat, lon, t.timestamp())
         return SkyResponse(
             t=t,
             lat=lat,
@@ -46,6 +53,8 @@ class SkyService:
             horizon_source=hz.source,
             sun=_body(float(pos.sun_az[0]), float(pos.sun_el[0]), hz.profile_deg),
             earth=_body(float(pos.earth_az[0]), float(pos.earth_el[0]), hz.profile_deg),
+            earth_centre_distance_km=round(centre_km, 1),
+            earth_surface_distance_km=round(centre_km - EARTH_EQUATORIAL_RADIUS_KM, 1),
         )
 
     def scene(self, t: datetime) -> SceneResponse:

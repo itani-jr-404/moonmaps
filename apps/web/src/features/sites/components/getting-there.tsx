@@ -1,16 +1,34 @@
 'use client';
 
-import { ErrorState, LoadingState } from '@/components/ui/states';
+import { EmptyState, ErrorState, LoadingState } from '@/components/ui/states';
 import { errorMessage, type Schemas } from '@/lib/api/client';
-import { useMissions } from '@/lib/api/hooks';
-import { fmtDate, plainDuration } from '@/lib/format/format';
+import { useDepartures, useMissions, useSiteOutlook } from '@/lib/api/hooks';
+import {
+  fmtDate,
+  fmtTravelDays,
+  fmtUtc,
+  plainDuration,
+} from '@/lib/format/format';
 
-import { hoursToMs } from '../lib/outlook';
+import { hoursToMs, outlookFrom } from '../lib/outlook';
+import { OUTLOOK_DAYS } from './landing-outlook';
 
 type Mission = Schemas['Mission'];
+type Departure = Schemas['Departure'];
 
-/** "Getting there": travel times of past landings from GET /missions, each with its source. */
-export function GettingThere({ siteId }: { siteId: string | null }) {
+/**
+ * "Getting there": travel times of past landings from GET /missions, each with its source, and
+ * when to leave Earth to land as the next good window opens (GET /missions/departures).
+ */
+export function GettingThere({
+  siteId,
+  site,
+  nowIso,
+}: {
+  siteId: string | null;
+  site: { id: string } | { lat: number; lon: number };
+  nowIso: string;
+}) {
   const q = useMissions();
 
   return (
@@ -39,6 +57,7 @@ export function GettingThere({ siteId }: { siteId: string | null }) {
           <TravelBody missions={q.data.missions} siteId={siteId} />
         )}
       </div>
+      <LeaveEarthBy site={site} nowIso={nowIso} />
     </section>
   );
 }
@@ -111,6 +130,112 @@ function TravelBody({
         ))}
       </ul>
     </div>
+  );
+}
+
+/**
+ * The next good window comes from the same POST /analyze as "Is it a good landing site"
+ * (same query key, so it is fetched once); the leave-Earth times come from the API.
+ */
+function LeaveEarthBy({
+  site,
+  nowIso,
+}: {
+  site: { id: string } | { lat: number; lon: number };
+  nowIso: string;
+}) {
+  const outlook = useSiteOutlook(site, nowIso, OUTLOOK_DAYS, true);
+  const next = outlook.data ? outlookFrom(outlook.data, 3).next : null;
+  const arrivalIso = next ? new Date(next.startMs).toISOString() : null;
+  const deps = useDepartures(arrivalIso);
+
+  return (
+    <div className="mt-8 border-t border-line pt-5" data-testid="leave-earth">
+      <h3 className="text-[13px] font-bold tracking-[0.16em] text-faint uppercase">
+        When to leave Earth
+      </h3>
+      <div className="mt-3">
+        {outlook.isPending ? (
+          <LoadingState label="Finding the next good window…" />
+        ) : outlook.isError ? (
+          <ErrorState
+            message={errorMessage(outlook.error)}
+            onRetry={() => void outlook.refetch()}
+          />
+        ) : !next ? (
+          <EmptyState>
+            There is no good window (Sun and Earth both in view) in the next{' '}
+            {OUTLOOK_DAYS} days, so there is no landing time to plan back from.
+          </EmptyState>
+        ) : deps.isPending ? (
+          <LoadingState label="Working out the departure times…" />
+        ) : deps.isError ? (
+          <ErrorState
+            message={errorMessage(deps.error)}
+            onRetry={() => void deps.refetch()}
+          />
+        ) : (
+          <DepartureList
+            arrivalIso={deps.data.arrival}
+            departures={deps.data.departures}
+            nowMs={Date.parse(nowIso)}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** The leave-Earth times for one landing time, shortest trip first, as the API sent them. */
+export function DepartureList({
+  arrivalIso,
+  departures,
+  nowMs,
+}: {
+  arrivalIso: string;
+  departures: Departure[];
+  nowMs: number;
+}) {
+  if (departures.length === 0) {
+    return (
+      <EmptyState>
+        No past mission has a known travel time to plan with.
+      </EmptyState>
+    );
+  }
+  return (
+    <>
+      <p className="text-[15px]">
+        To land when the next good window opens on{' '}
+        <b>{fmtUtc(Date.parse(arrivalIso))}</b>, leave Earth by:
+      </p>
+      <ul className="mt-3 grid gap-1.5 text-[14px]">
+        {departures.map((d) => {
+          const departMs = Date.parse(d.depart);
+          return (
+            <li
+              key={d.mission_id}
+              className="flex flex-wrap justify-between gap-x-4 border-b border-line py-1.5"
+            >
+              <span className="mono">
+                {fmtUtc(departMs)}
+                {departMs < nowMs ? (
+                  <span className="text-warn"> (already past)</span>
+                ) : null}
+              </span>
+              <span>
+                {d.name}-style trip, {fmtTravelDays(d.travel_hours)}{' '}
+                <Source url={d.source_url} />
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-3 max-w-[62ch] text-[13px] text-faint">
+        Each line uses one past mission&apos;s time from launch to landing. A
+        real mission&apos;s trip depends on its rocket, path and launch window.
+      </p>
+    </>
   );
 }
 

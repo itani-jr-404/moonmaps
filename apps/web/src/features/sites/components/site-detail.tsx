@@ -123,7 +123,7 @@ function SiteBody({
         <RightNow point={point} nowIso={nowIso} />
         <LandingOutlook site={ref} nowIso={nowIso} />
         <SkyForecast site={ref} nowIso={nowIso} />
-        <GettingThere siteId={siteId} />
+        <GettingThere siteId={siteId} site={ref} nowIso={nowIso} />
         <section className="panel p-6 md:p-8" aria-labelledby="sure-h">
           <p className="eyebrow">How sure are we</p>
           <h2 id="sure-h" className="mt-3 font-display text-2xl font-light">
