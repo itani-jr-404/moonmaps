@@ -91,12 +91,21 @@ export function AboutSection() {
             </ul>
           </div>
         </div>
-        <h2 className="h3 mt-16 mb-8" id="future-h" data-reveal>
-          Future scope
-        </h2>
-        <p className="mb-8" data-reveal>
-          Planned, not built yet.
-        </p>
+        <div className="mt-24 mb-16">
+          <p className="eyebrow" data-reveal>
+            Future scope
+          </p>
+          <h2 className="h2" id="future-h" data-lines>
+            <span className="line">
+              <span className="li">What comes next,</span>
+            </span>
+            <span className="line">
+              <span className="li">
+                <em>planned, not built yet.</em>
+              </span>
+            </span>
+          </h2>
+        </div>
         <div className={styles.grid} aria-labelledby="future-h">
           <div className={styles.col} data-reveal>
             <span className={styles.n}>04</span>
