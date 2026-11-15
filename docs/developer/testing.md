@@ -96,7 +96,7 @@ The workflow is `.github/workflows/ci.yml` (GitHub Actions, https://docs.github.
 
 A change to the workflow file itself runs every job.
 
-`main` cannot be protected on the repository's GitHub plan (GitHub's API refuses branch protection for a private repository on the free plan, checked 2026-11-14), so a red check does not block a merge by itself. The rule is a habit: merge only when the checks are green.
+`main` has no branch protection rule, so a red check does not block a merge by itself. The rule is a habit: merge only when the checks are green.
 
 ## Manual checklist before a demo
 
