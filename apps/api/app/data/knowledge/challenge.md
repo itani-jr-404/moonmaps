@@ -36,7 +36,7 @@ Status as the project documents give it on 2026-11-15 [5][6]. "Planned" means no
 - **Sites.** 17 curated sites: Artemis candidate regions, a CLPS landing, Apollo sites, missions of other countries, and reference points. Any latitude and longitude can also be given, or a point chosen on the globe [5][6].
 - **Metrics.** Built in the API: share of time in sunlight, share of time with Earth in view, longest dark period, longest gap in contact, next sunset, sunrise, Earthset and Earthrise, Sun elevation, and a power and communication status [8]. The web planner shows a verdict, a 30-day calendar and the best windows [6].
 - **Comparison.** The API accepts up to four scenarios. The web app analyses one site at a time; side-by-side comparison is planned [5].
-- **Views.** A Moon globe and a 3D surface view are being built. The ground in the 3D views is decorative, not LOLA terrain. The horizon panorama is planned [5][6].
+- **Views.** A Moon globe, a 3D landed view and a planner diorama are built. In the landed view the far skyline is the LOLA terrain horizon from the API; the near ground in the 3D views is decorative. Each site's page has a horizon panorama [5][6].
 - **Assistant.** Built: a chat panel that answers from these documents and from the app's API. It works only when a model key is set on the server [5].
 - **Checks.** Results are compared with JPL Horizons and with NASA Goddard's polar illumination maps [5].
 

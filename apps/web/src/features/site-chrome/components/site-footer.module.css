@@ -71,12 +71,18 @@
   font-size: 13px;
 }
 
+.team {
+  margin-top: 64px;
+  color: var(--color-muted);
+  font-size: 15px;
+}
+
 .bottom {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   justify-content: space-between;
-  margin-top: 64px;
+  margin-top: 24px;
   padding-block: 24px;
   border-top: 1px solid var(--color-line);
   font-size: 13px;

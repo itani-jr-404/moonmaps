@@ -10,16 +10,25 @@ import { glowTexture, sunCoreTexture } from '@/scene/textures';
 import { textSprite } from '@/scene/text-sprite';
 import { D2R, enuToVector } from '@/scene/units';
 
+import {
+  capGround,
+  groundCeiling,
+  skylineGeometry,
+  type HorizonProfile,
+} from './skyline';
+
 /*
  * Standing on the Moon at the chosen point. Units are kilometres; the scene
  * frame is x = east, y = up, z = -north (see scene/units.ts).
  *
  * The Sun and the Earth are placed from the API's azimuth and elevation, and
- * the good/bad mood comes from the API's `visible` flags. The ground itself is
- * decorative (scene/ground.ts); the real horizon is what the API used. So the
- * drawing never contradicts the answer: a body the API calls visible is drawn
- * over the ground (the drawn hills cannot hide it), with its label, and a body
- * the API calls hidden is not drawn at all.
+ * the good/bad mood comes from the API's `visible` flags. A body the API calls
+ * hidden is not drawn at all. The far hills are the API's terrain horizon from
+ * NASA LOLA (lib/skyline.ts), and the decorative near ground (scene/ground.ts)
+ * is kept below that horizon, so a visible body rises above the drawn hills
+ * exactly where the API says it clears them. Until the horizon arrives, or if
+ * it cannot be loaded, a visible body is drawn over the ground instead, so the
+ * drawing never hides what the API calls visible.
  *
  * Light intensities are the prototype's times Math.PI (physically based lights).
  */
@@ -60,6 +69,9 @@ export class SurfaceScene {
   private readonly dir = new THREE.Vector3();
   private readonly target = new THREE.Vector3();
   private terrain: THREE.Mesh | null = null;
+  /** The real skyline; null until the API's horizon for this point arrives. */
+  private skyline: THREE.Mesh | null = null;
+  private horizon: HorizonProfile | null = null;
   private ground: PolarGround | null = null;
   private lander: THREE.Object3D | null = null;
   private exposure = 1.05;
@@ -182,6 +194,38 @@ export class SurfaceScene {
     if (this.lander) this.lander.visible = false;
   }
 
+  /**
+   * Draws the API's terrain horizon as the far hills and lowers the decorative
+   * ground below it. Call after build(), for the same point.
+   */
+  setHorizon(p: HorizonProfile): void {
+    if (!this.terrain || !this.ground || p.elevationDeg.length === 0) return;
+    const geo = this.terrain.geometry;
+    const pos = geo.getAttribute('position') as THREE.BufferAttribute;
+    if (capGround(pos.array as Float32Array, p, this.eye.y) > 0) {
+      pos.needsUpdate = true;
+      geo.computeVertexNormals();
+    }
+    const base = this.ground.heightAt;
+    const eyeY = this.eye.y;
+    this.ground = {
+      geometry: geo,
+      heightAt: (e, n) => Math.min(base(e, n), groundCeiling(p, eyeY, e, n)),
+    };
+    this.horizon = p;
+    this.skyline = new THREE.Mesh(
+      skylineGeometry(p, this.eye.y),
+      new THREE.MeshStandardMaterial({
+        color: 0x8e8b86,
+        roughness: 1,
+        metalness: 0,
+        side: THREE.DoubleSide,
+      }),
+    );
+    this.scene.add(this.skyline);
+    this.placeLander(this.look.yaw / D2R);
+  }
+
   /** Places the Sun, the Earth and the lights from an API answer, and sets the mood. */
   setSky(sky: SkyResponse): void {
     const sv = enuToVector(sky.sun.az, sky.sun.el);
@@ -192,12 +236,15 @@ export class SurfaceScene {
 
     this.sunCore.position.copy(this.eye).addScaledVector(sv, SKY_D);
     this.sunGlow.position.copy(this.sunCore.position);
-    // Only the API decides what shows; the decorative ground never hides a visible body.
+    // Only the API decides what shows. With the real skyline drawn, bodies sit
+    // behind it like any distant object; without it, a visible body is drawn on top.
+    const overlay = this.horizon === null;
     this.sunCore.visible = this.sunGlow.visible = sunUp;
     for (const m of [this.sunCore.material, this.sunGlow.material]) {
-      m.depthTest = !sunUp;
+      m.depthTest = !(sunUp && overlay);
     }
-    this.sunCore.renderOrder = this.sunGlow.renderOrder = sunUp ? 6 : 0;
+    this.sunCore.renderOrder = this.sunGlow.renderOrder =
+      sunUp && overlay ? 6 : 0;
 
     const s = this.sunLight;
     s.target.position.copy(this.eye).setY(this.eye.y - EYE);
@@ -220,8 +267,8 @@ export class SurfaceScene {
     s.intensity = (good ? 5 : sunUp ? 1.2 : 0) * PI;
     this.ambient.intensity = (good ? 0.09 : 0.006) * PI;
     this.earth.visible = earthUp;
-    this.earthMaterial.depthTest = !earthUp;
-    this.earth.renderOrder = earthUp ? 5 : 0;
+    this.earthMaterial.depthTest = !(earthUp && overlay);
+    this.earth.renderOrder = earthUp && overlay ? 5 : 0;
     this.sunTag.visible = sunUp;
     this.earthTag.visible = earthUp;
     this.sunTag.position
@@ -353,6 +400,13 @@ export class SurfaceScene {
   }
 
   private clearGround(): void {
+    this.horizon = null;
+    if (this.skyline) {
+      this.scene.remove(this.skyline);
+      this.skyline.geometry.dispose();
+      (this.skyline.material as THREE.Material).dispose();
+      this.skyline = null;
+    }
     if (!this.terrain) return;
     this.scene.remove(this.terrain);
     this.terrain.geometry.dispose();

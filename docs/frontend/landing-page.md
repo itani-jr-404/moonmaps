@@ -18,7 +18,7 @@ The preloader plays only when a visit starts on `/`.
 
 A globe of the Moon with the curated sites. Aiming at a point asks the API whether the Sun and the Earth are visible there; choosing it opens a surface view of that point. When the landed spot is not good now, the panel says "Good again from (date), for (length)", from one `POST /analyze` over the next 30 days, or that it is not good at any time in those 30 days. "See everything about this spot" opens the site page: `/sites/(id)` when the site's pin was clicked, else `/sites/spot?lat=&lon=` for the point itself (a nearby site is only named, "near (site)"). "See the best dates" opens `/planner` on the spot.
 
-Data credits and the statement that NASA does not endorse the project are in the footer of every page.
+Data credits, the statement that NASA does not endorse the project, and the team's names (team Lunar Titans: Ali Al Itani, Hussein Alassaad, Leonardo Khayyat, Khalil Dandashli, Hassan Korek) are in the footer of every page.
 
 The hero scene is decoration; it does not show where the Sun or the Earth really is. Every number on the pages comes from the API.
 

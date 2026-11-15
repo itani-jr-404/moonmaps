@@ -29,6 +29,15 @@ const CREDITS = [
   },
 ] as const;
 
+/** The people who built Moon Maps, team Lunar Titans. */
+const TEAM = [
+  'Ali Al Itani',
+  'Hussein Alassaad',
+  'Leonardo Khayyat',
+  'Khalil Dandashli',
+  'Hassan Korek',
+] as const;
+
 export function SiteFooter() {
   return (
     <footer className={styles.footer}>
@@ -71,6 +80,9 @@ export function SiteFooter() {
             <p className={styles.note}>NASA does not endorse this project.</p>
           </div>
         </div>
+        <p className={styles.team}>
+          Made by team Lunar Titans: {TEAM.join(', ')}.
+        </p>
         <div className={styles.bottom}>
           <span>
             © 2026 Moon Maps, team Lunar Titans. Built for NASA Space Apps.

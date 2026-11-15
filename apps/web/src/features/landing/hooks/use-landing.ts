@@ -28,7 +28,7 @@ import {
   HALO_OPACITY,
   type GlobeHit,
 } from '../lib/globe-scene';
-import { fetchNextSunrise, fetchSkyAt } from '../lib/landing-api';
+import { fetchHorizon, fetchNextSunrise, fetchSkyAt } from '../lib/landing-api';
 import { pickPoint, placeOf } from '../lib/pick';
 import { SurfaceScene } from '../lib/surface-scene';
 
@@ -357,6 +357,15 @@ export function useLanding(
       arrived = false;
       requestSky(now);
       surface.build(l.lat, l.lon);
+      // The real skyline; if it fails, visible bodies stay drawn over the ground.
+      fetchHorizon(l.lat, l.lon).then(
+        (horizon) => {
+          if (current !== l) return;
+          surface.setHorizon(horizon);
+          if (l.sky) surface.setSky(l.sky);
+        },
+        () => {},
+      );
 
       // On the surface: shown by the dive's timeline, or by the timer when frames are too slow.
       let dive: gsap.core.Timeline | null = null;
