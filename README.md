@@ -57,7 +57,7 @@ Details and checks: [docs/developer/getting-started.md](docs/developer/getting-s
 
 ## Team
 
-Ali Al Itani, Leonardo Khayyat, Hussein Alassaad, Sam Abou Zeid, Khalil Dandashli, Hassan Korek.
+Ali Al Itani, Hussein Alassaad, Leonardo Khayyat, Khalil Dandashli, Hassan Korek.
 
 ## Data and credits
 

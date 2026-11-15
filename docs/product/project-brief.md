@@ -85,7 +85,7 @@ A caution, so that we do not overstate it: we have compared ourselves only with 
 | | |
 | --- | --- |
 | Name | Moon Maps |
-| Team | Lunar Titans: Ali Al Itani, Leonardo Khayyat, Hussein Alassaad, Sam Abou Zeid, Khalil Dandashli, Hassan Korek |
+| Team | Lunar Titans: Ali Al Itani, Hussein Alassaad, Leonardo Khayyat, Khalil Dandashli, Hassan Korek |
 | Event | NASA Space Apps Challenge 2026, Beirut local event, 14 to 15 November 2026 |
 | Challenge | Lunar Landing Site Navigator |
 | Kind of product | A web app. It runs in a browser, with no login and nothing to install |
