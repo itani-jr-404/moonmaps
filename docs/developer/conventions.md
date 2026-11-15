@@ -1,8 +1,8 @@
 # Conventions
 
-Status: Design. Last updated: 2026-11-14.
+Status: Design. Last updated: 2026-11-15.
 
-Rules we agree to follow so that code written by six people reads as one codebase. Layering rules are in [architecture/application-layers.md](../architecture/application-layers.md); units are in [science/conventions-and-ephemeris.md](../science/conventions-and-ephemeris.md).
+Rules we agree to follow so that code written by five people reads as one codebase. Layering rules are in [architecture/application-layers.md](../architecture/application-layers.md); units are in [science/conventions-and-ephemeris.md](../science/conventions-and-ephemeris.md).
 
 ## General
 

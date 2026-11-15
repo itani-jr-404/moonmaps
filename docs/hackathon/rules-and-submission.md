@@ -51,7 +51,7 @@ Our record is [reference/ai-use.md](../reference/ai-use.md).
 - Materials that are not NASA's must be freely available or under an open-source licence.
 - No images, video, audio or likeness of anyone under 18. No personal information.
 - The project page accepts only images (JPG, PNG or GIF, up to 10 MB each). Videos and documents are linked from elsewhere.
-- All six team members must be registered and confirmed for the Beirut event and appear on the team's Members tab before submissions close.
+- All five team members must be registered and confirmed for the Beirut event and appear on the team's Members tab before submissions close.
 
 ## The link to the final project must be public
 
