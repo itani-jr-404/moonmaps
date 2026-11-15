@@ -1,6 +1,6 @@
 # System overview
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Built. Last updated: 2026-11-15.
 
 ## What the system does
 
@@ -14,7 +14,7 @@ Output for each scenario:
 - the windows when the Sun is up, when the Earth is up, and when both are;
 - summary metrics and a go, caution or no-go status for power and for communication.
 
-The web app turns that output into a verdict, a 30-day calendar, the best windows and 3D views. For a single moment at one point it uses `GET /sky`. A horizon panorama, a comparison table and a chat assistant are planned.
+The web app turns that output into a verdict, a 30-day calendar, the best windows, a sky forecast and a horizon panorama for each site, and 3D views. For a single moment at one point it uses `GET /sky`. It also shows an elevation map from `GET /terrain`, accuracy figures from `GET /accuracy`, travel times from `GET /missions`, and a chat assistant through `POST /assistant/chat`. A comparison table is planned.
 
 ## The parts
 
@@ -27,6 +27,9 @@ flowchart TD
   A --> AN["Analysis service"]
   A --> SK["Sky service"]
   A --> VA["Validation service"]
+  A --> TS["Terrain service"]
+  A --> AC["Accuracy service"]
+  A --> AS["Assistant service"]
 
   AN --> SI
   AN --> HS["Horizon service"]
@@ -34,6 +37,12 @@ flowchart TD
   AN --> EE["Ephemeris engine (Skyfield)"]
   SK --> EE
   VA --> EE
+  AC --> VA
+  AS --> AN
+  AS --> SK
+  AS --> AC
+  AS --> LLM["AI model providers"]
+  TS --> HE
   AN --> VE["Visibility engine"]
   HS --> HE["Terrain and horizon engines (numpy)"]
 
@@ -41,11 +50,12 @@ flowchart TD
   HE --> G[("LOLA elevation grids")]
   HS --> C[("Horizon cache on disk")]
   VA --> R[("Saved JPL Horizons values")]
+  AC --> AF[("Saved comparison files and missions")]
 ```
 
 | Part | Responsibility | State | Details |
 | --- | --- | --- | --- |
-| Web app | All screens and 3D scenes. Holds no science. | Being written | [frontend/routes-and-state.md](../frontend/routes-and-state.md) |
+| Web app | All pages and 3D scenes. Holds no science. | Built | [frontend/routes-and-state.md](../frontend/routes-and-state.md) |
 | Contract | One OpenAPI file generated from the API; TypeScript types generated from it. | Built | [repository-structure.md](repository-structure.md) |
 | API routers | Check input, call one service, shape errors. | Built | [backend/service-layer.md](../backend/service-layer.md) |
 | Site service | The curated sites; turns a site reference into a site. | Built | [data/sites.md](../data/sites.md) |
@@ -53,11 +63,12 @@ flowchart TD
 | Sky service | The Sun and the Earth at one point and moment; the sub-solar and sub-Earth points. | Built | [backend/api-reference.md](../backend/api-reference.md) |
 | Horizon service | Horizon profiles, cached in memory and on disk. | Built | [science/terrain-and-horizon.md](../science/terrain-and-horizon.md) |
 | Validation service | Our angles next to saved JPL Horizons values. | Built | [science/validation.md](../science/validation.md) |
+| Accuracy service | Error rates, the calibration, the Apollo comparison and past missions, read from saved files. | Built | [VALIDATION.md](../VALIDATION.md) |
 | Ephemeris engine | Where the Sun and the Earth are, seen from a point on the Moon. | Built | [science/conventions-and-ephemeris.md](../science/conventions-and-ephemeris.md) |
 | Terrain and horizon engines | Read the elevation grids, build the horizon profile. | Built | [science/terrain-and-horizon.md](../science/terrain-and-horizon.md) |
 | Visibility engine | Compares positions with the horizon, finds windows. | Built | [science/visibility-and-metrics.md](../science/visibility-and-metrics.md) |
-| Terrain tiles | Height tiles for a 3D site view. | Planned | [science/terrain-and-horizon.md](../science/terrain-and-horizon.md) |
-| Assistant service | Chat grounded in a knowledge base and in tool calls to the analysis service. | Planned | [backend/assistant.md](../backend/assistant.md) |
+| Terrain service | An elevation tile around a point (`GET /terrain`), used by the 2D elevation map. A 3D site view built from it is planned. | Built | [science/terrain-and-horizon.md](../science/terrain-and-horizon.md) |
+| Assistant service | Chat grounded in a knowledge base and in tool calls to the site, analysis, sky and accuracy services. | Built | [backend/assistant.md](../backend/assistant.md) |
 
 ## Principles
 
@@ -69,9 +80,9 @@ flowchart TD
 
 ## Runtime shape
 
-- **Web app:** planned on Vercel. 3D scenes run in the browser.
-- **API:** one container. It holds the kernels and the elevation grids on its disk and keeps the grids memory-mapped, so memory use stays low.
-- **Outside services:** none at run time. A planned assistant would call an AI model API.
+- **Web app:** on Vercel, at https://moonmaps.vercel.app. 3D scenes run in the browser.
+- **API:** one container, built from `apps/api/Dockerfile` and run on Vercel at https://moonmaps-api.vercel.app. It holds the kernels and the elevation grids on its disk and keeps the grids memory-mapped, so memory use stays low.
+- **Outside services:** only the assistant calls outside services at run time: the AI model providers whose keys are set. The calculations need none.
 
 There is no queue, no scheduler and no database. See [developer/deployment.md](../developer/deployment.md).
 

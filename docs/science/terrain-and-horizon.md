@@ -149,4 +149,4 @@ The elevation map on the site page asks the API for an `n` by `n` array of heigh
 
 Heights are metres above the 1737.4 km sphere (the labels' `OFFSET`), rounded to 1 m. The web app colours and shades them; the shading is for reading the shape of the ground and is not the Sun.
 
-The 3D ground in the web app is still procedural noise for decoration; it does not use this tile.
+The 3D ground in the web app is procedural noise for decoration and does not use this tile. The far skyline of the landed view on `/explore` is the horizon profile above, taken from `POST /analyze` ([ADR-016](../decisions/ADR-016-landed-view-real-skyline.md)).

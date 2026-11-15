@@ -81,4 +81,4 @@ The details of each doubt are in [research/site-coordinates.md](../../research/s
 ## Generated outputs
 
 - `apps/api/scripts/precompute_horizons.py` reads `sites.json` and builds the horizon profile of every site.
-- Planned: the assistant's `knowledge/sites.md`, generated from `sites.json`, so the assistant and the app never disagree about a site.
+- The assistant's site list (knowledge id `sites`) is generated from `sites.json` in memory at start-up (`_sites_passage` in `apps/api/app/services/knowledge.py`), so the assistant and the app never disagree about a site.

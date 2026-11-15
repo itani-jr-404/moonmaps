@@ -1,12 +1,17 @@
 # Moon Maps
 
-Moon Maps is a 3D web app for the NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". You pick a landing site on the Moon and a date, and it shows when the site has sunlight (power) and when it can see the Earth (a direct radio link), using real NASA terrain for the horizon (fine maps near the south pole, a global map elsewhere). A side-by-side comparison and a chat assistant are planned.
+Moon Maps is a 3D web app for the NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". You pick a landing site on the Moon and a date, and it shows when the site has sunlight (power) and when it can see the Earth (a direct radio link), using real NASA terrain for the horizon (fine maps near the south pole, a global map elsewhere). A chat assistant explains the results. A side-by-side comparison is planned.
 
 Built by team Lunar Titans at the Beirut local event, 14 to 15 November 2026.
 
 ## Status
 
-The API is built for the core calculation and is checked against JPL Horizons. The web app is a one-page port of the team's prototype and is still being written. Nothing is deployed yet. See [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md) for what is real today.
+The API is built for the core calculation and is checked against JPL Horizons. The web app is a Next.js site with separate pages: home, choose a landing, planner, sites with a page per site, accuracy, and about. Both are deployed on Vercel from the `main` branch:
+
+- Web app: https://moonmaps.vercel.app
+- API: https://moonmaps-api.vercel.app (interactive documentation at https://moonmaps-api.vercel.app/docs)
+
+See [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md) for what is real today.
 
 ## Where things are
 
@@ -25,7 +30,7 @@ The API is built for the core calculation and is checked against JPL Horizons. T
 1. The API calculates where the Sun and the Earth are in the sky of the chosen site at each moment, from NASA JPL ephemeris files.
 2. It builds the horizon around the site from NASA LOLA elevation data.
 3. A body is visible when it is higher than the terrain in its direction. The Moon has no atmosphere, so nothing is bent.
-4. The web app shows the result: a verdict for a moment, a 30-day calendar, the best windows, and 3D views with the Sun and the Earth where the API places them.
+4. The web app shows the result: a verdict for a moment, a 30-day calendar, the best windows, a page for each site with a sky forecast, a horizon panorama and an elevation map, and 3D views with the Sun and the Earth where the API places them.
 
 More in [docs/architecture/system-overview.md](docs/architecture/system-overview.md). A one-page summary of the features, the purpose and what sets the project apart is in [docs/product/project-brief.md](docs/product/project-brief.md).
 

@@ -34,6 +34,8 @@ Positions, horizons, visibility and metrics are deterministic calculations from 
 | 2026-11-15 | Error study (`apps/api/scripts/error_study.py`, `fetch_horizons_wide.py`, `compare_pgda_grids.py`, `app/engines/error_budget.py`, its tests, `research/error-study.md`) | Claude | Wrote the scripts and tests, ran them, and wrote the note from their saved output; every number in the note comes from the JSON files the scripts wrote | The team lead, to review |
 | 2026-11-15 | Fixes from the testers' results: the landed view's real skyline (`apps/web/src/features/landing/lib/skyline.ts`, ADR-016) and the team's names in the footer | Claude | Wrote the code, tests and docs from the testers' notes and screenshots | The team lead |
 | 2026-11-15 | Assistant answer style in `apps/api/app/services/assistant_prompt.md` (direct first sentence, length and words fitted to the person) | Claude | Rewrote the style rules from the team lead's request | The team lead |
+| 2026-11-15 | Documentation sweep after the testers' results (`docs/backend`, `docs/frontend`, `docs/science`, `docs/data`, `docs/reference` and the assistant's knowledge files) | Claude | Compared the documents with the code and corrected the statements that no longer matched | The team lead, to review |
+| 2026-11-15 | The Apollo Journal note on the Accuracy page, the smaller shadow map on weaker devices (`apps/web/src/scene/renderer.ts`) and the matching updates in `docs/VALIDATION.md` | Claude | Wrote the code, tests and text from the team lead's requests and the testers' notes; checked the figures against `GET /accuracy` and the deployed app | The team lead |
 
 How the output was checked:
 
@@ -61,6 +63,7 @@ AI-made content never uses or alters NASA logos, flags or mission insignia.
 ## Where this is disclosed
 
 - This file.
-- The About page of the app.
 - The "Use of Super Intelligence" field of the submission.
 - A short section in the repository's README.
+
+The About page of the app does not mention AI use. The assistant's panel carries an "AI" tag, and the site assistant says "AI can make mistakes".

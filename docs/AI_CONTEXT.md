@@ -6,7 +6,7 @@ Read this first if you are an AI coding tool working in this repository. It is s
 
 ## Project in one paragraph
 
-Moon Maps answers one question: for a given place on the Moon and a given time range, when is the Sun above the local terrain horizon (power) and when is the Earth above it (direct radio link)? A Python API computes the positions of the Sun and the Earth as seen from the site, builds the terrain horizon from NASA elevation data, and returns time series, windows and metrics. A Next.js app shows the result on one page with 3D scenes, a verdict, a 30-day calendar and the best windows. A horizon panorama, a comparison view and a chat assistant are planned.
+Moon Maps answers one question: for a given place on the Moon and a given time range, when is the Sun above the local terrain horizon (power) and when is the Earth above it (direct radio link)? A Python API computes the positions of the Sun and the Earth as seen from the site, builds the terrain horizon from NASA elevation data, and returns time series, windows and metrics. A Next.js app shows the result on separate pages: 3D scenes, a verdict, a 30-day calendar, the best windows, and a page for each site with a sky forecast, a horizon panorama and an elevation map. A chat assistant on every page explains the results. A comparison view is planned. The app is deployed on Vercel: https://moonmaps.vercel.app (web) and https://moonmaps-api.vercel.app (API).
 
 ## Rules that must not be broken
 
@@ -25,11 +25,11 @@ The two standing rules of the repository are in [CLAUDE.md](../CLAUDE.md): **cit
 
 ## Architecture at a glance
 
-- `apps/web`: Next.js 16, React 19, TypeScript 5.9, Tailwind CSS v4 (tokens in `src/app/globals.css`) with CSS modules for complex effects, three.js used directly (not React Three Fiber), GSAP and Lenis, TanStack Query over `openapi-fetch`, zustand. No shadcn/ui, no Chart.js. One page, `/`.
-- `apps/api`: Python 3.12 with uv, FastAPI, Pydantic, Skyfield, numpy. Routers `system`, `sites`, `analysis`, `terrain`, `accuracy`, `assistant`; services `sites`, `horizons`, `analysis`, `sky`, `terrain`, `validation`, `accuracy`, `assistant`; engines `ephemeris`, `terrain`, `horizon`, `relief`, `visibility`.
+- `apps/web`: Next.js 16, React 19, TypeScript 5.9, Tailwind CSS v4 (tokens in `src/app/globals.css`) with CSS modules for complex effects, three.js used directly (not React Three Fiber), GSAP and Lenis, TanStack Query over `openapi-fetch`, zustand. No shadcn/ui, no Chart.js. Pages: `/`, `/explore`, `/planner`, `/sites`, `/sites/[id]`, `/sites/spot?lat=&lon=`, `/accuracy`, `/about`, and a not-found page; the navigation list is in `src/lib/routes.ts`.
+- `apps/api`: Python 3.12 with uv, FastAPI, Pydantic, Skyfield, numpy. Routers `system`, `sites`, `analysis`, `terrain`, `accuracy`, `assistant`; services `sites`, `horizons`, `analysis`, `sky`, `terrain`, `validation`, `accuracy`, `assistant`, `knowledge`, `llm`, `providers`; engines `ephemeris`, `terrain`, `horizon`, `relief`, `visibility`, `error_budget`.
 - `packages/contracts`: `openapi.json` exported from the API and `api.d.ts` generated from it.
 - No database. Site list in a JSON file, horizon profiles cached in memory and on disk.
-- Endpoints built: `/health`, `/sites`, `/analyze`, `/sky`, `/scene`, `/terrain`, `/validation`, `/accuracy`, `/missions`, `/assistant/chat`. See [CURRENT_STATE.md](CURRENT_STATE.md).
+- Endpoints built: `/health`, `/sites`, `/analyze`, `/sky`, `/scene`, `/terrain`, `/validation`, `/accuracy`, `/missions`, `/missions/departures`, `/assistant/chat`. See [CURRENT_STATE.md](CURRENT_STATE.md).
 
 ## Where to look for a task
 
@@ -49,7 +49,7 @@ The two standing rules of the repository are in [CLAUDE.md](../CLAUDE.md): **cit
 
 - Some docs describe parts that are planned, not built. Check [CURRENT_STATE.md](CURRENT_STATE.md) before assuming a file or endpoint exists.
 - Items marked "to confirm" have not been checked against the real file or library. Confirm them before relying on them, then update the doc.
-- The AI model behind the assistant is not chosen. Code against the `LLMClient` interface, not a vendor SDK.
+- The assistant uses a chain of free model providers ([decisions/ADR-013-assistant-model.md](decisions/ADR-013-assistant-model.md)). Code against the `LLMClient` interface in `apps/api/app/services/llm.py`, not a vendor SDK.
 
 ## Checks to run before saying a change is done
 

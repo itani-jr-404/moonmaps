@@ -1,6 +1,6 @@
 # Product overview
 
-Status: Design. Last updated: 2026-11-14.
+Status: Design. Last updated: 2026-11-15.
 
 ## The problem
 
@@ -45,6 +45,8 @@ The same screens serve both. A switch between a Planner mode (all the numbers) a
 | 4 | Site view | The terrain around the site in 3D with moving shadows, a panorama of the horizon with the Sun's and the Earth's paths, a time slider |
 | 5 | Compare | Up to four scenarios side by side, each marked go, caution or no-go for power and for communication |
 | 6 | Assistant | A chat that explains a number, answers questions about the Moon, or runs a comparison |
+
+This table is the design. The deployed app (https://moonmaps.vercel.app) has these pages: home, choose a landing (the Moon globe and a landed view), the planner, sites with a page per site (a horizon panorama, a sky forecast and an elevation map), accuracy and about, with the assistant on every page. The Solar System screen and the Compare screen are not built. See [CURRENT_STATE.md](../CURRENT_STATE.md).
 
 Detailed specifications: [frontend/](../frontend/routes-and-state.md) and [features/README.md](../features/README.md).
 

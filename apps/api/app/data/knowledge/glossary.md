@@ -34,7 +34,7 @@ Terms a visitor meets in Moon Maps or in the assistant's answers, trimmed from t
 
 **Lunar day.** From one noon to the next at a place on the Moon, about 29.5 Earth days.
 
-**UTC.** The world's reference time. The API works in UTC, and so does the `t=` value in a shared link. The page shows times in the visitor's own time zone.
+**UTC.** The world's reference time. The API works in UTC, and so does the `t=` value in a shared link. Most times on the pages are in the visitor's own time zone. The day cards of a site's sky forecast, its "When to leave Earth" times, the Accuracy page and the assistant use UTC.
 
 **Sunrise, sunset, Earthrise, Earthset.** The moments the Sun or the Earth crosses the terrain horizon as seen from the site. Over most of the Moon the Earth stays in about the same place in the sky. Near the poles it hovers at the horizon, and terrain and libration make it appear and disappear.
 

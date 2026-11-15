@@ -10,7 +10,7 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 
 | Check | Pass rule | Result | Section |
 | --- | --- | --- | --- |
-| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 97 API tests (with the NASA data, none skipped), 166 web unit tests and 20 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
+| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 97 API tests (with the NASA data, none skipped), 173 web unit tests and 20 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
 | Sun and Earth positions against NASA JPL Horizons, 2026 | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference 0.0001 degrees | [2](#2-positions-against-nasa-jpl-horizons) |
 | Sun elevation at 16 Apollo moonwalk times (1969 to 1972) against JPL Horizons | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference under 0.005 degrees | [3](#3-past-missions) |
 | Long-term sunlight against NASA Goddard's polar illumination map | Mean absolute difference at most 0.10 and correlation at least 0.90 | **Pass.** Mean absolute difference 0.006, correlation 0.992, over 300 random points | [4](#4-sunlight-and-earth-visibility-against-nasas-polar-maps) |
@@ -28,7 +28,7 @@ Commands, run from the repository root on 15 November 2026, with the NASA data d
 
 ```bash
 cd apps/api && uv run pytest -v          # 97 passed
-pnpm test                                 # 166 passed (25 files)
+pnpm test                                 # 173 passed (27 files)
 pnpm lint && pnpm typecheck               # no errors
 pnpm build                                # production build succeeds
 pnpm contracts:check                      # API models, openapi.json and api.d.ts agree
@@ -59,9 +59,9 @@ Continuous integration on GitHub Actions (https://github.com/itani-jr-404/moonma
 | `tests/test_assistant.py` (28) | The chat endpoint with a scripted model: tool calls, guardrails, limits and errors |
 | `tests/test_error_budget.py` (13) | The error study's helpers (Section 13) |
 
-### Web tests (Vitest), 166 passed
+### Web tests (Vitest), 173 passed
 
-166 tests in 25 files, next to the code they test. The list of files and what each proves is in [developer/testing.md](developer/testing.md#web-tests-vitest).
+173 tests in 27 files, next to the code they test. The list of files and what each proves is in [developer/testing.md](developer/testing.md#web-tests-vitest).
 
 ## 2. Positions against NASA JPL Horizons
 
@@ -121,7 +121,7 @@ Pass rule: our value within 0.05 degrees of JPL Horizons. Result: **all 16 pass;
 | Apollo 17 | EVA-3 start | 163.50 | 1972-12-14 01:03 | 39.0 | 38.11 | 38.11 |
 | Apollo 17 | EVA-3 end | 170.75 | 1972-12-14 08:18 | 42.6 | 41.37 | 41.37 |
 
-Our script first compared our values with the journal table, allowing 0.3 degrees for its rounding: 6 of the 16 cases were within that. For Apollo 11, and for the Apollo 15 stand-up EVA, the journal table agrees with us within 0.12 degrees. For the later Apollo 15 and 17 moonwalks it does not, but JPL Horizons gives exactly our values, so the difference lies in the table. The table's angles rise by 0.508 degrees an hour at both sites (13.0 to 44.3 degrees in 61.5 hours at Apollo 15; 15.3 to 42.6 degrees in 53.75 hours at Apollo 17). That rate is one full turn per synodic month of 29.53 days (NASA Moon Fact Sheet), the rate at the lunar equator. Horizons and our engine give slower climbs at these sites, at 26 N and 20 N (0.44 and 0.46 degrees an hour). The table does not state its method, so we report this as an observation, not as the table's error.
+Our script first compared our values with the journal table, allowing 0.3 degrees for its rounding: 6 of the 16 cases were within that. For Apollo 11, and for the Apollo 15 stand-up EVA, the journal table agrees with us within 0.12 degrees. For the later Apollo 15 and 17 moonwalks it does not, but JPL Horizons gives exactly our values, so the difference lies in the table. The table's angles rise by 0.508 degrees an hour at both sites (13.0 to 44.3 degrees in 61.5 hours at Apollo 15; 15.3 to 42.6 degrees in 53.75 hours at Apollo 17). That rate is one full turn per synodic month of 29.53 days (NASA Moon Fact Sheet), the rate at the lunar equator. Horizons and our engine give slower climbs at these sites, at 26 N and 20 N (0.44 and 0.46 degrees an hour). The table does not state its method, so we report this as an observation, not as the table's error. The app's Accuracy page shows this table under "Past landings" with a note that the Journal column is this 1999 table, that it drifts from both Moon Maps and JPL Horizons by up to 4.3 degrees (Apollo 15, 2 August 1971 at 13:49 UTC: 44.3 against 40.02), and that the 0.05 degree pass rule is for the comparison with JPL Horizons.
 
 ### The LCROSS impact point is permanently dark
 
@@ -149,7 +149,7 @@ The judges asked how long the trip to the Moon takes. NASA's NSSDCA pages give l
 | Apollo 15 | 26 July 1971, 13:34:00 | 30 July 1971, 22:16:29 | 4 days 8 h 42 min |
 | Apollo 17 | 7 December 1972, 05:33:00 | 11 December 1972, 19:54:57 | 4 days 14 h 22 min |
 
-Sources: the NSSDCA pages linked above, and https://nssdc.gsfc.nasa.gov/planetary/lunar/apollo17info.html for the Apollo 17 landing date. The app does not show these yet (Section 11).
+Sources: the NSSDCA pages linked above, and https://nssdc.gsfc.nasa.gov/planetary/lunar/apollo17info.html for the Apollo 17 landing date. Each site's page shows these travel times with their sources (Section 11).
 
 ## 4. Sunlight and Earth visibility against NASA's polar maps
 
@@ -213,7 +213,7 @@ The horizon comes from NASA's Lunar Orbiter Laser Altimeter (LOLA) on the Lunar 
 - **Synthetic terrain.** `tests/test_horizon.py` places a 2 km high mountain whose edge is 10 km east of a site. The horizon at azimuth 90 comes out within 0.2 degrees of the exact angle.
 - **Against NASA's results.** Section 4 compares the full chain (terrain, horizon, positions, visibility) with NASA's maps at 310 points.
 - **Speed.** A new horizon profile takes 17 to 35 ms (575 samples in each of 360 directions).
-- **Global grid (added 15 November 2026).** Sites outside the south polar grids now use NASA's global LOLA grid `LDEM_16` (16 pixels per degree, 1895.21 m per pixel at the equator, label https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/LDEM_16.LBL, read 2026-11-15; [ADR-015](decisions/ADR-015-global-terrain-grid.md)). `tests/test_lola_global.py` checks the reader against the label, and checks that at 2,000 random points between 81 S and 88 S the global grid and the 80 m polar grid agree (correlation 0.9996; 0.25 with the longitude mirrored). With `scripts/precompute_horizons.py` on 15 November, the ten curated sites south of 80 S had exactly the same horizon profiles as before, and the seven others got terrain horizons whose highest points are 0.92 degrees (Apollo 11) to 12.43 degrees (Apollo 15) instead of a flat 0.
+- **Global grid.** Sites outside the south polar grids use NASA's global LOLA grid `LDEM_16` (16 pixels per degree, 1895.21 m per pixel at the equator, label https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/LDEM_16.LBL, read 2026-11-15; [ADR-015](decisions/ADR-015-global-terrain-grid.md)). `tests/test_lola_global.py` checks the reader against the label, and checks that at 2,000 random points between 81 S and 88 S the global grid and the 80 m polar grid agree (correlation 0.9996; 0.25 with the longitude mirrored). With `scripts/precompute_horizons.py` on 15 November, the ten curated sites south of 80 S have exactly the same horizon profiles as with the polar grids alone, and the seven others have terrain horizons whose highest points are 0.92 degrees (Apollo 11) to 12.43 degrees (Apollo 15), where a smooth Moon gives 0.
 
 ## 7. API behaviour
 
@@ -221,7 +221,7 @@ Measured on a laptop on 14 November 2026 against the running API (`uv run uvicor
 
 | Request | Answer |
 | --- | --- |
-| `GET /health` | `{"ok":true,"kernels":true,"dem":["lola-80s-80m","lola-75s-120m"],"version":"0.1.0"}` (since 15 November the list ends with `"lola-global-16ppd"`) |
+| `GET /health` | `{"ok":true,"kernels":true,"dem":["lola-80s-80m","lola-75s-120m","lola-global-16ppd"],"version":"0.1.0"}` (the deployed API, 15 November 2026) |
 | `GET /sites` | 17 sites, each with a source link ([data/sites.md](data/sites.md)) |
 | `GET /sky?lat=-89.684&lon=-163.261&t=2026-11-14T14:56:00Z` (Shackleton ridge) | Sun at azimuth 282.29, elevation 1.62, 3.02 degrees above the terrain: visible. Earth at elevation -4.29, 4.30 degrees below the terrain: hidden. Horizon from `lola-80s-80m`. |
 | `GET /scene?t=2026-11-14T14:56:00Z` | Sub-solar point 1.56 S, 119.04 E; sub-Earth point 3.74 N, 2.09 W; Earth 405,200 km away |
@@ -241,33 +241,35 @@ The tests in `apps/web/e2e/` (Playwright, https://playwright.dev/) open the prod
 | Test | What it proves |
 | --- | --- |
 | Planner opened from a link (`?site=shackleton-ridge&t=2026-11-14T14:56Z`) | The page asks the API about that site and moment. "Good" or "Bad landing site" follows the API's Sun and Earth visibility. The Sun and Earth lines show the API's next sunrise, sunset, earthrise or earthset. Each of the 30 calendar days has the grade that the API's windows give for that local day. Every "best time" lies inside one of the API's windows. The terrain source is shown. |
-| Choosing other sites and a quick date | Clicking Malapert Massif, "In a week" and Apollo 11 each sends a new request and shows its answer, with the same checks. The address updates to the new place. In the run of 14 November Apollo 11 showed "Smooth Moon: no terrain data at this latitude", as the API reported then. Since 15 November the API gives Apollo 11 a terrain horizon from the global grid, and the test expects "Horizon from NASA LOLA terrain (global grid, 16 pixels per degree)"; this updated test has not been run yet. |
+| Choosing other sites and a quick date | Clicking Malapert Massif, "In a week" and Apollo 11 each sends a new request and shows its answer, with the same checks. The address updates to the new place. For Apollo 11 the page shows "Horizon from NASA LOLA terrain (global grid, 16 pixels per degree)", as the API reports. |
 | API unreachable | With the API blocked, the planner shows "We could not reach the Moon Maps API" and a "Try again" button. After unblocking, "Try again" loads and shows the correct answer. |
 | Live south pole readout | "Sunlight" and "Earth" in the hero match the API's answer for 89.9 S, 0 E. |
-| Aiming at the globe and landing | Hovering the Moon shows a card whose verdict, "Sunlight right now" and "Can see Earth" match the API answer for that spot. Clicking lands, and the surface panel's verdict matches the API answer for the landed point. "See the best dates" hands the spot to the planner. |
+| Aiming at the globe and landing | On `/explore`, hovering the Moon shows a card whose verdict, "Sunlight right now" and "Can see Earth" match the API answer for that spot. Clicking lands, and the surface panel's verdict matches the API answer for the landed point. "See the best dates" hands the spot to the planner. |
 | Reduced motion | With the system set to reduce motion, there is no intro, the headline and navigation show at once, every scroll-reveal block is fully visible, and the planner works. |
 | Phone width (390 by 844 px, touch) | The page is no wider than the screen, and the planner shows its answer. |
-| Navigation | Each link in the navigation bar brings its section into view. |
+| Navigation | Every page is reachable from the navigation bar. |
+| Site page | A site page shows the API's answer for that site, and an unknown site says so. |
+| Assistant and site assistant | With a mocked chat endpoint: questions, answers with sources, keyboard use, errors (503, 429, lost signal), closing, scrolling, and one conversation per site. |
 
-The table lists the tests that check answers. With the tests for the pages, the site page, the site assistant, navigation and accessibility there are 20 (`apps/web/e2e/`); on 15 November 2026 **20 of 20 pass** locally and in GitHub Actions.
-
-Result on 14 November 2026: **8 of 8 pass**, in two consecutive runs. The tests found one real bug, now fixed: after the intro, an invisible 1 px line from the preloader stayed across the middle of the screen and blocked the mouse there.
+There are 20 tests in 5 files (`apps/web/e2e/`). On 15 November 2026 **20 of 20 pass** locally and in GitHub Actions, on every pull request. The tests found one real bug, fixed: after the intro, an invisible 1 px line from the preloader stayed across the middle of the screen and blocked the mouse there.
 
 ### Checks by hand
 
-The production build (`pnpm build`, then `next start`) was also opened by hand against the running API on 14 November 2026. The API's log showed every request the page made answered with status 200, and no errors.
+The production build (`pnpm build`, then `next start`) was opened by hand against the running API on 14 November 2026, and the deployed app (https://moonmaps.vercel.app with https://moonmaps-api.vercel.app) on 15 November 2026. The API's log showed every request the page made answered with status 200, and no errors. The planner rows below are from the deployed app on 15 November, in Beirut time (UTC+2).
 
 | What was checked | Result |
 | --- | --- |
 | Hero: "Right now at the south pole" | Shows "Sunlight: No, it is dark" and "Earth: Hidden", from `GET /sky` for 89.9 S, 0 E. The clock ticks every second. |
 | Choose a landing: aiming at the globe | The card showed "Bad landing site, Spot 82.6°S, 91.2°W, Sunlight right now: No, Can see Earth: No" with the matching explanation, from `GET /sky` for that point. |
 | Choose a landing: clicking to land | The surface view asked `GET /sky` for the exact moment at the landed point. |
-| Planner opened from the address `?site=shackleton-ridge&t=2026-11-14T14:56Z` | "Shackleton rim ridge, Saturday 14 November 2026 at 16:56" (Beirut time, UTC+2), "Bad landing site", "Sunlight for power: Yes, for more than a month", "Can talk to Earth: No. Earth comes back into view Tue 17 Nov, 21:16". |
-| The planner agrees with the API | `POST /analyze` for the same site and moment gives `next_earthrise` 2026-11-17 19:16:03 UTC, which is 21:16 in Beirut. |
-| Best times | "Tue 17 Nov, 21:16 until Mon 30 Nov, 12:47, 12 days 16 hours", matching the API's first window with both visible, 19:16 to 10:47 UTC. |
+| Planner opened from the address `?site=shackleton-ridge&t=2026-11-14T14:56Z` | "Shackleton rim ridge", "Bad landing site", "There is sunlight, but Earth is hidden behind the horizon", "Can talk to Earth: No. Earth comes back into view Tue 17 Nov, 21:15", "Horizon from NASA LOLA terrain (80 m grid)". |
+| The planner agrees with the API | `POST /analyze` for the same site and moment gives power `go`, comm `caution` and `next_earthrise` 2026-11-17 19:15:36 UTC, which is 21:15 in Beirut. |
+| Best times | The first window ends "Mon 30 Nov, 12:46", matching the API's first window with both visible, 2026-11-17 19:15:36 to 2026-11-30 10:46:59 UTC. |
 | A second site, `?site=malapert-massif&t=2026-11-20T12:00Z` | "Bad landing site. Earth is in view, but the Sun is hidden. Sunlight returns Wed 25 Nov, 16:10." |
 | Phone width (390 by 844 px, iPhone 12 Pro size) | The first check found the planner's date and time fields 51 px wider than the screen. We fixed the layout, and the page now measures exactly 390 px wide with no element past the edge. |
 | 3D site view | Shows "Horizon from NASA LOLA terrain (80 m grid)", as returned by the API. |
+| Landed view on `/explore`, deployed app, 15 November | At 81.6 S, 98.0 W after "Skip to sunrise", the panel says "Sunlight: Yes, Can see Earth: No", and the Sun shows on the far skyline, which is drawn from the API's terrain horizon ([ADR-016](decisions/ADR-016-landed-view-real-skyline.md)), with part of its disc behind it. |
+| Assistant, deployed app, 15 November | Asked how far Shackleton ridge is from Earth's surface right now, it called the `sky_at` tool, which reads `GET /sky`, and gave the tool's value, 397,423 km. Answers took 11 to 17 seconds with the free model in use. |
 
 Screenshots taken during the check:
 
@@ -300,12 +302,12 @@ Open items are listed in [CURRENT_STATE.md](CURRENT_STATE.md#to-confirm-before-r
 
 ## 10. What is not validated yet
 
-- **How smooth it looks.** The automated tests check what the page shows, not how smoothly the 3D scenes and the intro animate. We have not measured frame rates.
+- **How smooth it looks.** The automated tests check what the page shows, not how smoothly the 3D scenes and the intro animate. We have not measured frame rates. To lower the cost on weaker devices, phones, touch-only devices and machines with four or fewer CPU cores get a 2048 px shadow map in the landed view and the planner diorama instead of 4096 px (`shadowMapSize` in `apps/web/src/scene/renderer.ts`); this has not been tried on a real low-end device.
 - **Real phones.** The phone-width test runs in a desktop browser set to a phone's size and touch input, not on a phone.
 - **Site coordinates by eye.** We have not opened them in Quickmap or Moon Trek.
 - **Horizons from the global grid.** They have not been compared with an independent terrain horizon (for example one drawn in Moon Trek). At about 1.9 km per pixel, hills and crater rims close to a site are smoothed.
-- **Many users at once.** The timings in Section 7 are single requests on a laptop.
-- **The deployed app.** Nothing is deployed yet.
+- **Many users at once.** The timings in Section 7 are single requests on a laptop. The deployed app (https://moonmaps.vercel.app) was checked by hand (Section 8), not under load, and the automated browser tests run against a local build.
+- **The assistant's wording.** The automated tests use a scripted model. Answers from the real model were checked by hand on a few questions only (Section 8).
 
 ## 11. Judges' feedback and our plan
 
@@ -314,9 +316,9 @@ We received the judges' feedback and will act on it. Their main points, and what
 1. **Check our results against past missions to narrow the error range.** Started: Section 3 checks 16 Apollo moonwalk times, the LCROSS impact point and the SLIM landing, and Section 4 checks long-term results against NASA's maps. Next: Chandrayaan-3 and the robotic south pole landers, each with a mission source.
 2. **Show the distance from the Earth to the Moon.** Done on each site's page. It shows two distances: from the site to the nearest point of the Earth's surface (`earth_surface_distance_km` in `GET /sky`, the site-to-Earth-centre distance minus the Earth's equatorial radius of 6378.137 km from the NASA NSSDCA Earth Fact Sheet), and the centre-to-centre distance (`earth_distance_km` in `GET /scene`), which Section 5 checks against NASA's range. A test checks that from the point under the Earth the site distance is the centre-to-centre distance minus the Moon's 1737.4 km radius.
 3. **Show how long the trip to the Moon takes.** The feedback's example said Mars takes 3 to 4 days; it most likely meant the Moon. Section 3 gives launch-to-landing times of 4.3 to 4.6 days for three Apollo missions, from NASA's records. Done: each site's page lists past missions' travel times with their sources, and says when to leave Earth, for each of those travel times, to land as the next good window opens (`GET /missions/departures`).
-4. **Forecast where the Earth will be, like a weather forecast.** The positions of the Earth and the Moon change over time. For each landing site we will show a forecast of where the Earth and the Sun will be in its sky over the coming days, with their rise and set times. The planner's 30-day calendar already forecasts the good landing windows from the same calculation. Next: draw the Earth's and the Sun's paths above each site's terrain horizon.
+4. **Forecast where the Earth will be, like a weather forecast.** The positions of the Earth and the Moon change over time. Done: each site's page has a "Sky forecast" with the next 14 days, day by day, and a horizon panorama that draws the paths of the Sun and the Earth over the next 3 days above the site's terrain horizon. The planner's 30-day calendar forecasts the good landing windows from the same calculation.
 
-These are recorded as planned features in [features/README.md](features/README.md).
+The status of each is recorded in [features/README.md](features/README.md).
 
 ## 12. Learning from past data
 

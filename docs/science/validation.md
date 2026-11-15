@@ -2,7 +2,7 @@
 
 Status: Partly built. Last updated: 2026-11-15.
 
-How we know the numbers are right. There are two independent checks, one for each half of the calculation.
+How we know the numbers are right. There are two independent checks, one for each half of the calculation, plus unit tests and a check against past missions.
 
 ## Check 1: positions against JPL Horizons
 
@@ -39,7 +39,7 @@ Times: 2026-11-15, 2026-11-22, 2026-11-29 and 2026-12-06, each at 00:00 UTC, spr
 
 - As a test: `apps/api/tests/test_horizons.py` fails if any case is out of tolerance. It is skipped when the kernels have not been downloaded.
 - In the API: `GET /validation` returns every case with our value, the Horizons value and the difference.
-- In the web app: an accuracy page that shows this report is planned, not built.
+- In the web app: the accuracy page (`/accuracy`, `apps/web/src/features/accuracy`) shows the result from `GET /accuracy`, built from the saved reference and comparison files in `apps/api/app/data/validation/`.
 
 ## Check 2: terrain against NASA's illumination maps
 
@@ -54,13 +54,13 @@ What agreement to expect:
 
 This check is built: `apps/api/scripts/compare_pgda.py` (maps downloaded with `scripts/download_data.py --pgda`). Over 300 random points and 18.6 years, the mean absolute difference from NASA's maps is 0.006 for the Sun and 0.006 for the Earth, with correlations of 0.992 and 0.999, using the maps' "any part of the disc" rule. Results and the pass rule are in [VALIDATION.md](../VALIDATION.md#4-sunlight-and-earth-visibility-against-nasas-polar-maps).
 
-## Check 4: past missions
-
-`apps/api/scripts/check_apollo_sun.py` compares our Sun elevation at 16 Apollo moonwalk times with the Apollo Lunar Surface Journal's table and with JPL Horizons; `tests/test_apollo_sun.py` keeps the Horizons comparison in the test suite. Results are in [VALIDATION.md](../VALIDATION.md#3-past-missions).
-
 ## Check 3: unit tests on the pieces
 
 Listed in [developer/testing.md](../developer/testing.md): the projection on synthetic and real grids, the great-circle formulas, the elevation-angle formula against hand-worked cases, the horizon on synthetic terrain, window finding on synthetic series, the metrics and the status thresholds.
+
+## Check 4: past missions
+
+`apps/api/scripts/check_apollo_sun.py` compares our Sun elevation at 16 Apollo moonwalk times with the Apollo Lunar Surface Journal's table and with JPL Horizons; `tests/test_apollo_sun.py` keeps the Horizons comparison in the test suite. Results are in [VALIDATION.md](../VALIDATION.md#3-past-missions), and the accuracy page shows them under "Past landings".
 
 ## Eyeball checks
 
@@ -71,5 +71,5 @@ Listed in [developer/testing.md](../developer/testing.md): the projection on syn
 ## What we do not claim
 
 - We do not model reflected light, thermal conditions, or the radio link itself (antenna, ground stations).
-- The status badges are summaries with adjustable thresholds, not mission criteria.
+- The go, caution and no-go statuses are summaries with adjustable thresholds, not mission criteria.
 - Terrain finer than the grid (boulders, small craters) is not seen.

@@ -19,7 +19,11 @@ The web app's 3D scenes use three.js 0.187 directly, not React Three Fiber ([ADR
 | Surface view | `landing` | Standing at the chosen point: the Sun, the Earth and the NASA lunar module. The far skyline is the point's terrain horizon from `POST /analyze` (`lib/skyline.ts`, [ADR-016](../decisions/ADR-016-landed-view-real-skyline.md)); the decorative near ground is kept 0.2 degrees below it. A body the API calls visible is drawn with normal depth testing behind that skyline, with its "SUN" or "EARTH" label; a hidden body is not drawn. Until the horizon loads, or if it fails, a visible body is drawn over the ground | Sun and Earth directions and visible flags from `GET /sky`; the skyline from `horizon` of `POST /analyze` |
 | Diorama | `planner` | A cut-out of ground around the place, the lander, a compass ring and beams toward the Sun and the Earth | Directions and visible flags from `GET /sky` |
 
-The ground in the surface view and the diorama is procedural noise for decoration. It is not LOLA terrain and it never decides visibility; the API's horizon, built from LOLA grids, does ([science/terrain-and-horizon.md](../science/terrain-and-horizon.md)).
+The near ground in the surface view and the ground of the diorama are procedural noise for decoration. They are not LOLA terrain and they never decide visibility; the API's horizon, built from LOLA grids, does ([science/terrain-and-horizon.md](../science/terrain-and-horizon.md)). The surface view's far skyline is that horizon; the diorama has no real skyline.
+
+The surface view and the diorama cast Sun shadows from a square shadow map. Its side is 2048 px on phones (narrower than 700 px), touch-only devices and machines with four or fewer CPU cores, and 4096 px elsewhere (`shadowMapSize` in `src/scene/renderer.ts`), to lower the cost on weaker devices.
+
+The horizon panorama on the site page is a 2D SVG, not a 3D scene. It is described in [routes-and-state.md](routes-and-state.md#the-site-page).
 
 ## Conventions
 
@@ -46,4 +50,3 @@ The ground in the surface view and the diorama is procedural noise for decoratio
 - A site view on real terrain from `GET /terrain`, with shadows from the tile and distant blocking from the horizon profile ([ADR-006](../decisions/ADR-006-3d-shadows-and-distant-terrain.md)).
 - A Solar System scene with planet positions from `GET /scene`.
 - Lighting the globe from the real sub-solar point in `GET /scene`.
-- A horizon panorama (2D SVG): azimuth 0 to 360 across, elevation up, the terrain profile as a silhouette, and the Sun's and the Earth's paths drawn solid where visible and faint where hidden.

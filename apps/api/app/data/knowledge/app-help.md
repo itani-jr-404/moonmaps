@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-15.
 
-Moon Maps is one long page. For a place on the Moon and a moment in time, it says whether a lander would have sunlight for its solar panels and the Earth in view for a direct radio link. "Good landing site" means both are above the terrain horizon at that moment. Nothing else is checked: not slopes, rocks or safety.
+Moon Maps is a website with several pages (listed below). For a place on the Moon and a moment in time, it says whether a lander would have sunlight for its solar panels and the Earth in view for a direct radio link. "Good landing site" means both are above the terrain horizon at that moment. Nothing else is checked: not slopes, rocks or safety.
 
 All Sun and Earth answers come from the Moon Maps API. In the 3D views the Sun and Earth directions, the yes/no answers and the landed view's far skyline come from the API; the near ground is drawn for looks.
 
@@ -67,7 +67,7 @@ The south polar region faces you at the start. Small dots mark the curated sites
 4. Buttons in the panel:
    - "Back to orbit" returns to the globe.
    - "Skip to sunrise" (only when it is dark) jumps to just after the next sunrise within 35 days. If there is none: "The Sun does not rise here in the next 35 days."
-   - "See the best dates" sends the spot and time to the planner and scrolls there ("Showing the best dates for this spot.").
+   - "See the best dates" opens the Planner page on the spot and time ("Showing the best dates for this spot.").
 
 ## Why the south pole (on Home, `/#why`)
 
@@ -183,14 +183,14 @@ If the device asks for reduced motion, there is no intro, everything shows at on
 
 ## The assistant
 
-- The dark rounded square at the bottom right of every screen, with a small Moon and orbit, labelled "Ask the Moon Maps assistant", opens the chat. It appears after the intro. The small light on its corner is green when all is well; it turns amber and shows a number when answers arrived while the chat was closed. The close button or the Escape key closes the chat. On a phone the chat fills the screen.
+- The dark rounded square at the bottom right of every page except a site's own page (which has its own chat), with a small Moon and orbit, labelled "Ask the Moon Maps assistant", opens the chat. It appears after the intro. The small light on its corner is green when all is well; it turns amber and shows a number when answers arrived while the chat was closed. The close button or the Escape key closes the chat. On a phone the chat fills the screen.
 - Before the chat is opened, two suggested questions float next to the button ("Is this spot good right now?" and "How do I use Moon Maps?"). Tapping one opens the chat and asks it. The small X hides them.
 - The header shows the time now in UTC and "LINK OK", or "NO LINK" when the assistant cannot be reached. The square icon button starts a new chat.
 - Two tabs sit under the header: "Chat" and "Resources". "Resources" lists two NASA tools, Moon Trek (maps of the Moon) and the JPL Horizons System (positions of the Sun and the Earth), each opening in a new tab.
 - The "ON SCREEN" strip shows what the assistant knows about the page: the site chosen in the planner or landed on in Choose a landing (or "Custom spot" for a point that is not a curated site), its latitude and longitude, and the time in UTC. After a landing it is the landed spot and the time shown in the landed panel.
 - At the top of a new chat: "Plan a landing" opens the planner, "Best dates this month" asks for the best landing dates in the next 30 days for the spot on screen, and three suggested questions ask themselves when clicked. The assistant can still answer questions about the NASA Space Apps challenge when asked.
 - Type a question and press Enter to send it. Shift and Enter adds a new line. A question can be up to 2,000 characters.
-- Typing "/" at the start of the box opens shortcuts: /planner, /landing, /why and /about jump to those parts of the page, /resources opens the Resources tab, and /new starts a new chat. Use the arrow keys and Enter, or click.
+- Typing "/" at the start of the box opens shortcuts: /planner, /landing (Choose a landing), /sites, /accuracy and /about open those pages, /why goes to the "Why the south pole" part of the home page, /resources opens the Resources tab, and /new starts a new chat. Use the arrow keys and Enter, or click.
 - Your questions appear in bubbles on the right. Answers appear on the left under "MOON MAPS" and the time in UTC.
 - Every number about a site or a date comes from the Moon Maps API, which the assistant calls while it answers. The numbered chips after "Sources" name the documents and API tools it used; point at one to see its full name.
 - When an answer is about one place and time, a card under it shows the place, its coordinates and the time, with a "Load in planner" button that opens them in the planner. The latest answer also offers buttons such as "Explain more simply" and "Is this spot good now?".
@@ -201,7 +201,7 @@ If the device asks for reduced motion, there is no intro, everything shows at on
 
 ## Sources
 
-- Page structure and text: `apps/web/src/app/page.tsx` and `apps/web/src/features/` (hero, landing, why, planner, about, site-chrome).
+- Page structure and text: `apps/web/src/app/` (one folder per page), `apps/web/src/lib/routes.ts` and `apps/web/src/features/` (hero, home, why, landing, planner, sites, site-assistant, accuracy, about, assistant, site-chrome).
 - Messages and states: `apps/web/src/components/ui/states.tsx`, `apps/web/src/components/ui/toast.tsx`, `apps/web/src/lib/api/client.ts`, `apps/api/app/core/errors.py`, `apps/api/app/services/analysis.py`, `apps/api/app/services/sites.py`.
 - Links and time: `apps/web/src/lib/state/url-sync.ts`, `apps/web/src/lib/state/scenario-store.ts`, `apps/web/src/lib/format/format.ts`.
 - Behaviour checked by the browser tests: `apps/web/e2e/`.

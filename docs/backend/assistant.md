@@ -49,7 +49,7 @@ It must not:
    | `accuracy_report` | `AccuracyService.report` | the error-rate headline and items, and the calibration summary (`GET /accuracy`) |
    | `past_missions` | `AccuracyService.missions` | each past landing's launch and landing time (UTC), travel hours, site id and source page (`GET /missions`) |
 
-All of the knowledge base goes into the system prompt on every request (about 7,000 words on 2026-11-15). Retrieval is added only when it no longer fits; the change stays inside `KnowledgeBase.select`.
+All of the knowledge base goes into the system prompt on every request. On 2026-11-15 the knowledge files held about 8,400 words (counted with `wc -w`), plus the generated site list. Retrieval is added only when it no longer fits; the change stays inside `KnowledgeBase.select`.
 
 ## Model
 

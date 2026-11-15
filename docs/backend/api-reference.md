@@ -6,7 +6,7 @@ The contract is `packages/contracts/openapi.json`, exported from the API's Pydan
 
 All conventions (degrees, azimuth clockwise from north, east-positive longitude, UTC) are defined in [science/conventions-and-ephemeris.md](../science/conventions-and-ephemeris.md).
 
-Base URL: set per environment, see [developer/deployment.md](../developer/deployment.md). Locally it is `http://localhost:8000`, and the interactive documentation FastAPI generates is at `/docs`. All bodies are JSON. There is no authentication. Responses larger than 1 KB are gzip-compressed when the client accepts it. Every response carries an `x-request-id` header; a client may send its own.
+Base URL: set per environment, see [developer/deployment.md](../developer/deployment.md). The deployed API is https://moonmaps-api.vercel.app. Locally it is `http://localhost:8000`, and the interactive documentation FastAPI generates is at `/docs`. All bodies are JSON. There is no authentication. Responses larger than 1 KB are gzip-compressed when the client accepts it. Every response carries an `x-request-id` header; a client may send its own.
 
 ## Summary
 
@@ -272,7 +272,7 @@ Response (`ValidationReport`), real output shortened to one case:
 
 ## GET /accuracy
 
-Returns `AccuracyReport`, built once at start-up from saved files; nothing is fetched at run time. Method and numbers: [VALIDATION.md](../VALIDATION.md#12-learning-from-past-data). Decision: [ADR-014](../decisions/ADR-014-calibration.md).
+Returns `AccuracyReport`, built from saved files on the first request and then kept in memory (`app/services/accuracy.py`); nothing is fetched at run time. The web app's `/accuracy` page shows it. Method and numbers: [VALIDATION.md](../VALIDATION.md#12-learning-from-past-data). Decision: [ADR-014](../decisions/ADR-014-calibration.md).
 
 | Field | Meaning |
 | --- | --- |
@@ -355,7 +355,7 @@ Response (`TerrainTile`), real output for the Apollo 11 site with the defaults o
 
 Errors: `no_terrain` (404) when no elevation grid is loaded for the point; `invalid_input` (422) for a parameter out of range.
 
-The 3D ground in the web app is still decorative and does not use this endpoint.
+The 3D ground in the web app is decorative and does not use this endpoint. The far skyline of the landed view on `/explore` comes from `horizon` in `POST /analyze` ([ADR-016](../decisions/ADR-016-landed-view-real-skyline.md)).
 
 ## POST /assistant/chat
 
@@ -373,7 +373,7 @@ Request (illustrative):
 | Field | Meaning |
 | --- | --- |
 | `messages` | 1 to 20 messages. `role` is `user` or `assistant` only; `content` is 1 to 2,000 characters. The last message must be the user's |
-| `context` | Optional. What is on screen: `site_id`, or `lat` and `lon` for a custom spot, and `t`, the moment chosen in the planner |
+| `context` | Optional. What is on screen: `site_id`, or `lat` and `lon` for a custom spot, and `t`, the moment chosen in the planner or the landed moment on `/explore` |
 
 Response (illustrative):
 

@@ -20,6 +20,8 @@ One file per resource in `app/routers`. A router function validates input throug
 | `sites.py` | `GET /sites` |
 | `analysis.py` | `POST /analyze`, `GET /sky`, `GET /scene` |
 | `terrain.py` | `GET /terrain` |
+| `accuracy.py` | `GET /accuracy`, `GET /missions`, `GET /missions/departures` |
+| `assistant.py` | `POST /assistant/chat`, after the per-client rate limit |
 
 ```python
 @router.post("/analyze", response_model=AnalyzeResponse)
@@ -29,7 +31,7 @@ def analyze(body: AnalyzeRequest, services: Deps) -> AnalyzeResponse:
 
 ## Schemas
 
-The request and response models are in `app/schemas`: `common.py` (site, site reference, window, shared field types), `analyze.py` (scenario, result, series, metrics, limits), `sky.py` (`/sky` and `/scene`), `terrain.py` (`/terrain`), `system.py` (health, errors, validation report). They are the contract; see [architecture/repository-structure.md](../architecture/repository-structure.md) for how it is exported.
+The request and response models are in `app/schemas`: `common.py` (site, site reference, window, shared field types), `analyze.py` (scenario, result, series, metrics, limits), `sky.py` (`/sky` and `/scene`), `terrain.py` (`/terrain`), `accuracy.py` (`/accuracy`, `/missions`, `/missions/departures`), `assistant.py` (`/assistant/chat`), `system.py` (health, errors, validation report). They are the contract; see [architecture/repository-structure.md](../architecture/repository-structure.md) for how it is exported.
 
 ## Services
 
@@ -41,6 +43,7 @@ The request and response models are in `app/schemas`: `common.py` (site, site re
 | `SkyService` | `services/sky.py` | `at(lat, lon, t)`, `scene(t)` | The Sun and the Earth at one point and moment with clearance; the sub-solar and sub-Earth points |
 | `TerrainService` | `services/terrain.py` | `tile(lat, lon, radius_km, n)` | The elevation tile around a point from the grid stack (`engines/relief.py`), with the grid that covers the centre; raises `no_terrain` when no grid is loaded |
 | `ValidationService` | `services/validation.py` | `report()` | Recomputes our angles for the saved JPL Horizons cases and compares them; the report is built once and kept |
+| `AccuracyService` | `services/accuracy.py` | `report()`, `missions()`, `departures(arrival)` | The accuracy report from the validation report and the saved files in `app/data/validation/` (`apollo_sun.json`, `calibration.json`), built once and kept; past landings from `app/data/missions.json`; departure times for an arrival ([ADR-014](../decisions/ADR-014-calibration.md)) |
 | `AssistantService` | `services/assistant.py` | `chat(request)` | One assistant answer: system prompt, tool loop over the services above, guardrails. Uses `KnowledgeBase` (`services/knowledge.py`) and an `LLMClient` (`services/llm.py`); see [assistant.md](assistant.md) |
 
 `AnalysisService.run_one` in steps:
@@ -63,9 +66,11 @@ Pure functions and small classes in `app/engines`. They do not import FastAPI or
 | Module | Main contents |
 | --- | --- |
 | `ephemeris.py` | `Ephemeris(kernel_dir)` loads the kernels once; `sun_earth_altaz(lat, lon, height_m, unix_seconds)` returns azimuth and elevation arrays for the Sun and the Earth; `subpoints(unix_second)`; `EPHEMERIS_START`, `EPHEMERIS_END` |
-| `terrain.py` | `PolarGrid` (memory-mapped LOLA grid with `to_pixel` and bilinear `height_m`), `GridStack` (finest grid first, `height_m`, `source_for`), `read_label`, `load_polar_grid`, `MOON_RADIUS_M` |
+| `terrain.py` | `PolarGrid` and `CylindricalGrid` (memory-mapped LOLA grids with `to_pixel` and bilinear `height_m`), `GridStack` (finest grid first, `height_m`, `source_for`, `grid_for`), `read_label`, `load_polar_grid`, `load_cylindrical_grid`, `load_grid`, `MOON_RADIUS_M` |
+| `relief.py` | `local_tile(...)`: the elevation tile for `GET /terrain` |
 | `horizon.py` | `sample_distances_m(max_km)`, `destination(...)`, `elevation_angle_deg(...)`, `profile(height_fn, lat, lon, observer_height_m, max_km, az_step_deg)`, `smooth_sphere_profile()`, `horizon_at(profile, az)` |
 | `visibility.py` | `evaluate`, `windows`, `intersect`, `metrics`, `status`, `STATUS_THRESHOLDS` |
+| `error_budget.py` | Helpers for the error study (`scripts/error_study.py`, [research/error-study.md](../../research/error-study.md)). The running app does not call them |
 
 The calculations are described in the `science/` documents.
 
@@ -79,6 +84,7 @@ The calculations are described in the `science/` documents.
 | Horizon profile, on disk | `app/data/cache/horizon/*.npz` (profile, source, site height) | Rounded latitude and longitude, observer height, reach; for example `-89.684_-163.261_2m_200km.npz` | Until the file is deleted |
 | Analysis result | `LruCache` of 200 entries in `AnalysisService` | Rounded latitude and longitude, site id, start, end, step, `include_series` | Process |
 | Validation report | Built on first request | None | Process |
+| Accuracy report | Built on first request | None | Process |
 | Site list | Loaded once | None | Process |
 
 `LruCache` is in `app/core/cache.py`; it is thread-safe. The disk file name does not include the grid, so after a grid is added or changed, delete `app/data/cache/horizon/`.
@@ -95,7 +101,7 @@ Applied in the schemas and services, with the error codes from [api-reference.md
 - dates between 1900-01-02 and 2050-12-30 (`EPHEMERIS_START`, `EPHEMERIS_END` in `engines/ephemeris.py`);
 - a custom site name of at most 80 characters, a site id of at most 64.
 
-Not built: rate limiting per client, and the assistant service ([assistant.md](assistant.md)).
+`POST /assistant/chat` is also limited per client address, in memory (`app/core/rate_limit.py`): 6 requests a minute and 60 a day by default ([assistant.md](assistant.md)). The other routes have no rate limit.
 
 ## Errors
 

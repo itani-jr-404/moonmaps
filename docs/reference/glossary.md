@@ -22,7 +22,7 @@ Terms used in the app and in these documents, in plain words. The assistant's `a
 
 **Lunar day.** The time from one noon to the next at a place on the Moon, about 29.5 Earth days. Away from the poles that is roughly two weeks of daylight and two weeks of night.
 
-**UTC.** The world's reference time. The API and the `t=` value in a link use UTC; the page shows times in the visitor's own time zone.
+**UTC.** The world's reference time. The API and the `t=` value in a link use UTC. Most times on the pages are in the visitor's own time zone; the day cards of a site's sky forecast, its "When to leave Earth" times, the accuracy page and the assistant use UTC.
 
 **Sunrise, sunset, Earthrise, Earthset.** The moments the Sun or the Earth crosses the terrain horizon as seen from the site. Over most of the Moon the Earth never rises or sets; it stays in about the same place. Near the poles and the edge of the near side it hovers at the horizon, and terrain and libration make it appear and disappear.
 
@@ -74,7 +74,7 @@ Terms used in the app and in these documents, in plain words. The assistant's `a
 
 **Curated site.** A site from our list, as opposed to coordinates you enter yourself.
 
-**Go, caution, no-go.** A summary badge for power and for communication, based on thresholds applied to the metrics. It is a guide, not a mission decision.
+**Go, caution, no-go.** The API's summary for power and for communication, based on thresholds applied to the metrics. The web app does not show it; the assistant can report it. It is a guide, not a mission decision.
 
 **Sunlight fraction.** The share of the time range during which the Sun is visible from the site.
 

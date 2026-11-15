@@ -5,7 +5,7 @@ import type { SkyResponse } from '@/lib/api/client';
 import { createEarthMaterial, type BodyMaterial } from '@/scene/body-material';
 import { groundMaterial, polarGround, type PolarGround } from '@/scene/ground';
 import { loadLander } from '@/scene/models';
-import { disposeObject } from '@/scene/renderer';
+import { disposeObject, shadowMapSize } from '@/scene/renderer';
 import { glowTexture, sunCoreTexture } from '@/scene/textures';
 import { textSprite } from '@/scene/text-sprite';
 import { D2R, enuToVector } from '@/scene/units';
@@ -81,7 +81,7 @@ export class SurfaceScene {
     this.scene.background = new THREE.Color(0x000000);
     const s = this.sunLight;
     s.castShadow = true;
-    s.shadow.mapSize.set(4096, 4096);
+    s.shadow.mapSize.set(shadowMapSize(), shadowMapSize());
     Object.assign(s.shadow.camera, {
       left: -0.22,
       right: 0.22,

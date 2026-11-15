@@ -1,6 +1,6 @@
 # Judging criteria
 
-Last updated: 2026-11-14.
+Last updated: 2026-11-15.
 
 How projects are scored, and where in this project a judge can find the answer to each question. This file points to evidence; it does not argue a case.
 
@@ -38,8 +38,8 @@ Is the project scientifically and technically reliable?
 | Question | Where it is answered |
 | --- | --- |
 | Is it based on established scientific principles? | [science/](../science/conventions-and-ephemeris.md): JPL ephemerides, LOLA terrain, a stated visibility rule |
-| Has it been tested or supported by evidence? | [science/validation.md](../science/validation.md): comparison with JPL Horizons and with NASA's illumination maps; the accuracy page in the app |
-| Is it technically feasible and effective? | The running app; [architecture/system-overview.md](../architecture/system-overview.md) |
+| Has it been tested or supported by evidence? | [VALIDATION.md](../VALIDATION.md) and [science/validation.md](../science/validation.md): comparison with JPL Horizons and with NASA's illumination maps; the accuracy page in the app (https://moonmaps.vercel.app/accuracy) |
+| Is it technically feasible and effective? | The running app, https://moonmaps.vercel.app; [architecture/system-overview.md](../architecture/system-overview.md) |
 
 ## 4. Relevance
 
@@ -58,7 +58,7 @@ How clearly does the team communicate its work?
 | Question | Where it is answered |
 | --- | --- |
 | Are the problem and the proposed solution explained clearly? | The landing page; the idea description; the presentation |
-| Does the team demonstrate how the project works? | The live app; the 30-second and 2-minute videos |
+| Does the team demonstrate how the project works? | The live app, https://moonmaps.vercel.app; the 30-second and 2-minute videos |
 | Can the team explain its methods and results? | [science/](../science/visibility-and-metrics.md) and the accuracy page; every team member should be able to explain the visibility rule in one sentence |
 
 ## The path after the hackathon

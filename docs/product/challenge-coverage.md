@@ -1,8 +1,8 @@
 # Challenge coverage
 
-Status: Design. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
-Every objective and consideration on the challenge page, and where Moon Maps answers it. The status column says whether it is built; update it as features land.
+Every objective and consideration on the challenge page, and where Moon Maps answers it. The "Our answer" column describes the design. The status column says what is built in the deployed app (https://moonmaps.vercel.app); update it as features land. The full record is [CURRENT_STATE.md](../CURRENT_STATE.md).
 
 Source for the left-hand column: the official challenge page, https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/ , read on 2026-11-14 and kept verbatim in [research/challenges/11-lunar-landing-site-navigator.md](../../research/challenges/11-lunar-landing-site-navigator.md).
 
@@ -22,15 +22,15 @@ Source for the left-hand column: the official challenge page, https://www.spacea
 
 | Objective on the challenge page | Our answer | Document | Status |
 | --- | --- | --- | --- |
-| Interactive site selection: a curated list of notable sites (Apollo, CLPS targets, other commercial missions, other countries' programmes) and custom coordinates | Site list grouped by kind, plus any latitude and longitude, plus clicking on the Moon globe | [features 1 and 8](../features/README.md), [data/sites.md](../data/sites.md) | Planned |
-| Side-by-side or sequential comparison of several sites | Comparison view, up to four scenarios | [feature 6](../features/README.md) | Planned |
-| Date and time flexibility; how conditions change across lunar days or seasons | Date range, time slider, the one-month shift, ranges up to a year | [feature 2](../features/README.md) | Planned |
-| Show the Sun and the Earth relative to the horizon at a site and date | Horizon panorama and 3D site view | [frontend/3d-scenes.md](../frontend/3d-scenes.md) | Planned |
-| Show how much time remains before sunset or Earthset | Countdown tiles that follow the slider | [science/visibility-and-metrics.md](../science/visibility-and-metrics.md) | Planned |
-| Key metrics: solar elevation angle, duration of sunlight, Earth visibility windows | Metric tiles and the timeline | [feature 5](../features/README.md) | Planned |
-| Several ways of visualising: 2D maps, 3D surface views, other representations | Panorama (2D), timeline (2D), Moon globe and site terrain (3D), Solar System (3D) | [frontend/3d-scenes.md](../frontend/3d-scenes.md) | Planned |
-| Temporal dynamics: animations or timeline views over a lunar day or several days | Play button on the slider; shadows and markers move; timeline bars | [features 2, 4 and 9](../features/README.md) | Planned |
-| Accessible across skill levels | Planner and Explorer modes, glossary tooltips, assistant, landing page | [features 11 to 13](../features/README.md) | Planned |
+| Interactive site selection: a curated list of notable sites (Apollo, CLPS targets, other commercial missions, other countries' programmes) and custom coordinates | Site list grouped by kind, plus any latitude and longitude, plus clicking on the Moon globe | [features 1 and 8](../features/README.md), [data/sites.md](../data/sites.md) | Partly built: the sites page grouped by kind, a site picker in the planner, and any point on the globe; a form for typing coordinates is planned |
+| Side-by-side or sequential comparison of several sites | Comparison view, up to four scenarios | [feature 6](../features/README.md) | Planned; the API accepts four scenarios, the web app shows one site at a time |
+| Date and time flexibility; how conditions change across lunar days or seasons | Date range, time slider, the one-month shift, ranges up to a year | [feature 2](../features/README.md) | Partly built: the planner's moment picker, a 30-day calendar and a 14-day sky forecast; no range slider and no one-month shift |
+| Show the Sun and the Earth relative to the horizon at a site and date | Horizon panorama and 3D site view | [frontend/3d-scenes.md](../frontend/3d-scenes.md) | Built: the horizon panorama on each site's page, and the landed view on `/explore` with the API's LOLA skyline |
+| Show how much time remains before sunset or Earthset | Countdown tiles that follow the slider | [science/visibility-and-metrics.md](../science/visibility-and-metrics.md) | Partly built: the planner's verdict says how long the Sun and the Earth stay up, or when they return; countdown tiles are planned |
+| Key metrics: solar elevation angle, duration of sunlight, Earth visibility windows | Metric tiles and the timeline | [feature 5](../features/README.md) | Partly built: the planner's verdict, 30-day calendar and best windows, and each site's outlook and sky forecast; metric tiles are planned |
+| Several ways of visualising: 2D maps, 3D surface views, other representations | Panorama (2D), timeline (2D), Moon globe and site terrain (3D), Solar System (3D) | [frontend/3d-scenes.md](../frontend/3d-scenes.md) | Partly built: horizon panorama, elevation map and calendar (2D); Moon globe, landed view and planner diorama (3D); the Solar System view is planned |
+| Temporal dynamics: animations or timeline views over a lunar day or several days | Play button on the slider; shadows and markers move; timeline bars | [features 2, 4 and 9](../features/README.md) | Partly built: the 30-day calendar, the 14-day sky forecast and the 3-day tracks in the panorama; no play button or animation over time |
+| Accessible across skill levels | Planner and Explorer modes, glossary tooltips, assistant, landing page | [features 11 to 13](../features/README.md) | Partly built: the home page and the assistant; Planner and Explorer modes and glossary tooltips are planned |
 
 ## Potential considerations
 
