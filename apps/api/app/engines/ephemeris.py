@@ -71,7 +71,19 @@ class Ephemeris:
         self._frame = self._pc.build_frame_named(MOON_FRAME)
 
     def _times(self, unix_seconds: NDArray[np.float64]):
-        return self._ts.utc(1970, 1, 1, 0, 0, np.asarray(unix_seconds, dtype=float))
+        """Skyfield times for Unix timestamps.
+
+        A Unix timestamp counts 86,400 seconds per day and leaves out leap seconds
+        (POSIX.1-2017, "Seconds Since the Epoch",
+        https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_16).
+        So the timestamp is split into whole UTC days and seconds within the day, and Skyfield
+        applies the leap-second table for that day. Adding all the seconds to 1970-01-01 instead
+        would leave out every leap second since 1972 (27 s in 2026; IERS Bulletin C,
+        https://hpiers.obspm.fr/eoppc/bul/bulc/Leap_Second.dat).
+        """
+        s = np.asarray(unix_seconds, dtype=float)
+        days = np.floor(s / 86400.0)
+        return self._ts.utc(1970, 1, 1 + days.astype(int), 0, 0, s - days * 86400.0)
 
     def sun_earth_altaz(
         self, lat: float, lon: float, height_m: float, unix_seconds: NDArray[np.float64]

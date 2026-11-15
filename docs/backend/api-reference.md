@@ -248,7 +248,7 @@ Response (`ValidationReport`), real output shortened to one case:
   "generated_at": "2026-11-14T16:15:33Z",
   "horizons_source": "JPL Horizons API (https://ssd.jpl.nasa.gov/api/horizons.api), quantity 4, observer coord@301, fetched by script",
   "tolerance_deg": 0.05,
-  "max_diff_deg": 0.0123,
+  "max_diff_deg": 0.0001,
   "all_passed": true,
   "cases": [
     {
@@ -257,9 +257,9 @@ Response (`ValidationReport`), real output shortened to one case:
       "lon": 0.0,
       "t": "2026-11-15T00:00:00Z",
       "body": "sun",
-      "ours": { "az": 114.4376, "el": 1.515 },
+      "ours": { "az": 114.4337, "el": 1.515 },
       "horizons": { "az": 114.433749, "el": 1.514992 },
-      "diff": { "az": 0.0038, "el": 0.0 },
+      "diff": { "az": 0.0, "el": 0.0 },
       "passed": true
     }
   ]

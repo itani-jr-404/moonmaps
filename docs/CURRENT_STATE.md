@@ -18,11 +18,11 @@ The API is built for the core calculation: sites, analysis of up to four scenari
 | API: endpoints | `GET /health`, `GET /sites`, `POST /analyze`, `GET /sky`, `GET /scene` (sub-solar and sub-Earth points only), `GET /terrain` (elevation tile around a point), `GET /validation`, `GET /accuracy`, `GET /missions`, `GET /missions/departures`, `POST /assistant/chat`. See [backend/api-reference.md](backend/api-reference.md) |
 | Assistant | `POST /assistant/chat` and a chat panel on every screen. A chain of free model providers ([ADR-013](decisions/ADR-013-assistant-model.md)); tested live with OpenRouter; knowledge base of the app guide, glossary, data notes, the challenge, Space Apps and missions; the Resources tab lists Moon Trek and JPL Horizons only; six read-only tools over the API; guardrails against prompt injection; rate limited per client. Off until at least one provider key is set. See [backend/assistant.md](backend/assistant.md) |
 | Local development | `pnpm dev` starts the API and the web app together |
-| API: ephemeris engine | Skyfield with DE421 and the lunar frame kernels; agrees with JPL Horizons within 0.0123 degrees on 16 saved cases |
+| API: ephemeris engine | Skyfield with DE421 and the lunar frame kernels; agrees with JPL Horizons within 0.0001 degrees on 16 saved cases; times count the leap seconds since 1972 |
 | API: terrain and horizon engine | Reads `LDEM_80S_80M` and `LDEM_75S_120M` near the south pole and the global `LDEM_16` (16 pixels per degree) everywhere else, so every site has a terrain horizon ([ADR-015](decisions/ADR-015-global-terrain-grid.md)); 360-value profiles to 200 km; cached in memory and on disk |
 | API: visibility, windows, metrics, status | Built, with the starting thresholds |
 | API: scripts | `download_data.py`, `precompute_horizons.py`, `fetch_horizons.py`, `export_openapi.py` |
-| API: tests | 83 tests pass (`uv run pytest -q`, 2026-11-15), including the JPL Horizons comparisons for 2026 and for the Apollo moonwalks |
+| API: tests | 97 tests pass (`uv run pytest -q`, 2026-11-15), including the JPL Horizons comparisons for 2026 and for the Apollo moonwalks |
 | Web: end-to-end tests | 20 Playwright tests pass: the screens show exactly what the API returns, and the assistant panel works with a mocked chat endpoint (2026-11-15) |
 | Validation | Positions match JPL Horizons (32 cases, 1969 to 2026); long-term sunlight and Earth visibility match NASA Goddard's polar maps at 310 points (mean absolute difference 0.006). See [VALIDATION.md](VALIDATION.md). |
 | API: Dockerfile | `apps/api/Dockerfile`; downloads the data and builds the site horizons at image build time. Not yet run on a host |

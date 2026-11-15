@@ -1,6 +1,6 @@
 # Validation
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
 How we know the numbers are right. There are two independent checks, one for each half of the calculation.
 
@@ -33,7 +33,7 @@ Times: 2026-11-15, 2026-11-22, 2026-11-29 and 2026-12-06, each at 00:00 UTC, spr
 
 **Tolerance.** Azimuth and elevation within 0.05 degrees. Near the zenith azimuth is ill-defined, so cases where Horizons gives an elevation above 85 degrees compare elevation only (`TOLERANCE_DEG` and `ZENITH_LIMIT_DEG` in `app/services/validation.py`).
 
-**Result.** All 16 cases pass. The largest difference is 0.0123 degrees, in the Sun's azimuth near Apollo 11 on 2026-11-22, when the Sun is 83.8 degrees high. Every other difference is at most 0.0038 degrees. Example: at 89.9 S, 0 E on 2026-11-15 00:00 UTC we give the Sun at azimuth 114.4376 and elevation 1.5150; Horizons gives 114.4337 and 1.5150. These numbers come from running `ValidationService(...).report()` on 2026-11-14.
+**Result.** All 16 cases pass. The largest difference is 0.0001 degrees. Example: at 89.9 S, 0 E on 2026-11-15 00:00 UTC we give the Sun at azimuth 114.4337 and elevation 1.5150; Horizons gives 114.4337 and 1.5150. Times are converted with the leap seconds since 1972 counted; leaving them out puts each position 27 s early and gives differences of up to 0.0123 degrees ([research/error-study.md](../../research/error-study.md)). These numbers come from running `ValidationService(...).report()` on 2026-11-14.
 
 **Where it shows.**
 

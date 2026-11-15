@@ -2,7 +2,7 @@
 
 Team Lunar Titans, NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". Last updated: 15 November 2026.
 
-Moon Maps tells you whether a place and a date on the Moon are good for landing: whether the Sun is above the terrain horizon (power) and whether the Earth is above it (a direct radio link). This report shows how we checked that the app works and that its numbers are right. Every result was produced by running the code on 14 November 2026, and each one names the command, dataset or publication behind it. The 0.05 degree tolerance for the JPL Horizons comparisons was set in our design documents before any comparison ran, and the pass rule for NASA's maps was written into the script before its first run. Where a first comparison did not agree, the report says so. Section 10 lists what we have not yet checked.
+Moon Maps tells you whether a place and a date on the Moon are good for landing: whether the Sun is above the terrain horizon (power) and whether the Earth is above it (a direct radio link). This report shows how we checked that the app works and that its numbers are right. Every result was produced by running the code on 14 or 15 November 2026, and each one names the command, dataset or publication behind it. The 0.05 degree tolerance for the JPL Horizons comparisons was set in our design documents before any comparison ran, and the pass rule for NASA's maps was written into the script before its first run. Where a first comparison did not agree, the report says so. Section 10 lists what we have not yet checked.
 
 The repository is https://github.com/itani-jr-404/moonmaps. Links into it, including the test runs, open once the repository is public for the submission. The method behind the science checks is in [science/validation.md](science/validation.md).
 
@@ -10,8 +10,8 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 
 | Check | Pass rule | Result | Section |
 | --- | --- | --- | --- |
-| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 80 API tests (with the NASA data, none skipped; run again on 15 November with the global LOLA grid), 32 web unit tests and 8 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
-| Sun and Earth positions against NASA JPL Horizons, 2026 | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference 0.0123 degrees | [2](#2-positions-against-nasa-jpl-horizons) |
+| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 97 API tests (with the NASA data, none skipped), 166 web unit tests and 20 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
+| Sun and Earth positions against NASA JPL Horizons, 2026 | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference 0.0001 degrees | [2](#2-positions-against-nasa-jpl-horizons) |
 | Sun elevation at 16 Apollo moonwalk times (1969 to 1972) against JPL Horizons | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference under 0.005 degrees | [3](#3-past-missions) |
 | Long-term sunlight against NASA Goddard's polar illumination map | Mean absolute difference at most 0.10 and correlation at least 0.90 | **Pass.** Mean absolute difference 0.006, correlation 0.992, over 300 random points | [4](#4-sunlight-and-earth-visibility-against-nasas-polar-maps) |
 | Long-term Earth visibility against NASA Goddard's Earth-visibility map | Same rule | **Pass.** Mean absolute difference 0.006, correlation 0.999 | [4](#4-sunlight-and-earth-visibility-against-nasas-polar-maps) |
@@ -19,16 +19,16 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 | Earth to Moon distance against NASA's Moon Fact Sheet | Inside about 357,000 to 407,000 km | **Pass.** 357,284 to 406,607 km over 2027 | [5](#5-physical-checks) |
 | LOLA terrain files read correctly | Layout as in their labels; Shackleton crater is a bowl; the global grid matches the polar grid where both cover | **Pass** | [6](#6-terrain-and-horizon) |
 | API behaviour | Every endpoint answers; every error code is returned | **Pass.** Single answers took 20 to 41 ms | [7](#7-api-behaviour) |
-| The web app shows exactly what the API returns | Automated browser tests compare every answer on screen with the API response the page received | **Pass.** 8 of 8 browser tests: planner, 30-day calendar, best times, live readout, globe aim and landing, error state, phone width, reduced motion, navigation | [8](#8-web-app-in-a-browser) |
+| The web app shows exactly what the API returns | Automated browser tests compare every answer on screen with the API response the page received | **Pass.** 20 of 20 browser tests, including the planner, 30-day calendar, best times, live readout, globe aim and landing, error state, phone width, reduced motion, navigation | [8](#8-web-app-in-a-browser) |
 | Sources | Every number and dataset has a source | **Pass**, with the open items listed in Section 9 | [9](#9-sources) |
 
 ## 1. Automated tests
 
-Commands, run from the repository root on 14 November 2026:
+Commands, run from the repository root on 15 November 2026, with the NASA data downloaded:
 
 ```bash
-cd apps/api && uv run pytest -v          # 69 passed
-pnpm test                                 # 32 passed (5 files)
+cd apps/api && uv run pytest -v          # 97 passed
+pnpm test                                 # 166 passed (25 files)
 pnpm lint && pnpm typecheck               # no errors
 pnpm build                                # production build succeeds
 pnpm contracts:check                      # API models, openapi.json and api.d.ts agree
@@ -36,60 +36,59 @@ python3 scripts/check_docs_links.py       # 0 broken links
 ```
 
 ```bash
-cd apps/web && pnpm build && pnpm test:e2e   # 8 passed: real browser, real API
+cd apps/web && pnpm build && pnpm test:e2e   # 20 passed: real browser, real API
 ```
 
 Continuous integration on GitHub Actions (https://github.com/itani-jr-404/moonmaps/actions/workflows/ci.yml) runs all of these on every change. It downloads the JPL kernels and the 80 m LOLA grid first, so every API test runs there; the job fails if any test is skipped. A separate job builds the web app, starts the API, and runs the browser tests in Chromium.
 
-### API tests (pytest), 69 passed
+### API tests (pytest), 97 passed
 
 | File | What it proves |
 | --- | --- |
 | `tests/test_geometry.py` (7) | The great-circle walk and the elevation-angle formula give the hand-worked answers, including the drop of a distant point below the horizontal because the Moon is round |
-| `tests/test_projection.py` (3) | Latitude and longitude map to the right pixel of a polar grid: the pole is at the centre, longitude 0 points up and 90 E points right, as the LOLA catalogue file says |
-| `tests/test_horizon.py` (4) | A flat grid gives a level horizon; a mountain placed due east raises the horizon at azimuth 90 by the expected angle; the profile wraps at 360 degrees; the finest grid is used first |
+| `tests/test_projection.py` (6) | Latitude and longitude map to the right pixel of a polar grid and of the global grid, as the LOLA catalogue files say |
+| `tests/test_horizon.py` (7) | A flat grid gives a level horizon; a mountain placed due east raises the horizon at azimuth 90 by the expected angle; the profile wraps at 360 degrees; the finest grid is used first |
 | `tests/test_visibility.py` (7) | Visibility, window edges between samples, windows open at either end, overlaps, every metric, and the go, caution and no-go thresholds |
+| `tests/test_time_scale.py` (1) | Unix times become the right UTC instant on both sides of the 1972 and 2016 leap seconds |
 | `tests/test_horizons.py` (1) | All 16 saved JPL Horizons cases from 2026 agree within 0.05 degrees |
 | `tests/test_apollo_sun.py` (1) | All 16 saved JPL Horizons values at Apollo moonwalk times (1969 to 1972) agree within 0.05 degrees |
 | `tests/test_lola_grid.py` (2) | The real LOLA file has the size, scale and centre its label states, and Shackleton crater is a deep bowl on the correct side |
-| `tests/test_api.py` (12) | Each endpoint returns its model; unknown site, too many samples, dates outside the kernels, bad input and too many scenarios each return the documented error |
+| `tests/test_lola_global.py` (3) | The global LOLA grid matches the polar grid where both cover, and a site far from the pole gets a real horizon |
+| `tests/test_api.py` (15) | Each endpoint returns its model; unknown site, too many samples, dates outside the kernels, bad input and too many scenarios each return the documented error |
+| `tests/test_accuracy.py` (6) | `/accuracy`, `/missions` and `/missions/departures` return the saved values and reject bad input |
+| `tests/test_assistant.py` (28) | The chat endpoint with a scripted model: tool calls, guardrails, limits and errors |
+| `tests/test_error_budget.py` (13) | The error study's helpers (Section 13) |
 
-### Web tests (Vitest), 32 passed
+### Web tests (Vitest), 166 passed
 
-| File | What it proves |
-| --- | --- |
-| `src/lib/format/format.test.ts` (3) | Durations, coordinates, signed angles and compass words read correctly |
-| `src/features/planner/lib/calendar.test.ts` (11) | The 30-day calendar adds up the good hours of each local day, grades days, ranks the best windows and jumps to a good moment. These tests also pass with the computer set to UTC, New York, Kolkata, Chatham and Beirut time. |
-| `src/lib/state/url-sync.test.ts` (3) | A place and a time survive a round trip through the address; bad addresses fall back safely |
-| `src/features/landing/lib/verdict.test.ts` (5) | "Good landing site" only when both the Sun and the Earth are visible; the right explanation for each case; the nearest curated site within 2.2 degrees |
-| `src/scene/units.test.ts` (10) | Converting between latitude and longitude, compass directions and 3D directions is consistent |
+166 tests in 25 files, next to the code they test. The list of files and what each proves is in [developer/testing.md](developer/testing.md#web-tests-vitest).
 
 ## 2. Positions against NASA JPL Horizons
 
 JPL Horizons is NASA's reference service for the positions of Solar System bodies, and it can place an observer on the Moon (https://ssd.jpl.nasa.gov/horizons/). We fetched 16 reference values with `apps/api/scripts/fetch_horizons.py` on 14 November 2026 at 16:15 UTC, through the Horizons API (https://ssd.jpl.nasa.gov/api/horizons.api, quantity 4: airless apparent azimuth and elevation, observer `coord@301`). They are saved in `apps/api/app/data/validation/horizons.json`. Our values come from Skyfield with NASA JPL's DE421 kernels, with the observer on the 1737.4 km sphere that Horizons uses. The table is the output of the API's `GET /validation`.
 
-Pass rule: within 0.05 degrees in azimuth and elevation. Result: **all 16 pass; largest difference 0.0123 degrees.**
+Pass rule: within 0.05 degrees in azimuth and elevation. Result: **all 16 pass; largest difference 0.0001 degrees** (the values are compared at four decimals).
 
 | Point | Time (UTC) | Body | Horizons az / el | Ours az / el | Difference az / el |
 | --- | --- | --- | --- | --- | --- |
-| 89.9 S, 0 E | 2026-11-15 00:00 | Sun | 114.4337 / 1.5150 | 114.4376 / 1.5150 | 0.0038 / 0.0000 |
-| 89.9 S, 0 E | 2026-11-22 00:00 | Sun | 29.3109 / 1.6235 | 29.3146 / 1.6235 | 0.0038 / 0.0000 |
-| 89.9 S, 0 E | 2026-11-29 00:00 | Sun | 304.3655 / 1.5402 | 304.3692 / 1.5402 | 0.0038 / 0.0000 |
-| 89.9 S, 0 E | 2026-12-06 00:00 | Sun | 219.1905 / 1.3736 | 219.1943 / 1.3736 | 0.0038 / 0.0000 |
-| 89.9 S, 0 E | 2026-11-15 00:00 | Earth | 357.3802 / -3.4530 | 357.3806 / -3.4534 | 0.0004 / 0.0004 |
-| 89.9 S, 0 E | 2026-11-22 00:00 | Earth | 353.6205 / 5.4363 | 353.6202 / 5.4361 | 0.0003 / 0.0002 |
-| 89.9 S, 0 E | 2026-11-29 00:00 | Earth | 5.1372 / 1.6731 | 5.1368 / 1.6736 | 0.0004 / 0.0005 |
-| 89.9 S, 0 E | 2026-12-06 00:00 | Earth | 5.2515 / -6.5627 | 5.2517 / -6.5626 | 0.0002 / 0.0001 |
-| 0.67416 N, 23.47314 E | 2026-11-15 00:00 | Sun | 91.5459 / -0.9767 | 91.5458 / -0.9805 | 0.0001 / 0.0038 |
-| 0.67416 N, 23.47314 E | 2026-11-22 00:00 | Sun | 110.7545 / 83.7592 | 110.7423 / 83.7557 | 0.0123 / 0.0035 |
-| 0.67416 N, 23.47314 E | 2026-11-29 00:00 | Sun | 268.3588 / 10.8716 | 268.3587 / 10.8754 | 0.0001 / 0.0038 |
-| 0.67416 N, 23.47314 E | 2026-12-06 00:00 | Sun | 267.0385 / -74.2649 | 267.0392 / -74.2611 | 0.0006 / 0.0038 |
-| 0.67416 N, 23.47314 E | 2026-11-15 00:00 | Earth | 276.1275 / 63.6835 | 276.1284 / 63.6839 | 0.0009 / 0.0004 |
-| 0.67416 N, 23.47314 E | 2026-11-22 00:00 | Earth | 257.7238 / 59.4017 | 257.7244 / 59.4014 | 0.0006 / 0.0002 |
-| 0.67416 N, 23.47314 E | 2026-11-29 00:00 | Earth | 262.1501 / 71.4074 | 262.1487 / 71.4070 | 0.0014 / 0.0004 |
-| 0.67416 N, 23.47314 E | 2026-12-06 00:00 | Earth | 287.9388 / 70.8555 | 287.9387 / 70.8558 | 0.0001 / 0.0003 |
+| 89.9 S, 0 E | 2026-11-15 00:00 | Sun | 114.4337 / 1.5150 | 114.4337 / 1.5150 | 0.0000 / 0.0000 |
+| 89.9 S, 0 E | 2026-11-22 00:00 | Sun | 29.3109 / 1.6235 | 29.3108 / 1.6235 | 0.0000 / 0.0000 |
+| 89.9 S, 0 E | 2026-11-29 00:00 | Sun | 304.3655 / 1.5402 | 304.3654 / 1.5402 | 0.0000 / 0.0000 |
+| 89.9 S, 0 E | 2026-12-06 00:00 | Sun | 219.1905 / 1.3736 | 219.1904 / 1.3736 | 0.0000 / 0.0000 |
+| 89.9 S, 0 E | 2026-11-15 00:00 | Earth | 357.3802 / -3.4530 | 357.3802 / -3.4530 | 0.0000 / 0.0000 |
+| 89.9 S, 0 E | 2026-11-22 00:00 | Earth | 353.6205 / 5.4363 | 353.6205 / 5.4364 | 0.0000 / 0.0000 |
+| 89.9 S, 0 E | 2026-11-29 00:00 | Earth | 5.1372 / 1.6731 | 5.1372 / 1.6731 | 0.0000 / 0.0000 |
+| 89.9 S, 0 E | 2026-12-06 00:00 | Earth | 5.2515 / -6.5627 | 5.2515 / -6.5627 | 0.0000 / 0.0000 |
+| 0.67416 N, 23.47314 E | 2026-11-15 00:00 | Sun | 91.5459 / -0.9767 | 91.5459 / -0.9767 | 0.0000 / 0.0000 |
+| 0.67416 N, 23.47314 E | 2026-11-22 00:00 | Sun | 110.7545 / 83.7592 | 110.7546 / 83.7592 | 0.0001 / 0.0000 |
+| 0.67416 N, 23.47314 E | 2026-11-29 00:00 | Sun | 268.3588 / 10.8716 | 268.3588 / 10.8716 | 0.0000 / 0.0000 |
+| 0.67416 N, 23.47314 E | 2026-12-06 00:00 | Sun | 267.0385 / -74.2649 | 267.0385 / -74.2649 | 0.0000 / 0.0000 |
+| 0.67416 N, 23.47314 E | 2026-11-15 00:00 | Earth | 276.1275 / 63.6835 | 276.1275 / 63.6835 | 0.0000 / 0.0000 |
+| 0.67416 N, 23.47314 E | 2026-11-22 00:00 | Earth | 257.7238 / 59.4017 | 257.7238 / 59.4017 | 0.0000 / 0.0000 |
+| 0.67416 N, 23.47314 E | 2026-11-29 00:00 | Earth | 262.1501 / 71.4074 | 262.1501 / 71.4074 | 0.0000 / 0.0000 |
+| 0.67416 N, 23.47314 E | 2026-12-06 00:00 | Earth | 287.9388 / 70.8555 | 287.9388 / 70.8555 | 0.0000 / 0.0000 |
 
-The largest difference (0.0123 degrees, in azimuth) is for the Sun 83.8 degrees high, where a small shift in position moves the azimuth a lot. Most Sun cases differ by about 0.0038 degrees in one coordinate; this is ten times smaller than the tolerance. Our ephemeris (DE421) is older than the one Horizons uses (DE441, as stated in each Horizons response, for example "Target body name: Sun (10) {source: DE441}"); [science/conventions-and-ephemeris.md](science/conventions-and-ephemeris.md) explains why this is acceptable.
+The time conversion counts the leap seconds added since 1972 (`Ephemeris._times` in `apps/api/app/engines/ephemeris.py`, tested in `apps/api/tests/test_time_scale.py`; leap seconds from IERS Bulletin C, https://hpiers.obspm.fr/eoppc/bul/bulc/Leap_Second.dat). Leaving them out puts every position 27 seconds early in 2026 and gives differences of up to 0.0123 degrees on these cases, about 0.0038 degrees in one coordinate for most Sun cases (Section 13). Our ephemeris (DE421) is older than the one Horizons uses (DE441, as each Horizons response states, for example "Target body name: Sun (10) {source: DE441}"); over 420 wider cases from 1900 to 2050 that difference is at most 0.00008 degrees (Section 13).
 
 The point 0.67416 N, 23.47314 E is the Apollo 11 site position from LROC (https://lroc.im-ldi.com/images/938), used here as a low-latitude test point.
 
@@ -250,6 +249,8 @@ The tests in `apps/web/e2e/` (Playwright, https://playwright.dev/) open the prod
 | Phone width (390 by 844 px, touch) | The page is no wider than the screen, and the planner shows its answer. |
 | Navigation | Each link in the navigation bar brings its section into view. |
 
+The table lists the tests that check answers. With the tests for the pages, the site page, the site assistant, navigation and accessibility there are 20 (`apps/web/e2e/`); on 15 November 2026 **20 of 20 pass** locally and in GitHub Actions.
+
 Result on 14 November 2026: **8 of 8 pass**, in two consecutive runs. The tests found one real bug, now fixed: after the intro, an invisible 1 px line from the preloader stayed across the middle of the screen and blocked the mouse there.
 
 ### Checks by hand
@@ -340,6 +341,36 @@ The spread of the learned error between repeats is below 0.0001. A check of othe
 
 - The calibration applies only to long-term shares over the 18.6-year cycle, between 80.5 S and 89.5 S. It is not applied to the planner's 30-day results, which are a different quantity, and the app shows uncalibrated results everywhere. `app/services/accuracy.py` has a helper for long-term shares only.
 - 300 points and one reference product; NASA's maps are themselves a model built from LOLA terrain, not measurements on the ground.
-- The Apollo moonwalk Sun angles (Section 3) give nothing to learn: our values equal JPL Horizons to under 0.0005 degrees, as saved in `apollo_sun.json`.
+- The Apollo moonwalk Sun angles (Section 3) give nothing to learn: our values equal JPL Horizons at the two decimals saved in `apollo_sun.json`, so they agree within 0.005 degrees.
 
 **Past landings and travel times.** `GET /missions` lists launch and landing times, each from its official page, and the travel time computed from them: Apollo 11, 12, 14, 15, 16 and 17 (NASA NSSDCA, 102.8 to 110.5 hours), SLIM (JAXA, 3,231.6 hours on a long low-energy route) and Chandrayaan-3 (ISRO launch time; no official landing time to the minute found, so its landing is left empty, to confirm). The data is in `apps/api/app/data/missions.json` and the sources in [reference/references.md](reference/references.md#missions).
+
+## 13. Error study
+
+The full study is in [research/error-study.md](../research/error-study.md), with its scripts (`apps/api/scripts/error_study.py`, `fetch_horizons_wide.py`, `compare_pgda_grids.py`) and results (`apps/api/app/data/validation/error_study.json`, `horizons_wide.json`, `pgda_grid_comparison.json`). It measures each source of error in an answer, in degrees, in minutes of a rise or set, and in yes or no answers. Its numbers were computed on 15 November 2026 with the time conversion that leaves out leap seconds, and they show that error and its size.
+
+| Source | Measured | How |
+| --- | --- | --- |
+| Time conversion | Without the leap seconds since 1972, every position is 27 s early (2017 to 2050) and every rise and set 27 s late. The API counts them (Section 2) | 2,369 rise and set times over 2027 at 1-minute steps |
+| Ephemeris (DE421 against DE441 in Horizons) | At most 0.00008 degrees, at most 2.2 s of a rise or set | 420 new JPL Horizons values, 7 places, 1900 to 2050 |
+| An angle error turned into time | At the south pole, 0.01 degrees moves a Sun rise or set by 8 min (median) and 26 min (95th percentile); about 1 min away from the pole | Slope of the clearance at every edge |
+| Time step | 30 min (the planner): edges within 1.75 min (95th percentile), 0.19 % of edges missed. 60 min (the API default): 6.0 min, 0.5 % missed | Coarse steps against a 1-minute series |
+| Terrain grid (80 m against 120 m LOLA) | The yes or no answer is the same 99.57 % of the time for the Sun; a rise or set moves 3 min (median), 3.0 h (95th percentile) | 50 south polar points |
+| Site position (moved by one 80 m pixel) | Same answer 98.7 % of the time; a rise or set moves 30 min (median), 6.2 h (95th percentile) | Each curated site and 40 polar points |
+| Visibility rule (centre of the disc against any part) | Sun edges move 3.6 h (median) at the pole | Sun radius 0.2665 degrees (NASA Sun Fact Sheet) |
+
+**What it means.** The calculation of the Sun and Earth positions is far more precise than its inputs. The answer depends most on the terrain and on how exactly a site's position is known, then on the visibility rule. A time near a rise or set at the south pole can be off by hours for those reasons, while the positions themselves agree with JPL Horizons to a fraction of a second.
+
+**Proposed key figures.** The study proposes these as pass or fail figures. They are proposals and are not yet shown in the app.
+
+| Figure | Pass rule | Value |
+| --- | --- | --- |
+| Position error against JPL Horizons | At most 0.05 degrees | 0.0001 degrees on the 16 cases of Section 2 |
+| Rise and set time from position error (95th percentile) | At most 60 s | About 1 s with leap seconds counted (study) |
+| Rise and set time from the time step (95th percentile, share missed) | At most 5 min and 1 % | 30-min step passes (1.75 min, 0.19 %); 60-min step fails (6.0 min) |
+| Agreement with NASA's polar maps (points within 0.05; same go, caution or no-go class) | At least 90 % each | Sun: 99.0 % and 95.7 %, pass. Earth: 70.7 % and 89.3 %, fail with the centre-of-disc rule; 97.7 % and 99.3 % with the any-part rule |
+
+The 90 % and 1 % rules are the study's proposals and need the team's agreement. The Earth result follows from the visibility rule of [ADR-005](decisions/ADR-005-visibility-by-disc-centre.md), as Section 12 also shows.
+
+**Not measured.** LOLA's own height accuracy; the observer height and time sampling behind NASA's polar maps, which their labels do not give; and how precisely each curated site's position is known in its source. Times before 1972 also differ from JPL Horizons by up to 43 s, because Horizons reads them as UT1 (Horizons manual, https://ssd.jpl.nasa.gov/horizons/manual.html); the Apollo checks of Section 3 still pass.
+

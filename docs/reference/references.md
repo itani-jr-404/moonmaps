@@ -45,6 +45,9 @@ Used for the assistant's knowledge files `challenge.md` and `space-apps.md`. Not
 14d. Brian W. Lawrence, "Sun Angles", Apollo Lunar Surface Journal, last revised 8 February 1999. https://www.apollojournals.org/alsj/sunangles.html (read 2026-11-14).
 14e. LOLA polar illumination and Earth-visibility maps (PGDA product 69): `AVGVISIB_75S_120M_201608` and `AVGVISIB_75S_120M_201608_EARTH`. https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/ (downloaded 2026-11-14).
 14f. NASA NSSDCA, Earth Fact Sheet, Dr. David R. Williams, last updated 15 November 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html (read 2026-11-15). The Earth's equatorial radius, 6378.137 km (polar radius 6356.752 km), used for the distance from a site to the Earth's surface in `GET /sky`.
+14g. NASA JPL, Horizons System manual, section on time scales ("prior to 1962, UT means UT1. After 1962, UT means UTC"). https://ssd.jpl.nasa.gov/horizons/manual.html (read 2026-11-15). Used by the error study ([research/error-study.md](../../research/error-study.md)) and `apps/api/scripts/fetch_horizons_wide.py`, which fetched 420 more reference positions on 2026-11-15.
+14h. International Earth Rotation and Reference Systems Service (IERS), Bulletin C leap second table, `Leap_Second.dat`. https://hpiers.obspm.fr/eoppc/bul/bulc/Leap_Second.dat (read 2026-11-15). TAI - UTC was 10 s from 1 January 1972 and 37 s from 1 January 2017; used by the error study to explain the 27 s time offset.
+14i. LOLA global grid label `LDEM_16.LBL` (simple cylindrical, 16 pixels a degree, 1895.21 m a pixel). https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/LDEM_16.LBL (read 2026-11-15). Read by the error study's `CylindricalGrid` in `apps/api/app/engines/error_budget.py`.
 14a. NASA NSSDCA, Moon Fact Sheet, Dr. David R. Williams, last updated 11 January 2024. https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html (read 2026-11-14). Used for the distance and radius checks in [VALIDATION.md](../VALIDATION.md).
 
 ## Site coordinates
@@ -82,6 +85,7 @@ Used for the assistant's knowledge file `missions.md`.
 ## Papers
 
 22a. Hoerl, A. E., Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. Technometrics 12(1), 55-67. doi:10.1080/00401706.1970.10488634. The method of `apps/api/scripts/train_calibration.py` (ADR-014).
+22b. Cohen, J. (1960). A coefficient of agreement for nominal scales. Educational and Psychological Measurement 20(1), 37-46. doi:10.1177/001316446002000104. Cohen's kappa in the error study's class agreement with NASA's maps.
 22. Mazarico, E., Neumann, G. A., Smith, D. E., Zuber, M. T., Torrence, M. H. (2011). Illumination conditions of the lunar polar regions using LOLA topography. Icarus 211, 1066-1081. doi:10.1016/j.icarus.2010.10.030
 
 ## Software
