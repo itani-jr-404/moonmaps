@@ -1,5 +1,7 @@
 import { api, unwrap, type SkyResponse } from '@/lib/api/client';
 
+import type { HorizonProfile } from './skyline';
+
 /*
  * API calls for the landed view. Every Sun and Earth position and every
  * yes/no shown on the surface comes from these answers.
@@ -20,6 +22,41 @@ export async function fetchSkyAt(
       params: { query: { lat, lon, t: new Date(timeMs).toISOString() } },
     }),
   );
+}
+
+/** How long a span is asked for when only the horizon is needed. */
+const HORIZON_SPAN_MS = 3_600_000;
+
+/**
+ * The terrain horizon at a point from NASA LOLA grids, as the API computes it
+ * (the `horizon` of POST /analyze). The landed view draws it as the far hills.
+ */
+export async function fetchHorizon(
+  lat: number,
+  lon: number,
+): Promise<HorizonProfile> {
+  const start = Date.now();
+  const { results } = unwrap(
+    await api.POST('/analyze', {
+      body: {
+        scenarios: [
+          {
+            site: { lat, lon },
+            start: new Date(start).toISOString(),
+            end: new Date(start + HORIZON_SPAN_MS).toISOString(),
+            step_minutes: 60,
+            include_series: false,
+          },
+        ],
+      },
+    }),
+  );
+  const result = results[0];
+  if (!result) throw new Error('The API returned no result.');
+  return {
+    elevationDeg: result.horizon.elevation_deg,
+    azStepDeg: result.horizon.az_step_deg,
+  };
 }
 
 export interface NextSunrise {

@@ -4,11 +4,11 @@ Last updated: 2026-11-15.
 
 Moon Maps is one long page. For a place on the Moon and a moment in time, it says whether a lander would have sunlight for its solar panels and the Earth in view for a direct radio link. "Good landing site" means both are above the terrain horizon at that moment. Nothing else is checked: not slopes, rocks or safety.
 
-All Sun and Earth answers come from the Moon Maps API. In the 3D views only the Sun and Earth directions and the yes/no answers come from the API; the ground is drawn for looks.
+All Sun and Earth answers come from the Moon Maps API. In the 3D views the Sun and Earth directions, the yes/no answers and the landed view's far skyline come from the API; the near ground is drawn for looks.
 
 ## The pages
 
-Moon Maps has separate pages. The menu at the top links to them: Home, Explore, Planner, Sites, Accuracy and About, plus the "Open the planner" button. The page you are on is underlined. On a phone, the menu button opens the same links (Home, Choose a landing, Planner, Sites, How sure are we, About). "Skip to main content" is the first link for keyboard users.
+Moon Maps has separate pages. The menu at the top links to them: Home, Explore, Planner, Sites, Accuracy and About, plus the "Open the planner" button. The page you are on is underlined. The footer of every page lists the team that built Moon Maps, team Lunar Titans: Ali Al Itani, Hussein Alassaad, Leonardo Khayyat, Khalil Dandashli and Hassan Korek. On a phone, the menu button opens the same links (Home, Choose a landing, Planner, Sites, How sure are we, About). "Skip to main content" is the first link for keyboard users.
 
 | Page | Address | What it is for |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ The south polar region faces you at the start. Small dots mark the curated sites
    - "Good landing site" or "Bad landing site", the place, "Sunlight right now: Yes/No", "Can see Earth: Yes/No" and one sentence saying why;
    - "Could not check this spot" if the API did not answer. Move the pointer off the Moon and back to try again.
    The card is always for right now, not the planner's date. On a site's dot the card shows that site and a click lands on it. Anywhere else the card shows the point itself, such as "Spot 85.3°S, 30.2°E", with "near <site>" when a curated site is within 2.2 degrees; a click lands on exactly that point, never on the nearby site.
-3. Click to land. You dive in and stand on the spot. The panel shows "Landed", the place (the site name, or the spot's coordinates with "near <site>" when one is close), the verdict and why, the time with "(now)" or "(skipped ahead)", Sunlight, Can see Earth, and "You are facing …". Drag to look around. The Sun and Earth are drawn where the API puts them, with a "SUN" or "EARTH" label, and only when the API says they are visible; the answer refreshes every minute. The ground in this view is only a drawing; the yes and no answers come from the API's terrain horizon, so the drawn hills never hide a body the API calls visible.
+3. Click to land. You dive in and stand on the spot. The panel shows "Landed", the place (the site name, or the spot's coordinates with "near <site>" when one is close), the verdict and why, the time with "(now)" or "(skipped ahead)", Sunlight, Can see Earth, and "You are facing …". Drag to look around. The Sun and Earth are drawn where the API puts them, with a "SUN" or "EARTH" label, and only when the API says they are visible; the answer refreshes every minute. The far skyline is the API's terrain horizon from NASA LOLA data, the same one behind the yes and no answers, so the Sun or the Earth rises over the hills exactly when the panel says it is visible. A body just above the horizon shows only the part of its disc above the hills. The near ground is only a drawing, kept below the real horizon. The panel says: "The far skyline is the API's terrain horizon from NASA LOLA data; the near ground is only a drawing."
    Once you land, the assistant's "ON SCREEN" strip shows the landed spot and its time, and questions to the assistant are about that spot.
 4. Buttons in the panel:
    - "Back to orbit" returns to the globe.
@@ -160,7 +160,7 @@ If the device asks for reduced motion, there is no intro, everything shows at on
 ## Limits
 
 - Dates from 1900-01-02 to 2050-12-30. The answer card looks 35 days ahead, so it works up to about 25 November 2050.
-- Terrain is 80 m or 120 m per pixel from 75 S to the pole, and about 1.9 km per pixel elsewhere, so nearby hills there are smoothed. The 3D ground in all views is decorative.
+- Terrain is 80 m or 120 m per pixel from 75 S to the pole, and about 1.9 km per pixel elsewhere, so nearby hills there are smoothed. The near 3D ground in all views is decorative; the landed view's far skyline is the real LOLA horizon.
 - The planner samples every 30 minutes; rise and set times between samples are interpolated.
 - The globe card uses the time rounded down to 10 minutes and the point rounded to 0.1 degree.
 - The globe needs a mouse or touch; it has no keyboard control. The planner works with a keyboard.
@@ -173,7 +173,7 @@ If the device asks for reduced motion, there is no intro, everything shows at on
 
 **How do I check a spot that is not in the list?** Click it on the globe, then "See the best dates"; or use a `?lat=&lon=` link.
 
-**Why does the 3D ground not match photos?** It is decorative. The answer uses the real LOLA horizon.
+**Why does the 3D ground not match photos?** The near ground is decorative. In the landed view the far skyline is the real LOLA horizon, the same one the answer uses.
 
 **Why is the Apollo 11 horizon from a "global grid"?** It is near the equator, outside the fine south polar maps, so its horizon comes from NASA's global LOLA map, about 1.9 km per pixel.
 

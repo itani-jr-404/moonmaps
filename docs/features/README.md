@@ -16,7 +16,7 @@ Status values: `Planned`, `Building`, `Done`, `Postponed`.
 | 6 | Comparison | Planned | `POST /analyze` (built) |
 | 7 | Accuracy page | Built: `/accuracy` with error rates and learning from past data | `GET /accuracy` (built) |
 | 8 | Moon globe | Building: the globe in "choose a landing" | `GET /sites`, `GET /sky` (built) |
-| 9 | Site view in 3D | Building: surface view and planner diorama with decorative ground; real terrain planned | `GET /sky` (built), `GET /terrain` (built) |
+| 9 | Site view in 3D | Built: landed view with the API's LOLA horizon as its skyline and decorative near ground (ADR-016); planner diorama with decorative ground | `GET /sky` (built), `GET /terrain` (built) |
 | 10 | Solar System view | Planned | Planet positions in `GET /scene` (not built) |
 | 11 | Landing page | Building: home page with the hero, a card for each page, then the why section; navy theme with a star field | None |
 | 12 | Assistant | Built: chat panel on every screen; needs at least one model provider key on the API | `POST /assistant/chat` (built) |

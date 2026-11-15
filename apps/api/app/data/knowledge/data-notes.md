@@ -30,7 +30,7 @@ NASA Goddard's PGDA polar illumination maps were used by a script to check the a
 - **Coarse terrain outside the pole.** The global grid is about 1.9 km per pixel at the equator, so hills and crater rims close to a site are smoothed and the horizon there can be too low.
 - **Resolution.** One degree in azimuth smooths narrow gaps between peaks, about twice the Sun's width. The terrain itself is 80 m or 120 m per pixel near the south pole and about 1.9 km elsewhere.
 - **Ephemeris age.** The app uses DE421; Horizons uses DE441. The positions still agree within the checks below.
-- **3D ground.** The ground in the 3D views is decorative and never used for visibility.
+- **3D ground.** The near ground in the 3D views is decorative and never used for visibility. The landed view's far skyline is the API's LOLA terrain horizon.
 - **Not flight software.** It is a planning and learning tool.
 
 ## How the results were checked

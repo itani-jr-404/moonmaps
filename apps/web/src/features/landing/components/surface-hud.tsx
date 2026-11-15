@@ -153,8 +153,8 @@ export function SurfaceHud({
       </div>
       <p className={styles.hudNote}>
         Drag to look around. The Sun and Earth are drawn where the API puts them
-        at this moment. The ground is only a drawing; the yes and no answers
-        come from the API&rsquo;s terrain horizon.
+        at this moment. The far skyline is the API&rsquo;s terrain horizon from
+        NASA LOLA data; the near ground is only a drawing.
       </p>
     </div>
   );
