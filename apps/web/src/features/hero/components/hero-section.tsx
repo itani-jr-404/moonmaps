@@ -60,11 +60,7 @@ export function HeroSection() {
                 </span>
               </span>
             </h1>
-            <p
-              className={styles.sub}
-              data-hero-fade
-              title="Tip: click the empty space to spin the astronaut"
-            >
+            <p className={styles.sub} data-hero-fade>
               Find out in seconds whether a place and a date on the Moon are
               good for landing: enough sunlight for power, and Earth in sight to
               call home.

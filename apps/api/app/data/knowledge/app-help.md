@@ -49,7 +49,7 @@ On a site's page, a chat opens on the right by itself after about a second (a bo
 - On first load a short intro plays. The "Skip intro" button ends it.
 - Headline: "Pick the site. Pick the hour." Buttons: "Plan a landing" (to the planner) and "Choose a landing" (to the 3D Moon).
 - "Right now at the south pole" shows Sunlight ("Yes, the Sun is up" or "No, it is dark") and Earth ("In view" or "Hidden"). This is the API's answer for 89.9 S, 0 E, asked again every minute. "--" means it is loading; "Unavailable" means the API could not be reached.
-- "Your time" is your device's clock. The astronaut, Moon and Earth behind the text are decoration; clicking empty space spins the astronaut.
+- "Your time" is your device's clock. The astronaut, Moon and Earth behind the text are decoration. The astronaut turns once when the intro ends; clicking does not move it. The 3D picture stops drawing when you scroll past it or switch tabs.
 
 ## Choose a landing (`/explore`)
 
@@ -60,8 +60,9 @@ The south polar region faces you at the start. Small dots mark the curated sites
    - "Checking…" while the API answers;
    - "Good landing site" or "Bad landing site", the place, "Sunlight right now: Yes/No", "Can see Earth: Yes/No" and one sentence saying why;
    - "Could not check this spot" if the API did not answer. Move the pointer off the Moon and back to try again.
-   The card is always for right now, not the planner's date. Within 2.2 degrees of a curated site the card shows that site and a click lands on it; elsewhere it shows "Spot 85.3°S, 30.2°E" style coordinates.
-3. Click to land. You dive in and stand on the spot. The panel shows "Landed", the place, the verdict and why, the time with "(now)" or "(skipped ahead)", Sunlight, Can see Earth, and "You are facing …". Drag to look around. The Sun and Earth are drawn where the API puts them; the answer refreshes every minute.
+   The card is always for right now, not the planner's date. On a site's dot the card shows that site and a click lands on it. Anywhere else the card shows the point itself, such as "Spot 85.3°S, 30.2°E", with "near <site>" when a curated site is within 2.2 degrees; a click lands on exactly that point, never on the nearby site.
+3. Click to land. You dive in and stand on the spot. The panel shows "Landed", the place (the site name, or the spot's coordinates with "near <site>" when one is close), the verdict and why, the time with "(now)" or "(skipped ahead)", Sunlight, Can see Earth, and "You are facing …". Drag to look around. The Sun and Earth are drawn where the API puts them, with a "SUN" or "EARTH" label, and only when the API says they are visible; the answer refreshes every minute. The ground in this view is only a drawing; the yes and no answers come from the API's terrain horizon, so the drawn hills never hide a body the API calls visible.
+   Once you land, the assistant's "ON SCREEN" strip shows the landed spot and its time, and questions to the assistant are about that spot.
 4. Buttons in the panel:
    - "Back to orbit" returns to the globe.
    - "Skip to sunrise" (only when it is dark) jumps to just after the next sunrise within 35 days. If there is none: "The Sun does not rise here in the next 35 days."
@@ -182,9 +183,9 @@ If the device asks for reduced motion, there is no intro, everything shows at on
 - The dark rounded square at the bottom right of every screen, with a small Moon and orbit, labelled "Ask the Moon Maps assistant", opens the chat. It appears after the intro. The small light on its corner is green when all is well; it turns amber and shows a number when answers arrived while the chat was closed. The close button or the Escape key closes the chat. On a phone the chat fills the screen.
 - Before the chat is opened, two suggested questions float next to the button ("Is this spot good right now?" and "How do I use Moon Maps?"). Tapping one opens the chat and asks it. The small X hides them.
 - The header shows the time now in UTC and "LINK OK", or "NO LINK" when the assistant cannot be reached. The square icon button starts a new chat.
-- Two tabs sit under the header: "Chat" and "Resources". "Resources" lists official challenge and Space Apps pages, each opening in a new tab.
-- The "ON SCREEN" strip shows what the assistant knows about the page: the site chosen in the planner (or "Custom spot"), its latitude and longitude, and the planner's time in UTC.
-- At the top of a new chat: "Plan a landing" scrolls to the planner, "About the NASA challenge" asks about the challenge, and three suggested questions ask themselves when clicked.
+- Two tabs sit under the header: "Chat" and "Resources". "Resources" lists two NASA tools, Moon Trek (maps of the Moon) and the JPL Horizons System (positions of the Sun and the Earth), each opening in a new tab.
+- The "ON SCREEN" strip shows what the assistant knows about the page: the site chosen in the planner or landed on in Choose a landing (or "Custom spot" for a point that is not a curated site), its latitude and longitude, and the time in UTC. After a landing it is the landed spot and the time shown in the landed panel.
+- At the top of a new chat: "Plan a landing" opens the planner, "Best dates this month" asks for the best landing dates in the next 30 days for the spot on screen, and three suggested questions ask themselves when clicked. The assistant can still answer questions about the NASA Space Apps challenge when asked.
 - Type a question and press Enter to send it. Shift and Enter adds a new line. A question can be up to 2,000 characters.
 - Typing "/" at the start of the box opens shortcuts: /planner, /landing, /why and /about jump to those parts of the page, /resources opens the Resources tab, and /new starts a new chat. Use the arrow keys and Enter, or click.
 - Your questions appear in bubbles on the right. Answers appear on the left under "MOON MAPS" and the time in UTC.

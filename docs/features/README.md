@@ -116,6 +116,8 @@ Spec: [frontend/3d-scenes.md](../frontend/3d-scenes.md), scene 2. Code: `feature
 
 Done when: clicking a pin selects that site, clicking elsewhere creates a custom site at the right coordinates, and the lit side matches the date.
 
+Status: the globe on `/explore` picks a curated site only on its pin; anywhere else it lands on the point's own coordinates and names a site within 2.2 degrees as "near (site)" (`features/landing/lib/pick.ts`). The landed spot becomes the assistant's context. The lit side is fixed, not the real Sun.
+
 ## 9. Site view in 3D
 
 The terrain around the site with moving shadows.

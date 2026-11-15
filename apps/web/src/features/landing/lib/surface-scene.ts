@@ -16,7 +16,10 @@ import { D2R, enuToVector } from '@/scene/units';
  *
  * The Sun and the Earth are placed from the API's azimuth and elevation, and
  * the good/bad mood comes from the API's `visible` flags. The ground itself is
- * decorative (scene/ground.ts); the real horizon is what the API used.
+ * decorative (scene/ground.ts); the real horizon is what the API used. So the
+ * drawing never contradicts the answer: a body the API calls visible is drawn
+ * over the ground (the drawn hills cannot hide it), with its label, and a body
+ * the API calls hidden is not drawn at all.
  *
  * Light intensities are the prototype's times Math.PI (physically based lights).
  */
@@ -189,8 +192,12 @@ export class SurfaceScene {
 
     this.sunCore.position.copy(this.eye).addScaledVector(sv, SKY_D);
     this.sunGlow.position.copy(this.sunCore.position);
-    // Draw the disc while any of it can still show above the flat horizon.
-    this.sunCore.visible = this.sunGlow.visible = sky.sun.el > -0.6;
+    // Only the API decides what shows; the decorative ground never hides a visible body.
+    this.sunCore.visible = this.sunGlow.visible = sunUp;
+    for (const m of [this.sunCore.material, this.sunGlow.material]) {
+      m.depthTest = !sunUp;
+    }
+    this.sunCore.renderOrder = this.sunGlow.renderOrder = sunUp ? 6 : 0;
 
     const s = this.sunLight;
     s.target.position.copy(this.eye).setY(this.eye.y - EYE);
@@ -208,13 +215,15 @@ export class SurfaceScene {
     this.earthLight.position.copy(this.eye).addScaledVector(ev, 10);
     this.earthLight.intensity = earthUp ? (sunUp ? 0.03 : 0.35) * PI : 0;
 
-    // Good landing: bright, Sun and Earth both shown and labelled. Bad: the scene stays dark.
+    // Good landing: bright. Bad: the scene stays dark. Each visible body is shown and labelled.
     this.exposure = good ? 1.3 : 0.4;
     s.intensity = (good ? 5 : sunUp ? 1.2 : 0) * PI;
     this.ambient.intensity = (good ? 0.09 : 0.006) * PI;
-    this.earthMaterial.depthTest = !good;
-    this.earth.renderOrder = good ? 5 : 0;
-    this.sunTag.visible = this.earthTag.visible = good;
+    this.earth.visible = earthUp;
+    this.earthMaterial.depthTest = !earthUp;
+    this.earth.renderOrder = earthUp ? 5 : 0;
+    this.sunTag.visible = sunUp;
+    this.earthTag.visible = earthUp;
     this.sunTag.position
       .copy(this.sunCore.position)
       .add(new THREE.Vector3(0, 26, 0));

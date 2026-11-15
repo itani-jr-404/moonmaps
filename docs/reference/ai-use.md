@@ -26,6 +26,7 @@ Positions, horizons, visibility and metrics are deterministic calculations from 
 | 2026-11-15 | Assistant (`apps/api/app/services/assistant.py` and related files, `apps/web/src/features/assistant`) and its tests | Claude | Wrote the chat endpoint, its guardrails, the chat panel and their tests from [backend/assistant.md](../backend/assistant.md) | The team lead |
 | 2026-11-15 | Pages, site page, site assistant, accuracy page, learning from past data (`/accuracy`, `scripts/train_calibration.py`), missions | Claude | Wrote the code, tests and docs from the team's requests and the judges' feedback | The team lead |
 | 2026-11-15 | Assistant knowledge base (`apps/api/app/data/knowledge/`) | Claude | Wrote the files from the app's code, the repository's documents and the official Space Apps and NASA pages listed in each file | The team lead |
+| 2026-11-15 | Fixes from the team's test notes: chat resources and welcome, globe point picking and chat context, 3D Sun and Earth drawing, hero render loop, the landed panel on slow frames (`apps/web/src/features/assistant`, `landing`, `hero`) | Claude | Investigated the notes against the code, wrote the fixes, unit tests and document updates | The team lead |
 
 How the output was checked:
 

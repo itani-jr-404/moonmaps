@@ -1,6 +1,6 @@
 # 3D scenes
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
 The web app's 3D scenes use three.js 0.187 directly, not React Three Fiber ([ADR-010](../decisions/ADR-010-threejs-directly.md)). The web app is being written, so this page describes the structure and the rules, not every detail.
 
@@ -14,9 +14,9 @@ The web app's 3D scenes use three.js 0.187 directly, not React Three Fiber ([ADR
 
 | Scene | Feature | What it shows | Data from the API |
 | --- | --- | --- | --- |
-| Hero stage | `hero` | The Moon, the Earth's limb, a Sun glow, stars and the NASA Z2 astronaut, behind the opening text | None. It is decoration; the live readout next to it comes from `GET /sky` at the south pole |
+| Hero stage | `hero` | The Moon, the Earth's limb, a Sun glow, stars and the NASA Z2 astronaut, behind the opening text. Draws only while the hero is on screen and the tab is shown; the astronaut turns once in the intro and a click does not move it | None. It is decoration; the live readout next to it comes from `GET /sky` at the south pole |
 | Globe | `landing` | The whole Moon with curated site pins and an aiming marker, for choosing a landing point | `GET /sites` for the pins; `GET /sky` for the verdict at the aimed point. The globe's light is fixed, not the real Sun |
-| Surface view | `landing` | Standing at the chosen point: the Sun, the Earth and the NASA lunar module | Sun and Earth directions and visible flags from `GET /sky` |
+| Surface view | `landing` | Standing at the chosen point: the Sun, the Earth and the NASA lunar module. A body the API calls visible is drawn over the ground with its "SUN" or "EARTH" label; a hidden body is not drawn. The panel notes that the ground is only a drawing | Sun and Earth directions and visible flags from `GET /sky` |
 | Diorama | `planner` | A cut-out of ground around the place, the lander, a compass ring and beams toward the Sun and the Earth | Directions and visible flags from `GET /sky` |
 
 The ground in the surface view and the diorama is procedural noise for decoration. It is not LOLA terrain and it never decides visibility; the API's horizon, built from LOLA grids, does ([science/terrain-and-horizon.md](../science/terrain-and-horizon.md)).
