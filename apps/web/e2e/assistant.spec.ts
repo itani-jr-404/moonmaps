@@ -376,7 +376,9 @@ test('scrolling over the panel never scrolls the page behind it', async ({
   await page.mouse.move(logBox.x + 120, logBox.y + logBox.height / 2);
   const before = await log.evaluate((el) => el.scrollTop);
   await page.mouse.wheel(0, -400);
-  await page.waitForTimeout(300);
-  expect(await log.evaluate((el) => el.scrollTop)).toBeLessThan(before);
+  // Wheel scrolling is animated; slower machines need longer than a fixed pause.
+  await expect
+    .poll(() => log.evaluate((el) => el.scrollTop), { timeout: 5000 })
+    .toBeLessThan(before);
   expect(await pageY()).toBe(start);
 });
