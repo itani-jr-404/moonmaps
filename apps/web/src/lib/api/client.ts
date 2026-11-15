@@ -16,6 +16,7 @@ export type ChatRequest = Schemas['ChatRequest'];
 export type ChatResponse = Schemas['ChatResponse'];
 export type ChatSource = Schemas['ChatSource'];
 export type AppLink = Schemas['AppLink'];
+export type TerrainTile = Schemas['TerrainTile'];
 
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';

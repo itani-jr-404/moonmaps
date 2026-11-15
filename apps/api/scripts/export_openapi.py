@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "apps" / "api"))
 
 from fastapi.openapi.utils import get_openapi  # noqa: E402
 
-from app.routers import accuracy, analysis, assistant, sites, system  # noqa: E402
+from app.routers import accuracy, analysis, assistant, sites, system, terrain  # noqa: E402
 
 OUT = ROOT / "packages" / "contracts" / "openapi.json"
 
@@ -24,7 +24,7 @@ def build() -> str:
     from app.core.config import VERSION
 
     app = FastAPI(title="Moon Maps API", version=VERSION)
-    for module in (system, sites, analysis, accuracy, assistant):
+    for module in (system, sites, analysis, terrain, accuracy, assistant):
         app.include_router(module.router)
     spec = get_openapi(title=app.title, version=app.version, routes=app.routes)
     return json.dumps(spec, indent=2, sort_keys=True) + "\n"

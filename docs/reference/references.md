@@ -30,6 +30,8 @@ Used for the assistant's knowledge files `challenge.md` and `space-apps.md`. Not
 4. NASA Lunar Reconnaissance Orbiter, Lunar Orbiter Laser Altimeter (LOLA) gridded elevation, south pole. Browse: https://imbrium.mit.edu/BROWSE/LOLA_GDR/POLAR/SOUTH_POLE ; files: https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/ (`LDEM_80S_80M`, `LDEM_75S_120M`, downloaded 2026-11-14).
 5. LOLA PDS label of the 80 m south polar grid. https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/LDEM_80S_80M.LBL (read 2026-11-14). The `LDEM_75S_120M.LBL` label is at the same address pattern.
 6. LOLA catalogue, polar stereographic map projection description, DSMAP_POLAR.CAT. https://imbrium.mit.edu/CATALOG/DSMAP_POLAR.CAT (read 2026-11-14).
+6a. NASA Lunar Reconnaissance Orbiter, LOLA gridded elevation, global, simple cylindrical: `LDEM_16` (16 pixels per degree). Files: https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/ (listing read and `LDEM_16` downloaded 2026-11-15); label https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/LDEM_16.LBL (read 2026-11-15). The labels of `LDEM_4`, `LDEM_64` and `LDEM_128` in the same folder were read the same day for [ADR-015](../decisions/ADR-015-global-terrain-grid.md).
+6b. LOLA catalogue, simple cylindrical map projection description, DSMAP.CAT. https://imbrium.mit.edu/CATALOG/DSMAP.CAT (read 2026-11-15). The pixel formulas of the global grid reader.
 7. NASA Goddard, Planetary Geodesy Data Archive, lunar polar illumination maps. https://pgda.gsfc.nasa.gov/products/69
 8. NASA Goddard, Planetary Geodesy Data Archive, high-resolution LOLA models of south pole sites. https://pgda.gsfc.nasa.gov/products/78
 9. NASA's Scientific Visualization Studio, CGI Moon Kit (ID 4720). https://svs.gsfc.nasa.gov/4720 (read 2026-11-14). Files used: `lroc_color_2k.jpg`, `ldem_3_8bit.jpg`. Usage terms: https://svs.gsfc.nasa.gov/help/ (read 2026-11-14).
@@ -170,6 +172,9 @@ Free tiers, model ids, base URLs and limits, read 2026-11-15 from each provider'
 | Checked and not used (no free API use) | https://inference-docs.cerebras.ai/support/rate-limits.md , https://docs.mistral.ai/admin/billing-usage/usage-limits.md , https://docs.together.ai/docs/billing-credits.md , https://huggingface.co/docs/inference-providers/pricing.md |
 
 ## Design references
+
+- Wikipedia, "Lambert's cosine law". https://en.wikipedia.org/wiki/Lambert%27s_cosine_law (read 2026-11-15). The shading of the elevation map on the site page (`apps/web/src/features/sites/lib/relief.ts`): brightness is the cosine of the angle between the ground's normal and the light.
+- Wikipedia, "Terrain cartography", section "Shaded relief". https://en.wikipedia.org/wiki/Terrain_cartography (read 2026-11-15). The convention of a light from the north-west on maps with north up; the article cites Eduard Imhof, *Cartographic relief presentation* (2007), ISBN 978-1-58948-026-1.
 
 - Prompt Motion, a library of motion design examples with source code. Used as a reference for the landing page scenes and the demo video. https://www.promptsmotion.com
 

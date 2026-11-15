@@ -1,6 +1,6 @@
 # AI context
 
-Status: Partly built. Last updated: 2026-11-14.
+Status: Partly built. Last updated: 2026-11-15.
 
 Read this first if you are an AI coding tool working in this repository. It is short on purpose. Follow the links for detail.
 
@@ -26,10 +26,10 @@ The two standing rules of the repository are in [CLAUDE.md](../CLAUDE.md): **cit
 ## Architecture at a glance
 
 - `apps/web`: Next.js 16, React 19, TypeScript 5.9, Tailwind CSS v4 (tokens in `src/app/globals.css`) with CSS modules for complex effects, three.js used directly (not React Three Fiber), GSAP and Lenis, TanStack Query over `openapi-fetch`, zustand. No shadcn/ui, no Chart.js. One page, `/`.
-- `apps/api`: Python 3.12 with uv, FastAPI, Pydantic, Skyfield, numpy. Routers `system`, `sites`, `analysis`; services `sites`, `horizons`, `analysis`, `sky`, `validation`; engines `ephemeris`, `terrain`, `horizon`, `visibility`.
+- `apps/api`: Python 3.12 with uv, FastAPI, Pydantic, Skyfield, numpy. Routers `system`, `sites`, `analysis`, `terrain`, `accuracy`, `assistant`; services `sites`, `horizons`, `analysis`, `sky`, `terrain`, `validation`, `accuracy`, `assistant`; engines `ephemeris`, `terrain`, `horizon`, `relief`, `visibility`.
 - `packages/contracts`: `openapi.json` exported from the API and `api.d.ts` generated from it.
 - No database. Site list in a JSON file, horizon profiles cached in memory and on disk.
-- Endpoints built: `/health`, `/sites`, `/analyze`, `/sky`, `/scene`, `/validation`. Not built: `/terrain`, `/assistant/chat`.
+- Endpoints built: `/health`, `/sites`, `/analyze`, `/sky`, `/scene`, `/terrain`, `/validation`, `/accuracy`, `/missions`, `/assistant/chat`. See [CURRENT_STATE.md](CURRENT_STATE.md).
 
 ## Where to look for a task
 

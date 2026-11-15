@@ -1,7 +1,13 @@
 'use client';
 
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
-import { api, unwrap, type ChatRequest, type Scenario } from './client';
+import {
+  api,
+  ApiError,
+  unwrap,
+  type ChatRequest,
+  type Scenario,
+} from './client';
 
 const HOUR = 3_600_000;
 
@@ -168,5 +174,32 @@ export function useAccuracy() {
     queryFn: async ({ signal }) =>
       unwrap(await api.GET('/accuracy', { signal })),
     staleTime: Infinity,
+  });
+}
+
+/**
+ * Ground heights on a square around a point (GET /terrain), for the elevation map on the site
+ * page. The answer depends only on the place, so it is kept for the whole visit.
+ */
+export function useTerrain(
+  point: { lat: number; lon: number } | null,
+  radiusKm: number,
+) {
+  return useQuery({
+    queryKey: ['terrain', point?.lat, point?.lon, radiusKm],
+    queryFn: async ({ signal }) =>
+      unwrap(
+        await api.GET('/terrain', {
+          params: {
+            query: { lat: point!.lat, lon: point!.lon, radius_km: radiusKm },
+          },
+          signal,
+        }),
+      ),
+    enabled: point !== null,
+    staleTime: Infinity,
+    // "No terrain here" is an answer, not a failure worth retrying.
+    retry: (count, error) =>
+      !(error instanceof ApiError && error.status === 404) && count < 2,
   });
 }

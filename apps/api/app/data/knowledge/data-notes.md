@@ -9,7 +9,7 @@ Which NASA data the app uses, what limits follow from it, and how the results we
 | Data | Owner | Used for |
 | --- | --- | --- |
 | JPL ephemeris kernels: `de421.bsp`, `moon_pa_de421_1900-2050.bpc`, `moon_080317.tf`, `pck00008.tpc` | NASA JPL (NAIF) | Positions of the Sun and the Earth and the Moon's orientation, calculated live with the Skyfield library |
-| LOLA elevation grids `LDEM_80S_80M` (80 S to the pole, 80 m per pixel) and `LDEM_75S_120M` (75 S to the pole, 120 m per pixel) | NASA LRO LOLA team | The terrain horizon. The 80 m grid is used first, the 120 m grid where it does not reach. |
+| LOLA elevation grids `LDEM_80S_80M` (80 S to the pole, 80 m per pixel), `LDEM_75S_120M` (75 S to the pole, 120 m per pixel) and the global `LDEM_16` (the whole Moon, 16 pixels per degree, about 1.9 km per pixel at the equator) | NASA LRO LOLA team | The terrain horizon and the elevation map on each site's page. The 80 m grid is used first, then the 120 m grid, then the global grid everywhere else. |
 | JPL Horizons | NASA JPL | Reference values for testing only; never called by the running app |
 | CGI Moon Kit (colour map and greyscale relief) | NASA Scientific Visualization Studio | The look of the 3D globe only |
 | NASA 3D Resources (lunar module, spacesuit, astronaut) | NASA | Models in the 3D views |
@@ -26,9 +26,9 @@ NASA Goddard's PGDA polar illumination maps were used by a script to check the a
 ## Limits
 
 - **Dates.** 1900-01-02 to 2050-12-30, the range of the JPL kernels. Outside it the API refuses the request.
-- **Terrain coverage.** Real terrain only from 75 S to the pole. Everywhere else, including the Apollo sites, the Moon is treated as a smooth ball with a level horizon.
-- **Grid edges.** For sites near 75 S, terrain beyond the grids is not seen, so the horizon toward the north can be too low.
-- **Resolution.** One degree in azimuth smooths narrow gaps between peaks, about twice the Sun's width. The terrain itself is 80 m or 120 m per pixel.
+- **Terrain coverage.** Every site has a terrain horizon. From 75 S to the pole it comes from the fine polar grids; everywhere else, including the Apollo sites, from the global grid.
+- **Coarse terrain outside the pole.** The global grid is about 1.9 km per pixel at the equator, so hills and crater rims close to a site are smoothed and the horizon there can be too low.
+- **Resolution.** One degree in azimuth smooths narrow gaps between peaks, about twice the Sun's width. The terrain itself is 80 m or 120 m per pixel near the south pole and about 1.9 km elsewhere.
 - **Ephemeris age.** The app uses DE421; Horizons uses DE441. The positions still agree within the checks below.
 - **3D ground.** The ground in the 3D views is decorative and never used for visibility.
 - **Not flight software.** It is a planning and learning tool.
@@ -50,7 +50,7 @@ Notes on these checks:
 - The NASA map comparison used the "any part of the disc" rule, as NASA's maps do. With the app's centre-of-disc rule the shares are slightly lower, more so for the Earth, whose disc looks about 1.9 degrees wide against 0.53 for the Sun.
 - Nine of the ten south pole sites are within 3 percentage points of NASA's sunlight map. The largest gap is the Shackleton ridge point (81.5 % against 70.1 %), on a narrow ridge where the 80 m and 120 m grids differ most.
 
-Not checked yet: smoothness of the 3D scenes, real phones (only a desktop browser at phone size), site coordinates by eye in Quickmap or Moon Trek, many users at once, and a deployed copy of the app.
+Not checked yet: smoothness of the 3D scenes, real phones (only a desktop browser at phone size), site coordinates by eye in Quickmap or Moon Trek, horizons from the global grid against an independent horizon, many users at once, and a deployed copy of the app.
 
 ## Sources
 

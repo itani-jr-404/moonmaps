@@ -33,10 +33,10 @@ moon-maps/
     api/                          FastAPI app
       app/
         main.py                   creates the app: middleware, error handlers, routers
-        routers/                  system.py, sites.py, analysis.py, assistant.py, deps.py
-        schemas/                  common.py, analyze.py, sky.py, system.py, assistant.py: the contract
-        services/                 sites, horizons, analysis, sky, validation, assistant, knowledge, llm, container
-        engines/                  ephemeris, terrain, horizon, visibility (no FastAPI imports)
+        routers/                  system.py, sites.py, analysis.py, terrain.py, assistant.py, deps.py
+        schemas/                  common.py, analyze.py, sky.py, terrain.py, system.py, assistant.py: the contract
+        services/                 sites, horizons, analysis, sky, terrain, validation, assistant, knowledge, llm, container
+        engines/                  ephemeris, terrain, horizon, relief, visibility (no FastAPI imports)
         core/                     config, errors, cache
         data/
           sites.json              curated sites

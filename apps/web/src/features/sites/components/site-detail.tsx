@@ -17,6 +17,7 @@ import { GettingThere } from './getting-there';
 import { LandingOutlook } from './landing-outlook';
 import { RightNow } from './right-now';
 import { SkyForecast } from './sky-forecast';
+import { TerrainMap } from './terrain-map';
 
 type Props = { siteId: string } | { lat: number; lon: number };
 
@@ -123,6 +124,7 @@ function SiteBody({
         <RightNow point={point} nowIso={nowIso} />
         <LandingOutlook site={ref} nowIso={nowIso} />
         <SkyForecast site={ref} nowIso={nowIso} />
+        <TerrainMap point={point} />
         <GettingThere siteId={siteId} site={ref} nowIso={nowIso} />
         <section className="panel p-6 md:p-8" aria-labelledby="sure-h">
           <p className="eyebrow">How sure are we</p>

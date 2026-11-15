@@ -10,14 +10,14 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 
 | Check | Pass rule | Result | Section |
 | --- | --- | --- | --- |
-| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 69 API tests (with the NASA data, none skipped), 32 web unit tests and 8 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
+| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 80 API tests (with the NASA data, none skipped; run again on 15 November with the global LOLA grid), 32 web unit tests and 8 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
 | Sun and Earth positions against NASA JPL Horizons, 2026 | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference 0.0123 degrees | [2](#2-positions-against-nasa-jpl-horizons) |
 | Sun elevation at 16 Apollo moonwalk times (1969 to 1972) against JPL Horizons | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference under 0.005 degrees | [3](#3-past-missions) |
 | Long-term sunlight against NASA Goddard's polar illumination map | Mean absolute difference at most 0.10 and correlation at least 0.90 | **Pass.** Mean absolute difference 0.006, correlation 0.992, over 300 random points | [4](#4-sunlight-and-earth-visibility-against-nasas-polar-maps) |
 | Long-term Earth visibility against NASA Goddard's Earth-visibility map | Same rule | **Pass.** Mean absolute difference 0.006, correlation 0.999 | [4](#4-sunlight-and-earth-visibility-against-nasas-polar-maps) |
 | A permanently shadowed impact point (LCROSS) | 0 % sunlight | **Pass.** 0.0 % over 18.6 years; NASA's map also gives 0.0 % | [3](#3-past-missions) |
 | Earth to Moon distance against NASA's Moon Fact Sheet | Inside about 357,000 to 407,000 km | **Pass.** 357,284 to 406,607 km over 2027 | [5](#5-physical-checks) |
-| LOLA terrain file read correctly | Layout as in its label; Shackleton crater is a bowl | **Pass** | [6](#6-terrain-and-horizon) |
+| LOLA terrain files read correctly | Layout as in their labels; Shackleton crater is a bowl; the global grid matches the polar grid where both cover | **Pass** | [6](#6-terrain-and-horizon) |
 | API behaviour | Every endpoint answers; every error code is returned | **Pass.** Single answers took 20 to 41 ms | [7](#7-api-behaviour) |
 | The web app shows exactly what the API returns | Automated browser tests compare every answer on screen with the API response the page received | **Pass.** 8 of 8 browser tests: planner, 30-day calendar, best times, live readout, globe aim and landing, error state, phone width, reduced motion, navigation | [8](#8-web-app-in-a-browser) |
 | Sources | Every number and dataset has a source | **Pass**, with the open items listed in Section 9 | [9](#9-sources) |
@@ -214,6 +214,7 @@ The horizon comes from NASA's Lunar Orbiter Laser Altimeter (LOLA) on the Lunar 
 - **Synthetic terrain.** `tests/test_horizon.py` places a 2 km high mountain whose edge is 10 km east of a site. The horizon at azimuth 90 comes out within 0.2 degrees of the exact angle.
 - **Against NASA's results.** Section 4 compares the full chain (terrain, horizon, positions, visibility) with NASA's maps at 310 points.
 - **Speed.** A new horizon profile takes 17 to 35 ms (575 samples in each of 360 directions).
+- **Global grid (added 15 November 2026).** Sites outside the south polar grids now use NASA's global LOLA grid `LDEM_16` (16 pixels per degree, 1895.21 m per pixel at the equator, label https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/LDEM_16.LBL, read 2026-11-15; [ADR-015](decisions/ADR-015-global-terrain-grid.md)). `tests/test_lola_global.py` checks the reader against the label, and checks that at 2,000 random points between 81 S and 88 S the global grid and the 80 m polar grid agree (correlation 0.9996; 0.25 with the longitude mirrored). With `scripts/precompute_horizons.py` on 15 November, the ten curated sites south of 80 S had exactly the same horizon profiles as before, and the seven others got terrain horizons whose highest points are 0.92 degrees (Apollo 11) to 12.43 degrees (Apollo 15) instead of a flat 0.
 
 ## 7. API behaviour
 
@@ -221,7 +222,7 @@ Measured on a laptop on 14 November 2026 against the running API (`uv run uvicor
 
 | Request | Answer |
 | --- | --- |
-| `GET /health` | `{"ok":true,"kernels":true,"dem":["lola-80s-80m","lola-75s-120m"],"version":"0.1.0"}` |
+| `GET /health` | `{"ok":true,"kernels":true,"dem":["lola-80s-80m","lola-75s-120m"],"version":"0.1.0"}` (since 15 November the list ends with `"lola-global-16ppd"`) |
 | `GET /sites` | 17 sites, each with a source link ([data/sites.md](data/sites.md)) |
 | `GET /sky?lat=-89.684&lon=-163.261&t=2026-11-14T14:56:00Z` (Shackleton ridge) | Sun at azimuth 282.29, elevation 1.62, 3.02 degrees above the terrain: visible. Earth at elevation -4.29, 4.30 degrees below the terrain: hidden. Horizon from `lola-80s-80m`. |
 | `GET /scene?t=2026-11-14T14:56:00Z` | Sub-solar point 1.56 S, 119.04 E; sub-Earth point 3.74 N, 2.09 W; Earth 405,200 km away |
@@ -241,7 +242,7 @@ The tests in `apps/web/e2e/` (Playwright, https://playwright.dev/) open the prod
 | Test | What it proves |
 | --- | --- |
 | Planner opened from a link (`?site=shackleton-ridge&t=2026-11-14T14:56Z`) | The page asks the API about that site and moment. "Good" or "Bad landing site" follows the API's Sun and Earth visibility. The Sun and Earth lines show the API's next sunrise, sunset, earthrise or earthset. Each of the 30 calendar days has the grade that the API's windows give for that local day. Every "best time" lies inside one of the API's windows. The terrain source is shown. |
-| Choosing other sites and a quick date | Clicking Malapert Massif, "In a week" and Apollo 11 each sends a new request and shows its answer, with the same checks. The address updates to the new place. Apollo 11 shows "Smooth Moon: no terrain data at this latitude", as the API reports. |
+| Choosing other sites and a quick date | Clicking Malapert Massif, "In a week" and Apollo 11 each sends a new request and shows its answer, with the same checks. The address updates to the new place. In the run of 14 November Apollo 11 showed "Smooth Moon: no terrain data at this latitude", as the API reported then. Since 15 November the API gives Apollo 11 a terrain horizon from the global grid, and the test expects "Horizon from NASA LOLA terrain (global grid, 16 pixels per degree)"; this updated test has not been run yet. |
 | API unreachable | With the API blocked, the planner shows "We could not reach the Moon Maps API" and a "Try again" button. After unblocking, "Try again" loads and shows the correct answer. |
 | Live south pole readout | "Sunlight" and "Earth" in the hero match the API's answer for 89.9 S, 0 E. |
 | Aiming at the globe and landing | Hovering the Moon shows a card whose verdict, "Sunlight right now" and "Can see Earth" match the API answer for that spot. Clicking lands, and the surface panel's verdict matches the API answer for the landed point. "See the best dates" hands the spot to the planner. |
@@ -279,7 +280,8 @@ Screenshots taken during the check:
 | --- | --- | --- |
 | JPL kernels `de421.bsp`, `moon_pa_de421_1900-2050.bpc`, `moon_080317.tf`, `pck00008.tpc` (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/) | NASA JPL, NAIF | Sun and Earth positions; the Moon's orientation |
 | JPL Horizons API (https://ssd.jpl.nasa.gov/api/horizons.api) | NASA JPL | Reference values (Sections 2 and 3) |
-| LOLA grids `LDEM_80S_80M`, `LDEM_75S_120M` and their labels (https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/) and DSMAP_POLAR.CAT (https://imbrium.mit.edu/CATALOG/DSMAP_POLAR.CAT) | NASA LRO LOLA team, Goddard | The terrain horizon |
+| LOLA grids `LDEM_80S_80M`, `LDEM_75S_120M` and their labels (https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/) and DSMAP_POLAR.CAT (https://imbrium.mit.edu/CATALOG/DSMAP_POLAR.CAT) | NASA LRO LOLA team, Goddard | The terrain horizon near the south pole |
+| LOLA global grid `LDEM_16` and its label (https://imbrium.mit.edu/DATA/LOLA_GDR/CYLINDRICAL/IMG/) and DSMAP.CAT (https://imbrium.mit.edu/CATALOG/DSMAP.CAT) | NASA LRO LOLA team, Goddard | The terrain horizon everywhere else, and the site page's elevation map |
 | PGDA polar illumination and Earth-visibility maps, Mazarico et al. (2011), doi:10.1016/j.icarus.2010.10.030 (https://pgda.gsfc.nasa.gov/products/69) | NASA Goddard | Section 4 |
 | Moon Fact Sheet and Sun Fact Sheet (https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html, https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html) | NASA NSSDCA | Distance range, radii, synodic month |
 | Apollo Lunar Surface Journal, "Sun Angles" (https://www.apollojournals.org/alsj/sunangles.html) | Brian W. Lawrence, Apollo Lunar Surface Journal | Section 3 |
@@ -300,6 +302,7 @@ Open items are listed in [CURRENT_STATE.md](CURRENT_STATE.md#to-confirm-before-r
 - **How smooth it looks.** The automated tests check what the page shows, not how smoothly the 3D scenes and the intro animate. We have not measured frame rates.
 - **Real phones.** The phone-width test runs in a desktop browser set to a phone's size and touch input, not on a phone.
 - **Site coordinates by eye.** We have not opened them in Quickmap or Moon Trek.
+- **Horizons from the global grid.** They have not been compared with an independent terrain horizon (for example one drawn in Moon Trek). At about 1.9 km per pixel, hills and crater rims close to a site are smoothed.
 - **Many users at once.** The timings in Section 7 are single requests on a laptop.
 - **The deployed app.** Nothing is deployed yet.
 

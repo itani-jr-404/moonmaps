@@ -687,7 +687,7 @@
             "title": "Site Height M"
           },
           "source": {
-            "description": "Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)",
+            "description": "Elevation grid behind the horizon: lola-80s-80m or lola-75s-120m in the south polar region, lola-global-16ppd everywhere else, or sphere when no grid is loaded (smooth Moon)",
             "title": "Source",
             "type": "string"
           }
@@ -1402,7 +1402,7 @@
             "type": "number"
           },
           "horizon_source": {
-            "description": "Elevation grid behind the horizon: lola-80s-80m, lola-75s-120m, or sphere when no terrain is available (smooth Moon)",
+            "description": "Elevation grid behind the horizon: lola-80s-80m or lola-75s-120m in the south polar region, lola-global-16ppd everywhere else, or sphere when no grid is loaded (smooth Moon)",
             "title": "Horizon Source",
             "type": "string"
           },
@@ -1440,6 +1440,103 @@
           "earth_surface_distance_km"
         ],
         "title": "SkyResponse",
+        "type": "object"
+      },
+      "TerrainTile": {
+        "additionalProperties": false,
+        "description": "Ground heights on a square around a point, for the elevation picture. Read-only.\n\nRow 0 is the north edge and column 0 the west edge; the point is the centre sample.\nSample (i, j) lies at east = (j - c) * spacing_m, north = (c - i) * spacing_m, with\nc = (n - 1) / 2, measured along great circles from the centre.",
+        "properties": {
+          "centre_m": {
+            "description": "Height at the centre point, in metres",
+            "title": "Centre M",
+            "type": "number"
+          },
+          "heights_m": {
+            "description": "n rows of n heights in metres, rounded to 1 m; null where no grid covers",
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "title": "Heights M",
+            "type": "array"
+          },
+          "lat": {
+            "description": "Latitude in degrees, south negative",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "description": "East longitude, -180 to 180",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lon",
+            "type": "number"
+          },
+          "max_m": {
+            "title": "Max M",
+            "type": "number"
+          },
+          "min_m": {
+            "title": "Min M",
+            "type": "number"
+          },
+          "n": {
+            "description": "Samples per side",
+            "title": "N",
+            "type": "integer"
+          },
+          "radius_km": {
+            "description": "Half the width of the square, in km",
+            "title": "Radius Km",
+            "type": "number"
+          },
+          "reference_radius_km": {
+            "description": "Heights are metres above a sphere of this radius (the LOLA labels' OFFSET)",
+            "title": "Reference Radius Km",
+            "type": "number"
+          },
+          "resolution_m": {
+            "description": "Pixel size of that grid in metres (MAP_SCALE; for the global grid, at the equator)",
+            "title": "Resolution M",
+            "type": "number"
+          },
+          "source": {
+            "description": "Elevation grid that covers the centre: lola-80s-80m, lola-75s-120m or lola-global-16ppd. Samples outside it come from the next grid that covers them",
+            "title": "Source",
+            "type": "string"
+          },
+          "spacing_m": {
+            "description": "Distance between neighbouring samples, in metres",
+            "title": "Spacing M",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat",
+          "lon",
+          "radius_km",
+          "n",
+          "spacing_m",
+          "source",
+          "resolution_m",
+          "reference_radius_km",
+          "heights_m",
+          "centre_m",
+          "min_m",
+          "max_m"
+        ],
+        "title": "TerrainTile",
         "type": "object"
       },
       "ValidationCase": {
@@ -2189,6 +2286,113 @@
         "summary": "Sky",
         "tags": [
           "analysis"
+        ]
+      }
+    },
+    "/terrain": {
+      "get": {
+        "operationId": "terrain_terrain_get",
+        "parameters": [
+          {
+            "description": "Latitude in degrees, south negative",
+            "in": "query",
+            "name": "lat",
+            "required": true,
+            "schema": {
+              "description": "Latitude in degrees, south negative",
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Lat",
+              "type": "number"
+            }
+          },
+          {
+            "description": "East longitude in degrees, -180 to 360",
+            "in": "query",
+            "name": "lon",
+            "required": true,
+            "schema": {
+              "description": "East longitude in degrees, -180 to 360",
+              "maximum": 360,
+              "minimum": -180,
+              "title": "Lon",
+              "type": "number"
+            }
+          },
+          {
+            "description": "Half the width of the square, in km",
+            "in": "query",
+            "name": "radius_km",
+            "required": false,
+            "schema": {
+              "default": 30.0,
+              "description": "Half the width of the square, in km",
+              "maximum": 150,
+              "minimum": 1,
+              "title": "Radius Km",
+              "type": "number"
+            }
+          },
+          {
+            "description": "Samples per side",
+            "in": "query",
+            "name": "n",
+            "required": false,
+            "schema": {
+              "default": 64,
+              "description": "Samples per side",
+              "maximum": 128,
+              "minimum": 16,
+              "title": "N",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerrainTile"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Terrain",
+        "tags": [
+          "terrain"
         ]
       }
     },

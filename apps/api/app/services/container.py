@@ -7,7 +7,7 @@ from fastapi import Request
 
 from app.core.config import Settings
 from app.engines.ephemeris import Ephemeris
-from app.engines.terrain import GridStack, PolarGrid, load_polar_grid
+from app.engines.terrain import Grid, GridStack, load_grid
 from app.services.accuracy import AccuracyService
 from app.services.analysis import AnalysisService
 from app.services.assistant import AssistantService
@@ -17,12 +17,14 @@ from app.services.llm import ChainClient, LLMClient
 from app.services.providers import build_clients
 from app.services.sites import SiteService
 from app.services.sky import SkyService
+from app.services.terrain import TerrainService
 from app.services.validation import ValidationService
 
 log = logging.getLogger("moon_maps")
 
-# Finest first. Files and their layout: docs/data/sources.md.
-GRID_FILES = ["LDEM_80S_80M", "LDEM_75S_120M"]
+# Finest first: the two south polar grids, then the global grid that covers every other point.
+# Files and their layout: docs/data/sources.md; the choice: docs/decisions/ADR-015.
+GRID_FILES = ["LDEM_80S_80M", "LDEM_75S_120M", "LDEM_16"]
 
 
 @dataclass(frozen=True)
@@ -34,15 +36,16 @@ class Services:
     validation: ValidationService
     accuracy: AccuracyService
     assistant: AssistantService
+    terrain: TerrainService
     grids: GridStack
 
 
 def load_grids(settings: Settings) -> GridStack:
-    grids: list[PolarGrid] = []
+    grids: list[Grid] = []
     for name in GRID_FILES:
         img, lbl = settings.dem_dir / f"{name}.IMG", settings.dem_dir / f"{name}.LBL"
         if img.exists() and lbl.exists():
-            grids.append(load_polar_grid(img, lbl))
+            grids.append(load_grid(img, lbl))
         else:
             log.warning("elevation grid %s is missing; run scripts/download_data.py", name)
     return GridStack(grids)
@@ -88,6 +91,7 @@ def build_services(
             sky,
             accuracy=accuracy,
         ),
+        terrain=TerrainService(grids),
         grids=grids,
     )
 

@@ -21,7 +21,7 @@ Base URL: set per environment, see [developer/deployment.md](../developer/deploy
 | GET | `/accuracy` | Error rates against NASA references and the calibration learned from past data | Built |
 | GET | `/missions` | Past landings with launch and landing times and the travel time | Built |
 | GET | `/missions/departures` | When to leave Earth to land at a given time, for each past mission's travel time | Built |
-| GET | `/terrain` | A height tile around a site for a 3D site view | Planned, not built |
+| GET | `/terrain` | Ground heights on a square around a point, for the site page's elevation map | Built |
 | POST | `/assistant/chat` | One assistant answer | Built; off when no model key is set |
 
 Only `/assistant/chat` is rate limited (per client address, in memory).
@@ -33,14 +33,14 @@ The values in the examples come from running the API code on 2026-11-14 unless t
 ## GET /health
 
 ```json
-{ "ok": true, "kernels": true, "dem": ["lola-80s-80m", "lola-75s-120m"], "version": "0.1.0" }
+{ "ok": true, "kernels": true, "dem": ["lola-80s-80m", "lola-75s-120m", "lola-global-16ppd"], "version": "0.1.0" }
 ```
 
 | Field | Meaning |
 | --- | --- |
 | `ok` | Always `true` when the API answers |
 | `kernels` | `true`; the API does not start without its JPL kernels |
-| `dem` | Names of the elevation grids that are loaded. An empty list means no terrain; every site then uses a smooth Moon |
+| `dem` | Names of the elevation grids that are loaded, finest first. An empty list means no terrain; every site then uses a smooth Moon |
 | `version` | API version |
 
 ## GET /sites
@@ -180,7 +180,7 @@ Notes:
 - Index `i` of every `series` array belongs to time `t[i]` ([ADR-009](../decisions/ADR-009-columnar-series.md)). Angles are rounded to 4 decimals.
 - `*_clearance` is the body's elevation minus the terrain horizon at its azimuth, in degrees. Positive means above the terrain.
 - `at_start` is the visibility at the first sample, which is `start`.
-- `horizon.elevation_deg` has 360 values, rounded to 3 decimals. `horizon.source` is `lola-80s-80m`, `lola-75s-120m`, or `sphere` (no grid covers the site; smooth Moon). `horizon.site_height_m` is the ground height above the 1737.4 km sphere, rounded to 0.1 m, and `null` for `sphere`.
+- `horizon.elevation_deg` has 360 values, rounded to 3 decimals. `horizon.source` is `lola-80s-80m` or `lola-75s-120m` near the south pole, `lola-global-16ppd` everywhere else ([ADR-015](../decisions/ADR-015-global-terrain-grid.md)), or `sphere` when no grid is loaded (smooth Moon). `horizon.site_height_m` is the ground height above the 1737.4 km sphere, rounded to 0.1 m, and `null` for `sphere`.
 - `next_*` are measured from `start` and are `null` when no such event happens inside the range.
 - Window edges between samples are placed by interpolation, so they are not on the step grid.
 - Definitions of every metric and of `status`: [science/visibility-and-metrics.md](../science/visibility-and-metrics.md).
@@ -312,15 +312,50 @@ Response (`DeparturesResponse`), real output for `arrival=2026-12-01T12:00:00Z`,
 - The list is sorted by `travel_hours`, shortest first. A past mission's trip length is an example, not a plan: a real trip depends on the rocket, the path and the launch window.
 - An `arrival` without a time zone returns `422 invalid_input`; one outside the kernel range returns `422 out_of_ephemeris_range`.
 
-## Planned, not built
+## GET /terrain
 
-These are design, kept here so the shape is agreed before anyone builds them. Values are illustrative.
+Ground heights on a square around a point, for the elevation map on the site page. Read-only; nothing is stored. Method: [science/terrain-and-horizon.md](../science/terrain-and-horizon.md#elevation-tile-get-terrain).
 
-### GET /terrain
+Query:
 
-Query: `lat`, `lon`, `size_km` (5 to 80, default 40), `n` (65 to 513, default 257). Response: an `n` by `n` grid of heights in metres above the 1737.4 km sphere, as little-endian signed 16-bit integers in base64, with row 0 the north edge and the site at the centre sample. The local tile is described in [science/terrain-and-horizon.md](../science/terrain-and-horizon.md).
+| Parameter | Rule |
+| --- | --- |
+| `lat` | Required, -90 to 90 |
+| `lon` | Required, -180 to 360, east-positive |
+| `radius_km` | Optional, 1 to 150. Half the width of the square. Default 30 |
+| `n` | Optional, 16 to 128. Samples per side. Default 64 |
 
-The 3D ground in the web app today is decorative and does not use this endpoint.
+Response (`TerrainTile`), real output for the Apollo 11 site with the defaults on 2026-11-15, heights shortened:
+
+```json
+{
+  "lat": 0.67416,
+  "lon": 23.47314,
+  "radius_km": 30.0,
+  "n": 64,
+  "spacing_m": 952.381,
+  "source": "lola-global-16ppd",
+  "resolution_m": 1895.21,
+  "reference_radius_km": 1737.4,
+  "heights_m": [[-2018.0, -2024.0, -2026.0, "..."], [-2009.0, -2014.0, -2015.0, "..."], "..."],
+  "centre_m": -1921.6,
+  "min_m": -2143.3,
+  "max_m": -1306.6
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `heights_m` | `n` rows of `n` heights in metres above the 1737.4 km sphere, rounded to 1 m. Row 0 is the north edge, column 0 the west edge; the point is the centre sample. `null` where no grid covers a sample |
+| `spacing_m` | Distance between neighbouring samples, `2 * radius_km / (n - 1)` |
+| `source` | The grid that covers the centre: `lola-80s-80m`, `lola-75s-120m` or `lola-global-16ppd`. Samples outside it come from the next grid that covers them |
+| `resolution_m` | That grid's pixel size from its label (`MAP_SCALE`; for the global grid, at the equator) |
+| `reference_radius_km` | The sphere the heights are measured from (the labels' `OFFSET`, 1737400 m) |
+| `centre_m`, `min_m`, `max_m` | Height at the point, and the lowest and highest sample, rounded to 0.1 m |
+
+Errors: `no_terrain` (404) when no elevation grid is loaded for the point; `invalid_input` (422) for a parameter out of range.
+
+The 3D ground in the web app is still decorative and does not use this endpoint.
 
 ## POST /assistant/chat
 
@@ -379,6 +414,7 @@ Codes in use:
 | --- | --- | --- |
 | `invalid_input` | 422 | A field failed validation; `message` names the first one |
 | `unknown_site` | 404 | No curated site has that id |
+| `no_terrain` | 404 | `GET /terrain`: no elevation grid is loaded for the point |
 | `range_too_long` | 422 | More than 10,000 samples in a scenario |
 | `out_of_ephemeris_range` | 422 | A date is outside 1900-01-02 to 2050-12-30 |
 | `rate_limited` | 429 | Too many assistant requests from one client, or the model provider's own limit |
