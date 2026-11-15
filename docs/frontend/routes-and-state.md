@@ -23,6 +23,8 @@ The app has one page per task (Next.js App Router, `src/app`). The navigation ba
 
 The opening intro (preloader) plays only when the first page of a visit is `/`. Opening any other page first counts the intro as done, so the navigation and reveals start at once; going to `/` later does not replay it. Each new page starts at the top.
 
+`app/template.tsx` wraps every page in `PageTransition` (`site-chrome`). After a click in the navigation, the new page fades in and rises 32 px over 650 ms; `/` only fades, because a transform would move its fixed 3D stage. The first page of a visit is not animated, the class is removed when the animation ends, and reduced motion turns it off.
+
 ### The site page
 
 `features/sites/components/site-detail.tsx`. "Now" is rounded down to ten minutes when the page opens, so every panel asks about the same moment and answers are cached. Every number comes from the API.

@@ -1,0 +1,36 @@
+/* The page animation after a navigation; see page-transition.tsx for why Home only fades. */
+
+.rise {
+  animation: page-rise 650ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+}
+
+.fade {
+  animation: page-fade 650ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+}
+
+@keyframes page-rise {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .fade {
+    animation: none;
+  }
+}
