@@ -1,6 +1,6 @@
 # References
 
-Last updated: 2026-11-16.
+Last updated: 2026-11-15.
 
 Everything the project uses or cites: data, tools, code and reading. Add a line here in the same pull request that adds a dependency, a dataset or an asset. The submission form asks for this list. [CITATIONS.md](../../CITATIONS.md) at the repository root repeats it for judges; change both together.
 
@@ -87,13 +87,6 @@ Used for the assistant's knowledge file `missions.md`.
 22a. Hoerl, A. E., Kennard, R. W. (1970). Ridge regression: biased estimation for nonorthogonal problems. Technometrics 12(1), 55-67. doi:10.1080/00401706.1970.10488634. The method of `apps/api/scripts/train_calibration.py` (ADR-014).
 22b. Cohen, J. (1960). A coefficient of agreement for nominal scales. Educational and Psychological Measurement 20(1), 37-46. doi:10.1177/001316446002000104. Cohen's kappa in the error study's class agreement with NASA's maps.
 22. Mazarico, E., Neumann, G. A., Smith, D. E., Zuber, M. T., Torrence, M. H. (2011). Illumination conditions of the lunar polar regions using LOLA topography. Icarus 211, 1066-1081. doi:10.1016/j.icarus.2010.10.030
-22c. Speyerer, E. J., et al. (2016). Quantifying crater production and regolith overturn on the Moon with temporal imaging. Nature 538. doi:10.1038/nature19829. New impact craters found by comparing LROC images; behind the Future scope illustration of a fresh crater (`apps/web/src/features/about/components/future-demos.tsx`).
-22d. Samet, H. (1984). The quadtree and related hierarchical data structures. ACM Computing Surveys 16(2). https://www.cs.umd.edu/users/hjs/pubs/SameCSUR84-ocr.pdf (read 2026-11-15). The coarse-to-fine search in the Future scope illustration of the best spot in an area.
-22e. NASA GSFC and Arizona State University, LROC instrument specifications. https://lroc.im-ldi.com/about/specs (read 2026-11-15). The Narrow Angle Camera's visible light and 0.5 m per pixel, named in the flight-check illustration.
-22f. Morabito and Heckman. LRO K-band (26 GHz) signal analysis. JPL IPN Progress Report 42-222. https://ipnpr.jpl.nasa.gov/progress_report/42-222/42-222B.html (read 2026-11-15). The K-band radio named in the flight-check illustration.
-22g. W3C, Web Content Accessibility Guidelines 2.2, success criteria 2.2.2 (Pause, Stop, Hide), 1.4.11 (Non-text Contrast) and 2.5.8 (Target Size (Minimum)). https://www.w3.org/TR/WCAG22/ (read 2026-11-16). The Pause button, the spot colours and the button size of the Future scope boxes.
-
-The other sources of the Future scope study are listed in [research/future-scope-demos.md](../../research/future-scope-demos.md).
 
 ## Software
 

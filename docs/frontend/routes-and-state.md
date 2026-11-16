@@ -1,6 +1,6 @@
 # Routes and state
 
-Status: Partly built. Last updated: 2026-11-16.
+Status: Partly built. Last updated: 2026-11-15.
 
 How the web app is laid out, where state lives, and how data is fetched. Layering rules are in [architecture/application-layers.md](../architecture/application-layers.md). The web app is being written, so this page describes the structure, not every detail.
 
@@ -10,14 +10,14 @@ The app has one page per task (Next.js App Router, `src/app`). The navigation ba
 
 | Route | File | Feature folder | What it shows |
 | --- | --- | --- | --- |
-| `/` | `app/page.tsx` | `hero`, `home`, `about`, `why` | The hero with the opening intro, a card for each page, "Coming next" (the three Future scope boxes, linking to `/about#future-h`), then why the south pole |
+| `/` | `app/page.tsx` | `hero`, `home`, `why` | The hero with the opening intro, a card for each page, then why the south pole |
 | `/explore` | `app/explore/page.tsx` | `landing` | The 3D globe: aim at any point, land, look around. The landed panel says when a spot that is not good now is next good, and links to the spot's site page |
 | `/planner` | `app/planner/page.tsx` | `planner` | Pick a site and a moment; a verdict, a 30-day calendar, the best windows and a 3D diorama. Only this page keeps the choice in the address |
 | `/sites` | `app/sites/page.tsx` | `sites` | Every curated site from `GET /sites`, grouped by kind, each with one `GET /sky` line for right now |
 | `/sites/[id]` | `app/sites/[id]/page.tsx` | `sites` | Everything about one curated site (below). An unknown id shows a not-found state |
 | `/sites/spot?lat=&lon=` | `app/sites/spot/page.tsx` | `sites` | The same page for any point on the Moon. Longitudes from 180 to 360 are converted to -180 to 0; bad values show a not-found state |
 | `/accuracy` | `app/accuracy/page.tsx` | `accuracy` | Error rates and checks against past landings |
-| `/about` | `app/about/page.tsx` | `about` | What the app does and how, its limits, and a "Future scope" section on four planned ideas; cards 05 and 06 hold small looping illustrations (`about/components/future-demos.tsx`, CSS animations, made-up data, a Pause button, last frame shown with reduced motion) and card 07 an emergency landing simulation (same file: distance and two angles in, an arrow to the nearest made-up good spot out, with a legend for the spot colours) |
+| `/about` | `app/about/page.tsx` | `about` | What the app does and how, its limits, and a "Future scope" section on three planned ideas |
 
 `app/layout.tsx` holds what every page shares: the skip link (to `#main`), the navigation, the footer, the assistant, the toast, the custom cursor, the scroll reveals and `RouteEffects` (`site-chrome`). A page with no route shows `app/not-found.tsx`.
 

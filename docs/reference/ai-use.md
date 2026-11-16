@@ -1,6 +1,6 @@
 # Use of AI
 
-Last updated: 2026-11-16.
+Last updated: 2026-11-15.
 
 The Space Apps rules ask teams to say whether and how AI tools were used, to mark AI-made images and video with a visible watermark, and to disclose AI-made code, data and audio. This file is the project's record. Keep it accurate; it is the source for the "Use of Super Intelligence" answer in the submission.
 
@@ -38,8 +38,6 @@ Positions, horizons, visibility and metrics are deterministic calculations from 
 | 2026-11-15 | The Apollo Journal note on the Accuracy page, the smaller shadow map on weaker devices (`apps/web/src/scene/renderer.ts`) and the matching updates in `docs/VALIDATION.md` | Claude | Wrote the code, tests and text from the team lead's requests and the testers' notes; checked the figures against `GET /accuracy` and the deployed app | The team lead |
 | 2026-11-15 | About page "Future scope" section (`apps/web/src/features/about/components/about-section.tsx`) | Claude | Wrote the section's text from the team's two ideas (watching the site during the flight; best spot in an area by quadtree and sliding window) | The team lead |
 | 2026-11-15 | The "Future scope" heading on the About page, styled like the page's main heading (`apps/web/src/features/about/components/about-section.tsx`) | Claude | Changed the heading markup and wrote the line "What comes next, planned, not built yet." from the team lead's screenshot request | The team lead |
-| 2026-11-15 and 2026-11-16 | The Future scope illustrations and the emergency landing simulation (`apps/web/src/features/about/components/future-demos.tsx`), card 07 on About, the "Coming next" preview on Home, and the study behind them (`research/future-scope-demos.md`) | Claude | Researched the instruments, signals and search method with their sources, and built the illustrations from the team lead's request and a team member's review; the data in them is made up and labelled so. Then reviewed them in a browser at five screen widths and with reduced motion, and fixed what the review found (legend, spot letters, Pause button, text size, timing) | The team lead |
-| 2026-11-16 | The smooth-scroll settings (`apps/web/src/lib/motion/smooth-scroll.tsx`) | Claude | Raised the wheel distance and the catch-up rate from the team lead's note that the site answered slowly, and measured the result in Chrome | The team lead |
 | 2026-11-15 | `docs/hackathon/impact-and-opportunity.md` and `docs/hackathon/approach-challenges-and-limits.md` | Claude | Wrote both from the repository's documents, decision records, validation report and git history, for the Slack requirements' impact and judging-video items | The team lead |
 
 How the output was checked:

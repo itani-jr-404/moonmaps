@@ -12,7 +12,7 @@ import styles from './future-demos.module.css';
 /*
   Small illustrations for two Future scope ideas, shown on the About page and on Home. They are
   pictures of how the ideas could look, with made-up data, and the box says so. The instrument,
-  the radio band and the search method they name come from research/future-scope-demos.md:
+  the radio band and the search method they name come from these sources, read 2026-11-15:
   - LRO's Narrow Angle Camera images the ground in visible light at 0.5 m per pixel
     (https://lroc.im-ldi.com/about/specs), and LRO sends its data on K-band radio at 26 GHz
     (https://ipnpr.jpl.nasa.gov/progress_report/42-222/42-222B.html).

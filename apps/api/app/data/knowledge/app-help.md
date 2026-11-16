@@ -1,6 +1,6 @@
 # How to use Moon Maps
 
-Last updated: 2026-11-16.
+Last updated: 2026-11-15.
 
 Moon Maps is a website with several pages (listed below). For a place on the Moon and a moment in time, it says whether a lander would have sunlight for its solar panels and the Earth in view for a direct radio link. "Good landing site" means both are above the terrain horizon at that moment. Nothing else is checked: not slopes, rocks or safety.
 
@@ -12,7 +12,7 @@ Moon Maps has separate pages. The menu at the top links to them: Home, Explore, 
 
 | Page | Address | What it is for |
 | --- | --- | --- |
-| Home | `/` | Headline, the live south pole readout, cards that open each page ("What you can do"), a preview of the planned ideas ("Coming next"), then why the south pole matters |
+| Home | `/` | Headline, the live south pole readout, cards that open each page ("What you can do"), then why the south pole matters |
 | Choose a landing | `/explore` | A 3D Moon to aim at and land on |
 | Planner | `/planner` | Pick a place and a date; the answer, the 30-day calendar, the best times and a 3D view |
 | Sites | `/sites` | Every curated landing site as a card, grouped by kind, with a "right now" line |
@@ -50,7 +50,6 @@ On a site's page, a chat opens on the right by itself after about a second (a bo
 - On first load a short intro plays. The "Skip intro" button ends it.
 - Headline: "Pick the site. Pick the hour." Buttons: "Plan a landing" (to the planner) and "Choose a landing" (to the 3D Moon).
 - "Right now at the south pole" shows Sunlight ("Yes, the Sun is up" or "No, it is dark") and Earth ("In view" or "Hidden"). This is the API's answer for 89.9 S, 0 E, asked again every minute. "--" means it is loading; "Unavailable" means the API could not be reached.
-- "Coming next" previews the planned ideas from the About page's Future scope with the same three boxes (made-up data) and a "See the Future scope" button.
 - "Your time" is your device's clock. The astronaut, Moon and Earth behind the text are decoration. The astronaut turns once when the intro ends; clicking does not move it. The 3D picture stops drawing when you scroll past it or switch tabs.
 
 ## Choose a landing (`/explore`)
@@ -122,7 +121,7 @@ A block of ground around the place with the lander, a compass ring, and beams: a
 
 Three columns: "What it does for you", "The simple idea behind it" and "Good to know". It says the app is a planning and learning tool, not flight software.
 
-Below them, "Future scope" lists four ideas that are planned and not built. The first three are: counting relay satellites, which can keep a lander connected when the Earth is hidden (Moon Maps checks only the direct link to the Earth today, and this is the next step); watching the site during the flight against new orbital images and hazard data, such as a fresh impact crater; and finding the best spot in an area marked by 4 corners between two dates, the point and date with the longest run of good days, with a coarse-to-fine quadtree search and a sliding window over time. Moon Maps cannot do any of them yet. Under the second and third ideas, a small box labelled "Illustration, made-up data" loops a picture of how each could look: a new orbital image shows a fresh crater in the landing circle and the target moves to a backup site that still has the Sun and the Earth in view; and an area split into quarters down to one point (green cells are the best ones, an amber cell is one whose samples disagree), then a 30-day bar where the longest run with both in view is found. Each loop has a "Pause" button, which becomes "Play". The fourth idea, "Emergency landing mode", is: if the planned site turns bad late in the flight, Moon Maps would point at once to the nearest spot with the Sun and the Earth in view. Its box, "Simulation, made-up landing spots", lets the visitor set the craft's distance from the site, its angle from the site's vertical and the direction of that angle (clockwise from north), then press "Emergency landing" to see an arrow, the distance and the bearing to the nearest spot marked good. On the map, green spots have the Sun and the Earth in view, grey spots have one of them hidden, each spot has a letter (B to H), and the dashed ring is the craft. The map is a top view: the craft is drawn at the point on the ground below it, so its height does not show, and the distance and bearing are along the ground; a note under the map says so. The pictures and spots are not real results. Home shows the same three boxes under "Coming next", with a link to this section.
+Below them, "Future scope" lists three ideas that are planned and not built: counting relay satellites, which can keep a lander connected when the Earth is hidden (Moon Maps checks only the direct link to the Earth today, and this is the next step); watching the site during the flight against new orbital images and hazard data, such as a fresh impact crater; and finding the best spot in an area marked by 4 corners between two dates, the point and date with the longest run of good days, with a coarse-to-fine quadtree search and a sliding window over time. Moon Maps cannot do any of them yet.
 
 ## Sharing a link
 
