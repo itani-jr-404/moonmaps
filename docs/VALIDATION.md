@@ -1,8 +1,8 @@
 # Moon Maps: validation report
 
-Team Lunar Titans, NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". Last updated: 15 November 2026.
+Team Lunar Titans, NASA Space Apps Challenge 2026, challenge "Lunar Landing Site Navigator". Last updated: 16 November 2026.
 
-Moon Maps tells you whether a place and a date on the Moon are good for landing: whether the Sun is above the terrain horizon (power) and whether the Earth is above it (a direct radio link). This report shows how we checked that the app works and that its numbers are right. Every result was produced by running the code on 14 or 15 November 2026, and each one names the command, dataset or publication behind it. The 0.05 degree tolerance for the JPL Horizons comparisons was set in our design documents before any comparison ran, and the pass rule for NASA's maps was written into the script before its first run. Where a first comparison did not agree, the report says so. Section 10 lists what we have not yet checked.
+Moon Maps tells you whether a place and a date on the Moon are good for landing: whether the Sun is above the terrain horizon (power) and whether the Earth is above it (a direct radio link). This report shows how we checked that the app works and that its numbers are right. Every result was produced by running the code on 14, 15 or 16 November 2026, and each one names the command, dataset or publication behind it. The 0.05 degree tolerance for the JPL Horizons comparisons was set in our design documents before any comparison ran, and the pass rule for NASA's maps was written into the script before its first run. Where a first comparison did not agree, the report says so. Section 10 lists what we have not yet checked.
 
 The repository is https://github.com/itani-jr-404/moonmaps. Links into it, including the test runs, open once the repository is public for the submission. The method behind the science checks is in [science/validation.md](science/validation.md).
 
@@ -10,7 +10,7 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 
 | Check | Pass rule | Result | Section |
 | --- | --- | --- | --- |
-| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 97 API tests (with the NASA data, none skipped), 173 web unit tests and 20 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
+| Automated tests, lint, type check, build, contract | All pass, with none skipped | **Pass.** 97 API tests (with the NASA data, none skipped), 180 web unit tests and 20 end-to-end browser tests pass; lint, type check, production build and contract check pass. GitHub Actions runs all of them on every change. | [1](#1-automated-tests) |
 | Sun and Earth positions against NASA JPL Horizons, 2026 | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference 0.0001 degrees | [2](#2-positions-against-nasa-jpl-horizons) |
 | Sun elevation at 16 Apollo moonwalk times (1969 to 1972) against JPL Horizons | Within 0.05 degrees | **Pass.** 16 of 16 cases; largest difference under 0.005 degrees | [3](#3-past-missions) |
 | Long-term sunlight against NASA Goddard's polar illumination map | Mean absolute difference at most 0.10 and correlation at least 0.90 | **Pass.** Mean absolute difference 0.006, correlation 0.992, over 300 random points | [4](#4-sunlight-and-earth-visibility-against-nasas-polar-maps) |
@@ -24,11 +24,11 @@ The repository is https://github.com/itani-jr-404/moonmaps. Links into it, inclu
 
 ## 1. Automated tests
 
-Commands, run from the repository root on 15 November 2026, with the NASA data downloaded:
+Commands, run from the repository root on 16 November 2026, with the NASA data downloaded:
 
 ```bash
 cd apps/api && uv run pytest -v          # 97 passed
-pnpm test                                 # 173 passed (27 files)
+pnpm test                                 # 180 passed (29 files)
 pnpm lint && pnpm typecheck               # no errors
 pnpm build                                # production build succeeds
 pnpm contracts:check                      # API models, openapi.json and api.d.ts agree
@@ -59,9 +59,9 @@ Continuous integration on GitHub Actions (https://github.com/itani-jr-404/moonma
 | `tests/test_assistant.py` (28) | The chat endpoint with a scripted model: tool calls, guardrails, limits and errors |
 | `tests/test_error_budget.py` (13) | The error study's helpers (Section 13) |
 
-### Web tests (Vitest), 173 passed
+### Web tests (Vitest), 180 passed
 
-173 tests in 27 files, next to the code they test. The list of files and what each proves is in [developer/testing.md](developer/testing.md#web-tests-vitest).
+180 tests in 29 files, next to the code they test. The list of files and what each proves is in [developer/testing.md](developer/testing.md#web-tests-vitest).
 
 ## 2. Positions against NASA JPL Horizons
 

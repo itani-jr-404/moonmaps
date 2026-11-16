@@ -1,0 +1,439 @@
+/*
+  The Future scope boxes. The two illustrations loop on CSS animations and can be paused. The
+  resting style of every element is its last frame, so with reduced motion (animations off) the
+  box shows the finished picture.
+*/
+
+.box {
+  margin-top: 20px;
+  padding: 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  background: rgb(6 12 30 / 0.45);
+  container-type: inline-size;
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.box .label {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-sun);
+}
+/* At least 24 px high, the smallest target size WCAG 2.2 allows (success criterion 2.5.8). */
+.pause {
+  min-height: 24px;
+  margin: -6px -8px -6px 0;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.pause:hover {
+  color: var(--color-ink);
+}
+.box[data-paused] .loop {
+  animation-play-state: paused;
+}
+.box svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+}
+.box p.caption {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--color-faint);
+}
+.svgText {
+  font-family: var(--font-body);
+  font-size: 9px;
+  fill: var(--color-muted);
+}
+/* In a narrow box the picture is scaled down, so its words are set larger to stay readable. */
+@container (max-width: 340px) {
+  .box svg:not(.square) .svgText {
+    font-size: 11px;
+  }
+}
+
+/* Shared timing: one 9 s loop. */
+.loop {
+  animation-duration: 9s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+/* ---------- 05: watching the site during the flight ---------- */
+
+.scan {
+  opacity: 0;
+  animation-name: scan;
+}
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  36% {
+    transform: translateY(126px);
+    opacity: 1;
+  }
+  40%,
+  100% {
+    transform: translateY(126px);
+    opacity: 0;
+  }
+}
+.scanLabel {
+  opacity: 0;
+  animation-name: scanLabel;
+}
+@keyframes scanLabel {
+  0%,
+  2% {
+    opacity: 0;
+  }
+  6%,
+  36% {
+    opacity: 1;
+  }
+  42%,
+  100% {
+    opacity: 0;
+  }
+}
+.fresh {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: fresh;
+}
+/* The scan line crosses the crater between 16 % and 19 % of the loop. */
+@keyframes fresh {
+  0%,
+  16% {
+    transform: scale(0);
+  }
+  19% {
+    transform: scale(1.25);
+  }
+  22%,
+  100% {
+    transform: scale(1);
+  }
+}
+.pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation-name: pulse;
+}
+@keyframes pulse {
+  0%,
+  38% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.9;
+  }
+  56% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.siteA {
+  stroke: var(--color-sun);
+  animation-name: siteA;
+}
+@keyframes siteA {
+  0%,
+  38% {
+    stroke: var(--color-ok);
+  }
+  44%,
+  100% {
+    stroke: var(--color-sun);
+  }
+}
+.siteADot {
+  fill: var(--color-sun);
+  animation-name: siteADot;
+}
+@keyframes siteADot {
+  0%,
+  38% {
+    fill: var(--color-ok);
+  }
+  44%,
+  100% {
+    fill: var(--color-sun);
+  }
+}
+.warn {
+  animation-name: warn;
+}
+@keyframes warn {
+  0%,
+  40% {
+    opacity: 0;
+  }
+  46%,
+  100% {
+    opacity: 1;
+  }
+}
+.route {
+  stroke-dasharray: 4 4;
+  animation-name: route;
+}
+@keyframes route {
+  0%,
+  52% {
+    opacity: 0;
+  }
+  58%,
+  100% {
+    opacity: 1;
+  }
+}
+.siteB {
+  stroke: var(--color-ok);
+  animation-name: siteB;
+}
+@keyframes siteB {
+  0%,
+  62% {
+    stroke: var(--color-accent-2);
+  }
+  68%,
+  100% {
+    stroke: var(--color-ok);
+  }
+}
+.siteBDot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: siteBDot;
+}
+@keyframes siteBDot {
+  0%,
+  62% {
+    transform: scale(0);
+  }
+  68%,
+  100% {
+    transform: scale(1);
+  }
+}
+.ok {
+  animation-name: ok;
+}
+@keyframes ok {
+  0%,
+  66% {
+    opacity: 0;
+  }
+  72%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------- 06: the best spot in an area ---------- */
+
+.l1 {
+  animation-name: l1;
+}
+.l2 {
+  animation-name: l2;
+}
+.l3 {
+  animation-name: l3;
+}
+.dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: dot;
+}
+.window {
+  animation-name: window;
+}
+.cursor {
+  animation-name: cursor;
+}
+.answer {
+  animation-name: answer;
+}
+@keyframes l1 {
+  0%,
+  4% {
+    opacity: 0;
+  }
+  10%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes l2 {
+  0%,
+  18% {
+    opacity: 0;
+  }
+  24%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes l3 {
+  0%,
+  32% {
+    opacity: 0;
+  }
+  38%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes dot {
+  0%,
+  44% {
+    transform: scale(0);
+  }
+  48% {
+    transform: scale(1.4);
+  }
+  52%,
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes cursor {
+  0%,
+  54% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  56% {
+    opacity: 1;
+  }
+  80% {
+    transform: translateX(140px);
+    opacity: 1;
+  }
+  83%,
+  100% {
+    transform: translateX(140px);
+    opacity: 0;
+  }
+}
+@keyframes window {
+  0%,
+  64% {
+    opacity: 0;
+  }
+  70%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes answer {
+  0%,
+  80% {
+    opacity: 0;
+  }
+  86%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------- 07: emergency landing mode ---------- */
+
+.box svg.square {
+  max-width: 260px;
+  margin-inline: auto;
+}
+.box p.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--color-faint);
+}
+.key {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+.keyCraft {
+  border: 1px dashed #fff;
+}
+.box p.note {
+  margin-top: 10px;
+  padding-left: 10px;
+  border-left: 2px solid var(--color-sun);
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.fields {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.field {
+  display: grid;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--color-faint);
+}
+.field b {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.field input {
+  width: 100%;
+  accent-color: var(--color-accent);
+}
+.draw {
+  stroke-dasharray: 1;
+  animation: draw 0.9s ease-out both;
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loop {
+    animation: none;
+  }
+  .scan,
+  .scanLabel,
+  .pulse,
+  .cursor {
+    opacity: 0;
+  }
+}

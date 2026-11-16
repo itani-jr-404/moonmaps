@@ -34,9 +34,12 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
+    // Tuned by hand so the page answers the wheel quickly: each wheel step moves the page 1.4
+    // times its own distance, and the page closes about a quarter of the remaining gap on each
+    // frame, so it settles in roughly 0.2 s. Options: https://github.com/darkroomengineering/lenis
     const l = new Lenis({
-      lerp: 0.16,
-      wheelMultiplier: 1.05,
+      lerp: 0.24,
+      wheelMultiplier: 1.4,
       smoothWheel: true,
     });
     l.on('scroll', ScrollTrigger.update);

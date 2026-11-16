@@ -1,6 +1,6 @@
 # Current state
 
-Last updated: 2026-11-15.
+Last updated: 2026-11-16.
 
 This file says what is real today. Update it in every pull request that builds, removes or postpones something.
 
@@ -23,13 +23,13 @@ The API is built for the core calculation: sites, analysis of up to four scenari
 | API: visibility, windows, metrics, status | Built, with the starting thresholds |
 | API: scripts | `download_data.py`, `precompute_horizons.py`, `fetch_horizons.py`, `export_openapi.py` |
 | API: tests | 97 tests pass (`uv run pytest -q`, 2026-11-15), including the JPL Horizons comparisons for 2026 and for the Apollo moonwalks |
-| Web: unit tests | 173 Vitest tests in 27 files pass (`pnpm test`, 2026-11-15) |
+| Web: unit tests | 180 Vitest tests in 29 files pass (`pnpm test`, 2026-11-16) |
 | Web: end-to-end tests | 20 Playwright tests in 5 files pass: the screens show exactly what the API returns, and the assistant panel and the site assistant work with a mocked chat endpoint (2026-11-15) |
 | Validation | Positions match JPL Horizons (32 cases, 1969 to 2026); long-term sunlight and Earth visibility match NASA Goddard's polar maps at 310 points (mean absolute difference 0.006). See [VALIDATION.md](VALIDATION.md). |
 | API: Dockerfile | `apps/api/Dockerfile`; downloads the data and builds the site horizons at image build time. The deployed API runs from it |
 | Deployment | Vercel deploys `main`. Web app: https://moonmaps.vercel.app. API: https://moonmaps-api.vercel.app, a container built from `apps/api/Dockerfile` (`apps/api/vercel.json`), with interactive documentation at `/docs`. See [developer/deployment.md](developer/deployment.md) |
 | Sites | 17 curated sites in `apps/api/app/data/sites.json`. See [data/sites.md](data/sites.md) |
-| Web: pages | Home (`/`), Choose a landing (`/explore`), Planner (`/planner`), Sites (`/sites`), a page per site (`/sites/<id>`, `/sites/spot?lat=&lon=`) with the outlook, a 14-day sky forecast, a horizon panorama, a shaded elevation map of the ground from `GET /terrain`, travel times and a site assistant, Accuracy (`/accuracy`) and About (`/about`), which ends with a "Future scope" section on three planned ideas (relay satellites, watching the site during the flight, and the best spot in an area). See [frontend/routes-and-state.md](frontend/routes-and-state.md) |
+| Web: pages | Home (`/`), Choose a landing (`/explore`), Planner (`/planner`), Sites (`/sites`), a page per site (`/sites/<id>`, `/sites/spot?lat=&lon=`) with the outlook, a 14-day sky forecast, a horizon panorama, a shaded elevation map of the ground from `GET /terrain`, travel times and a site assistant, Accuracy (`/accuracy`) and About (`/about`), which ends with a "Future scope" section on four planned ideas (relay satellites, watching the site during the flight, the best spot in an area, and an emergency landing mode); the last three each have a small box with made-up data (two looping illustrations with a Pause button, and a simulation), and Home previews them under "Coming next". See [frontend/routes-and-state.md](frontend/routes-and-state.md) |
 | Web: look and navigation | Dark navy page with a still CSS star field; cards lighter than the page with a visible border; the navigation bar is a lighter navy band and lists Home first, on desktop and in the phone menu. On Home the "why the south pole" section comes after the page cards. The footer of every page names team Lunar Titans: Ali Al Itani, Hussein Alassaad, Leonardo Khayyat, Khalil Dandashli, Hassan Korek. Colour tokens and contrast: [frontend/design-system.md](frontend/design-system.md) |
 | Learning from past data | A ridge regression learns how the app's long-term sunlight and Earth visibility differ from NASA's polar maps (300 points, cross-validated); `GET /accuracy` reports the error before and after, and the Apollo comparison. See [VALIDATION.md](VALIDATION.md) and [ADR-014](decisions/ADR-014-calibration.md) |
 | Past missions | `GET /missions`: launch and landing times with sources, used for travel times. `GET /missions/departures`: when to leave Earth to land at a given time, for each past mission's travel time; the site page uses it for the next good window |

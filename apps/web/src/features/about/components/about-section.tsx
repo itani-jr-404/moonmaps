@@ -1,4 +1,9 @@
 import styles from './about-section.module.css';
+import { EmergencyDemo } from '@/features/future-scope/components/emergency-demo';
+import {
+  BestSpotDemo,
+  FlightCheckDemo,
+} from '@/features/future-scope/components/future-demos';
 
 /*
   What the app does, the idea behind it, and its limits. Keep this text true to the app:
@@ -106,7 +111,10 @@ export function AboutSection() {
             </span>
           </h2>
         </div>
-        <div className={styles.grid} aria-labelledby="future-h">
+        <div
+          className={`${styles.grid} ${styles.two}`}
+          aria-labelledby="future-h"
+        >
           <div className={styles.col} data-reveal>
             <span className={styles.n}>04</span>
             <h3>Relay satellites</h3>
@@ -127,6 +135,7 @@ export function AboutSection() {
               new orbital images and hazard data, such as a fresh impact crater,
               so the crew can pick another site before landing.
             </p>
+            <FlightCheckDemo />
           </div>
           <div className={styles.col} data-reveal>
             <span className={styles.n}>06</span>
@@ -139,6 +148,20 @@ export function AboutSection() {
               a sliding window over time finds the longest good run at each
               point.
             </p>
+            <BestSpotDemo />
+          </div>
+          <div className={styles.col} data-reveal>
+            <span className={styles.n}>07</span>
+            <h3>Emergency landing mode</h3>
+            <p>
+              If the planned site turns bad late in the flight, for example when
+              the Earth drops behind a ridge, Moon Maps would take the
+              craft&apos;s position and point at once to the nearest spot with
+              the Sun and the Earth in view. In this simulation you set the
+              position yourself: the distance from the site, the angle from the
+              site&apos;s vertical and the direction of that angle.
+            </p>
+            <EmergencyDemo />
           </div>
         </div>
       </div>

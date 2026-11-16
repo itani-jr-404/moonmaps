@@ -1,6 +1,6 @@
 # Testing
 
-Status: Built. Last updated: 2026-11-15.
+Status: Built. Last updated: 2026-11-16.
 
 What we test, where, and what must pass before a change is merged. The reasoning behind the science checks is in [science/validation.md](../science/validation.md).
 
@@ -38,11 +38,12 @@ Run from `apps/web`: `pnpm build && pnpm test:e2e`. Playwright starts the API an
 
 ## Web tests (Vitest)
 
-In `apps/web/src`, next to the code, as `*.test.ts` and `*.test.tsx`. Run with `pnpm test` from the root. Vitest uses jsdom (`apps/web/vitest.config.ts`). On 2026-11-15, 173 tests in 27 files pass. They cover:
+In `apps/web/src`, next to the code, as `*.test.ts` and `*.test.tsx`. Run with `pnpm test` from the root. Vitest uses jsdom (`apps/web/vitest.config.ts`). On 2026-11-16, 180 tests in 29 files pass. They cover:
 
 | Area | Tests |
 | --- | --- |
 | `lib/format` | Durations, coordinates, angles, UTC times and trip lengths format as expected |
+| `features/future-scope` | The Future scope illustrations carry their "made-up data" labels and descriptions, the flight-check caption names the camera and the radio band, and the Pause button stops and restarts the loop and is absent with reduced motion; the emergency simulation turns distance and two angles into a ground point and height, picks the nearest spot marked good with its bearing, shows its legend and a letter on each spot, and shows the answer only after the button is pressed |
 | `features/sites` | The outlook and panorama helpers; the elevation map's colour ramp, hill shading, pixels, scale bar and grid names; the "Right now" distance rows (label, value, note, loading, error); "When to leave Earth" in "Getting there" (loading, no good window, the API's departure times at the next window start, error with retry) |
 | `lib/state/url-sync` | A place and a time round-trip through the URL; a bad URL falls back safely |
 | `lib/routes` | The active page, and the links to a site's page and to the planner |
