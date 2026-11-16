@@ -1,6 +1,6 @@
 # Repository structure
 
-Status: Built. Last updated: 2026-11-16.
+Status: Built. Last updated: 2026-11-15.
 
 One repository holds the web app, the API and the contract between them. The root is a pnpm workspace (`pnpm-workspace.yaml`: `apps/web`, `packages/contracts`); the API is a separate uv project.
 
@@ -22,7 +22,6 @@ moon-maps/
                                   horizon panorama, elevation map, distances, travel times
           accuracy/               the accuracy page
           about/                  what the app does and how
-          future-scope/           the Future scope illustrations and simulation (about, home)
           assistant/              the chat panel on every page
           site-assistant/         the assistant on each site's page
           site-chrome/            navigation, footer, cursor, reveal effects

@@ -1,4 +1,4 @@
-import { FuturePreview } from '@/features/future-scope/components/future-preview';
+import { FuturePreview } from '@/features/about/components/future-demos';
 import { HeroSection } from '@/features/hero/components/hero-section';
 import { HomeCards } from '@/features/home/components/home-cards';
 import { WhySection } from '@/features/why/components/why-section';

@@ -1,9 +1,5 @@
 import styles from './about-section.module.css';
-import { EmergencyDemo } from '@/features/future-scope/components/emergency-demo';
-import {
-  BestSpotDemo,
-  FlightCheckDemo,
-} from '@/features/future-scope/components/future-demos';
+import { BestSpotDemo, EmergencyDemo, FlightCheckDemo } from './future-demos';
 
 /*
   What the app does, the idea behind it, and its limits. Keep this text true to the app:
@@ -112,7 +108,7 @@ export function AboutSection() {
           </h2>
         </div>
         <div
-          className={`${styles.grid} ${styles.two}`}
+          className="grid gap-6 min-[1000px]:grid-cols-2"
           aria-labelledby="future-h"
         >
           <div className={styles.col} data-reveal>

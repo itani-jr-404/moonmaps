@@ -28,7 +28,7 @@ Commands, run from the repository root on 16 November 2026, with the NASA data d
 
 ```bash
 cd apps/api && uv run pytest -v          # 97 passed
-pnpm test                                 # 180 passed (29 files)
+pnpm test                                 # 180 passed (28 files)
 pnpm lint && pnpm typecheck               # no errors
 pnpm build                                # production build succeeds
 pnpm contracts:check                      # API models, openapi.json and api.d.ts agree
@@ -61,7 +61,7 @@ Continuous integration on GitHub Actions (https://github.com/itani-jr-404/moonma
 
 ### Web tests (Vitest), 180 passed
 
-180 tests in 29 files, next to the code they test. The list of files and what each proves is in [developer/testing.md](developer/testing.md#web-tests-vitest).
+180 tests in 28 files, next to the code they test. The list of files and what each proves is in [developer/testing.md](developer/testing.md#web-tests-vitest).
 
 ## 2. Positions against NASA JPL Horizons
 

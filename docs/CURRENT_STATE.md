@@ -23,7 +23,7 @@ The API is built for the core calculation: sites, analysis of up to four scenari
 | API: visibility, windows, metrics, status | Built, with the starting thresholds |
 | API: scripts | `download_data.py`, `precompute_horizons.py`, `fetch_horizons.py`, `export_openapi.py` |
 | API: tests | 97 tests pass (`uv run pytest -q`, 2026-11-15), including the JPL Horizons comparisons for 2026 and for the Apollo moonwalks |
-| Web: unit tests | 180 Vitest tests in 29 files pass (`pnpm test`, 2026-11-16) |
+| Web: unit tests | 180 Vitest tests in 28 files pass (`pnpm test`, 2026-11-16) |
 | Web: end-to-end tests | 20 Playwright tests in 5 files pass: the screens show exactly what the API returns, and the assistant panel and the site assistant work with a mocked chat endpoint (2026-11-15) |
 | Validation | Positions match JPL Horizons (32 cases, 1969 to 2026); long-term sunlight and Earth visibility match NASA Goddard's polar maps at 310 points (mean absolute difference 0.006). See [VALIDATION.md](VALIDATION.md). |
 | API: Dockerfile | `apps/api/Dockerfile`; downloads the data and builds the site horizons at image build time. The deployed API runs from it |
